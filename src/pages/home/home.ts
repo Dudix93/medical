@@ -9,8 +9,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 export class HomePage {
 
   users: any;
-
-  user = {name: ''}
+  user = {name: '', id:''}
 
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider) {
     this.getUsers();
@@ -25,10 +24,20 @@ export class HomePage {
 
   saveUser() {
     this.restapiService.saveUser(this.user).then((result) => {
-      console.log(result);
+      console.log(this.user);
       this.getUsers();
     }, (err) => {
       console.log(err);
     });
+  }
+
+  deleteUser() {
+    this.restapiService.deleteUser(this.user);
+    // .then((result) => {
+    //   console.log(result);
+    //   this.getUsers();
+    // }, (err) => {
+    //   console.log(err);
+    // });
   }
 }

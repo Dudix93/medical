@@ -24,7 +24,7 @@ export class RestapiServiceProvider {
     // }
 
     return new Promise(resolve => {
-      console.log(options);
+      //console.log(options);
       this.http.get(this.apiUrl+'/users',options)
         .map(res => res.json())
         .subscribe(data => {
@@ -49,5 +49,9 @@ export class RestapiServiceProvider {
           reject(err);
         });
     });
+  }
+
+  deleteUser(data){
+    console.log(data);
   }
 }

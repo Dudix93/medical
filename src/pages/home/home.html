@@ -10,13 +10,12 @@
   <h2>User List</h2>
   <ion-list>
     <ion-item *ngFor="let user of users">
-      {{user.name}}
-      <!-- <form (ngSubmit)="updateUser()">
-        <ion-item>
-          <ion-input type="text" [(ngModel)]="user.name" name="name"></ion-input>
-        </ion-item>
-        <button ion-button small type="submit" block>Update User</button>
-      </form> -->
+      <ion-item>{{user.name}}</ion-item>
+      <ion-item>
+
+          <button ion-button small (click)="deleteUser(user)" block>Delete User</button>
+        
+      </ion-item>
     </ion-item>
   </ion-list>
 <br>
