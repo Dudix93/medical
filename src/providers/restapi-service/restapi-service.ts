@@ -12,19 +12,20 @@ export class RestapiServiceProvider {
   constructor(public http: Http) {}
 
   getUsers() {
-    // let headers = new Headers();
-    // headers.append('Accept', 'application/json');
-    // headers.append('Content-Type', 'application/json');
-    // headers.append('Access-Control-Allow-Origin', '*');
-    // headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    // let options = new RequestOptions({headers:headers});
+    let headers = new Headers();
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+    headers.append('Access-Control-Allow-Origin', '*');
+    headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    let options = new RequestOptions({headers:headers});
 
-    if (this.data) {
-      return Promise.resolve(this.data);
-    }
+    // if (this.data) {
+    //   return Promise.resolve(this.data);
+    // }
 
     return new Promise(resolve => {
-      this.http.get(this.apiUrl+'/users')
+      console.log(options);
+      this.http.get(this.apiUrl+'/users',options)
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -34,11 +35,11 @@ export class RestapiServiceProvider {
   }
 
   saveUser(data) {
-    // let headers = new Headers();
-    // headers.append('Content-Type', 'application/json');
-    // headers.append('Access-Control-Allow-Origin', '*');
-    // headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    // let options = new RequestOptions({ headers: headers});
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    headers.append('Access-Control-Allow-Origin', '*');
+    headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    let options = new RequestOptions({ headers: headers});
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.http.post(this.apiUrl+'/users', data)

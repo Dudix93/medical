@@ -24,7 +24,6 @@ export class HomePage {
   }
 
   saveUser() {
-    console.log(this.user);
     this.restapiService.saveUser(this.user).then((result) => {
       console.log(result);
       this.getUsers();
