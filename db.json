@@ -1,0 +1,26 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "hello"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "dzik"
+    },
+    {
+      "id": 2,
+      "name": "dodo"
+    },
+    {
+      "name": "gfgsdf",
+      "id": 3
+    },
+    {
+      "name": "fgdgsd",
+      "id": 4
+    }
+  ]
+}
