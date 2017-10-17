@@ -31,13 +31,12 @@ export class HomePage {
     });
   }
 
-  deleteUser() {
-    this.restapiService.deleteUser(this.user);
-    // .then((result) => {
-    //   console.log(result);
-    //   this.getUsers();
-    // }, (err) => {
-    //   console.log(err);
-    // });
+  deleteUser(id:String) {
+    this.restapiService.deleteUser(id).then((result) => {
+      console.log(result);
+      this.getUsers();
+    }, (err) => {
+      console.log(err);
+    });
   }
 }

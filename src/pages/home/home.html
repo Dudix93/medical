@@ -9,18 +9,18 @@
 <ion-content padding>
   <h2>User List</h2>
   <ion-list>
-    <ion-item *ngFor="let user of users">
-      {{user.name}}
-      <button ion-button small (click)="deleteUser(user.name)">Delete User</button>
+    <ion-item *ngFor="let u of users">
+      {{u.name}}
+      <button ion-button small (click)="deleteUser(u.id)">Delete User</button>
     </ion-item>
   </ion-list>
 <br>
-  <h2>Add User</h2>
-  <form (ngSubmit)="saveUser()">
-    <ion-item>
-      <ion-label>Name</ion-label>
-      <ion-input type="text" [(ngModel)]="user.name" name="name"></ion-input>
-    </ion-item>
-    <button ion-button type="submit" block>Add User</button>
-  </form>
+<h2>Add User</h2>
+<form (ngSubmit)="saveUser()">
+  <ion-item>
+    <ion-label>Name</ion-label>
+    <ion-input type="text" [(ngModel)]="user.name" name="name"></ion-input>
+  </ion-item>
+  <button ion-button type="submit">Add User</button>
+</form>
 </ion-content>

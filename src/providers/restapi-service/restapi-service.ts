@@ -48,5 +48,13 @@ export class RestapiServiceProvider {
 
   deleteUser(data){
     console.log(data);
+    return new Promise((resolve, reject) => {
+      this.http.delete(this.apiUrl+'/users/'+data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+    });
   }
 }
