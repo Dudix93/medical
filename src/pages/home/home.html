@@ -11,7 +11,7 @@
   <ion-list>
     <ion-item *ngFor="let u of users">
       {{u.name}}
-      <button ion-button small (click)="deleteUser(u.id)">Delete User</button>
+      <button ion-button small (click)="deleteUser(u.id)">Delete</button>
     </ion-item>
   </ion-list>
 <br>
@@ -21,6 +21,6 @@
     <ion-label>Name</ion-label>
     <ion-input type="text" [(ngModel)]="user.name" name="name"></ion-input>
   </ion-item>
-  <button ion-button type="submit">Add User</button>
+  <button ion-button type="submit">Add</button>
 </form>
 </ion-content>

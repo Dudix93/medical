@@ -8,7 +8,6 @@ export class RestapiServiceProvider {
   data:any;
   apiUrl = 'http://localhost:3000';
   //apiUrl = 'https://my-json-server.typicode.com/Dudix93/raportowanie';
-  //apiUrl = 'https://jsonplaceholder.typicode.com';
   constructor(public http: Http) {}
 
   getUsers() {

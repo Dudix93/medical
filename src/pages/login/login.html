@@ -1,0 +1,28 @@
+
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Logowanie</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form (ngSubmit)="login()">
+    
+    <ion-item>
+      <ion-label>API</ion-label>
+      <ion-input type="text" name="apiUrl"></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-label>Login</ion-label>
+        <ion-input type="text" name="login"></ion-input>        
+    </ion-item>
+    <ion-item>
+        <ion-label>Hasło</ion-label>
+        <ion-input type="text" name="password"></ion-input>    
+    </ion-item>
+    <button ion-button type="submit">Zaloguj</button>
+  </form>
+</ion-content>

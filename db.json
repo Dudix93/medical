@@ -23,4 +23,16 @@
       "id": 4
     }
   ]
+  "uzytkownicy": [
+    {
+      "id": 1,
+      "login": "dodo",
+      "haslo": "dodo123"
+    },
+    {
+      "id": 2,
+      "login": "dodzik",
+      "haslo": "abc123"
+    }
+  ]
 }
