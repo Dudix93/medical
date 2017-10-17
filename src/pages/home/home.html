@@ -10,12 +10,8 @@
   <h2>User List</h2>
   <ion-list>
     <ion-item *ngFor="let user of users">
-      <ion-item>{{user.name}}</ion-item>
-      <ion-item>
-
-          <button ion-button small (click)="deleteUser(user)" block>Delete User</button>
-        
-      </ion-item>
+      {{user.name}}
+      <button ion-button small (click)="deleteUser(user.name)">Delete User</button>
     </ion-item>
   </ion-list>
 <br>
