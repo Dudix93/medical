@@ -18,11 +18,12 @@ export class LoginPage {
   }
 
   login() {
-    //console.log(this.credentials);
+    console.log(this.credentials);
     this.restapiService.getUsers()
     .then(data => {
       this.correct=false;
       this.users = data;
+      console.log(this.users);
       for (var item of this.users) {
         if(item.login == this.credentials.login){
           if(item.password == this.credentials.password){

@@ -9,7 +9,7 @@
 <ion-content padding>
   <h2>Tasks List</h2>
   <ion-list>
-    <ion-item *ngFor="let t of tasks">
+    <ion-item *ngFor="let t of tasks,let i = index">
       {{t.title}}
       <button ion-button small (click)="deleteTask(t.id)">Delete</button>
     </ion-item>
