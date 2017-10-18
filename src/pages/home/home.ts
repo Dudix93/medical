@@ -8,33 +8,33 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 })
 export class HomePage {
 
-  users: any;
-  user = {name: '', id:''}
+  tasks: any;
+  task = {title: '', id:''}
 
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider) {
-    this.getUsers();
+    this.getTasks();
   }
 
-  getUsers() {
-    this.restapiService.getUsers()
+  getTasks() {
+    this.restapiService.getTasks()
     .then(data => {
-      this.users = data;
+      this.tasks = data;
     });
   }
 
-  saveUser() {
-    this.restapiService.saveUser(this.user).then((result) => {
-      console.log(this.user);
-      this.getUsers();
+  saveTask() {
+    this.restapiService.saveTask(this.task).then((result) => {
+      console.log(this.task);
+      this.getTasks();
     }, (err) => {
       console.log(err);
     });
   }
 
-  deleteUser(id:String) {
-    this.restapiService.deleteUser(id).then((result) => {
+  deleteTask(id:String) {
+    this.restapiService.deleteTask(id).then((result) => {
       console.log(result);
-      this.getUsers();
+      this.getTasks();
     }, (err) => {
       console.log(err);
     });

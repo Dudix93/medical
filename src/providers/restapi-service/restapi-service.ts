@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Response, RequestOptions, Headers, Http } from '@angular/http';
+import { Response, Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -11,6 +11,18 @@ export class RestapiServiceProvider {
   constructor(public http: Http) {}
 
   getUsers() {
+    return new Promise(resolve => {
+      //console.log(options);
+      this.http.get(this.apiUrl+'/users')
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+    });
+  }
+
+  getTasks() {
     // let headers = new Headers();
     // headers.append('Accept', 'application/json');
     // headers.append('Content-Type', 'application/json');
@@ -24,7 +36,7 @@ export class RestapiServiceProvider {
 
     return new Promise(resolve => {
       //console.log(options);
-      this.http.get(this.apiUrl+'/users')
+      this.http.get(this.apiUrl+'/tasks')
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -33,10 +45,10 @@ export class RestapiServiceProvider {
     });
   }
 
-  saveUser(data) {
+  saveTask(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
-      this.http.post(this.apiUrl+'/users', data)
+      this.http.post(this.apiUrl+'/tasks', data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -45,10 +57,10 @@ export class RestapiServiceProvider {
     });
   }
 
-  deleteUser(data){
+  deleteTask(data){
     console.log(data);
     return new Promise((resolve, reject) => {
-      this.http.delete(this.apiUrl+'/users/'+data)
+      this.http.delete(this.apiUrl+'/tasks/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {

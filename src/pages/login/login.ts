@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { Router } from '@angular/router';
+import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
+import { HomePage } from '../home/home';
 
 @IonicPage()
 @Component({
@@ -9,14 +10,21 @@ import { Router } from '@angular/router';
 })
 export class LoginPage {
 
+  users:any
   credentials = {apiUrl:'', login: '', password:''}
+  corect:boolean
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public router: Router) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider) {
   }
 
   login() {
-    console.log(this.credentials);
-    //this.router.navigate(['/home']);
+    //console.log(this.credentials);
+    this.restapiService.getUsers()
+    .then(data => {
+      this.users = data;
+      console.log(data);
+    });
+    //this.navCtrl.push(HomePage);
   }
 
 }
