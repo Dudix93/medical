@@ -12,7 +12,7 @@ export class LoginPage {
 
   users:any
   credentials = {apiUrl:'', login: '', password:''}
-  corect:boolean
+  correct=false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider) {
   }
@@ -21,10 +21,20 @@ export class LoginPage {
     //console.log(this.credentials);
     this.restapiService.getUsers()
     .then(data => {
+      this.correct=false;
       this.users = data;
-      console.log(data);
+      for (var item of this.users) {
+        if(item.login == this.credentials.login){
+          if(item.password == this.credentials.password){
+            this.correct = true;
+            break;
+          }
+        }
+      }
+      if(this.correct == true){
+        this.navCtrl.push(HomePage);
+      }
     });
-    //this.navCtrl.push(HomePage);
   }
 
 }
