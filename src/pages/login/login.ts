@@ -11,12 +11,12 @@ export class LoginPage {
 
   credentials = {apiUrl:'', login: '', password:''}
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public router: Router) {
   }
 
   login() {
     console.log(this.credentials);
-    
+    //this.router.navigate(['/home']);
   }
 
 }
