@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Router } from '@angular/router';
 
 @IonicPage()
 @Component({
@@ -8,11 +9,14 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class LoginPage {
 
+  credentials = {apiUrl:'', login: '', password:''}
+
   constructor(public navCtrl: NavController, public navParams: NavParams) {
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad LoginPage');
+  login() {
+    console.log(this.credentials);
+    
   }
 
 }
