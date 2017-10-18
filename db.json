@@ -1,38 +1,24 @@
 {
-  "posts": [
+  "tasks": [
     {
       "id": 1,
-      "title": "hello"
+      "title": "czynnosc1"
+    },
+    {
+      "id": 2,
+      "title": "czynnosc2"
     }
   ],
   "users": [
     {
       "id": 1,
-      "name": "dzik"
-    },
-    {
-      "id": 2,
-      "name": "dodo"
-    },
-    {
-      "name": "gfgsdf",
-      "id": 3
-    },
-    {
-      "name": "fgdgsd",
-      "id": 4
-    }
-  ],
-  "uzytkownicy": [
-    {
-      "id": 1,
       "login": "dodo",
-      "haslo": "dodo123"
+      "password": "dodo123"
     },
     {
       "id": 2,
       "login": "dodzik",
-      "haslo": "abc123"
+      "password": "dodo123"
     }
   ]
 }
