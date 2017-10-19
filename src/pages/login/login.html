@@ -1,7 +1,7 @@
 
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar hideBackButton>
     <ion-title>Logowanie</ion-title>
   </ion-navbar>
 
@@ -10,11 +10,6 @@
 
 <ion-content padding>
   <form (ngSubmit)="login()">
-    
-    <ion-item>
-      <ion-label>API</ion-label>
-      <ion-input type="text" [(ngModel)]="credentials.apiUrl" name="apiUrl"></ion-input>
-    </ion-item>
     <ion-item>
         <ion-label>Login</ion-label>
         <ion-input type="text" [(ngModel)]="credentials.login" name="login"></ion-input>        

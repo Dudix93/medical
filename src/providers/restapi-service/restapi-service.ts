@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage';
 import { Response, Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 
@@ -9,12 +10,24 @@ export class RestapiServiceProvider {
   apiUrl = 'http://localhost:3000';
   //apiUrl = 'https://projekt-3d99e.firebaseio.com';
   //apiUrl = 'https://my-json-server.typicode.com/Dudix93/raportowanie';
-  constructor(public http: Http) {}
+  constructor(public http: Http, public storage:Storage) {}
 
   getUsers() {
     return new Promise(resolve => {
       //console.log(options);
-      this.http.get(this.apiUrl+'/users.json')
+      this.http.get(this.apiUrl+'/users')
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+    });
+  }
+
+  getUserPreferences() {
+    return new Promise(resolve => {
+      //console.log(options);
+      this.http.get(this.apiUrl+'/preferences')
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -37,11 +50,10 @@ export class RestapiServiceProvider {
 
     return new Promise(resolve => {
       //console.log(options);
-      this.http.get(this.apiUrl+'/tasks.json',options)
+      this.http.get(this.apiUrl+'/tasks',options)
         .map(res => res.json())
         .subscribe(data => {
-          this.data = Array.of(data);
-          console.log(data);
+          this.data = data;
           resolve(this.data);
         });
     });
@@ -50,7 +62,7 @@ export class RestapiServiceProvider {
   saveTask(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
-      this.http.post(this.apiUrl+'/tasks.json', data)
+      this.http.post(this.apiUrl+'/tasks', data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -62,7 +74,7 @@ export class RestapiServiceProvider {
   deleteTask(data){
     console.log(data);
     return new Promise((resolve, reject) => {
-      this.http.delete(this.apiUrl+'/tasks.json/'+data)
+      this.http.delete(this.apiUrl+'/tasks/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {

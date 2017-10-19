@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { Storage } from '@ionic/storage';
 import { NavController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
+import { LoginPage } from '../login/login';
+import { PreferencesPage } from '../preferences/preferences';
 
 @Component({
   selector: 'page-home',
@@ -11,7 +14,11 @@ export class HomePage {
   tasks: any;
   task = {title: '', id:''}
 
-  constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider) {
+  constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
+    // this.storage.set('zalogowany', "dodo");
+    // this.storage.get('zalogowany').then((val) => {
+    //   console.log('Zalogowany jako:', val);
+    // });
     this.getTasks();
   }
 
@@ -38,5 +45,14 @@ export class HomePage {
     }, (err) => {
       console.log(err);
     });
+  }
+
+  logout(){
+    this.storage.set('zalogowany', null);
+    this.navCtrl.push(LoginPage);
+  }
+
+  preferences(){
+    this.navCtrl.push(PreferencesPage);
   }
 }

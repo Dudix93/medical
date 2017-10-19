@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>preferences</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-item *ngFor="let p of preferences">
+    <div *ngIf="p.user_id == loggedUser.id">
+        <form (ngSubmit)="saveUserPreferences()">
+            <ion-item>
+              <ion-label>Poniedziałek</ion-label>
+              <ion-checkbox [(ngModel)]="settings.pon" name="pon"></ion-checkbox>
+            </ion-item>
+            <ion-item>
+                <ion-label>Wtorek</ion-label>
+                <ion-checkbox [(ngModel)]="settings.wt" name="wt"></ion-checkbox>
+            </ion-item>
+            <ion-item>
+                <ion-label>Środa</ion-label>
+                <ion-checkbox [(ngModel)]="settings.sr" name="sr"></ion-checkbox>
+            </ion-item>
+            <ion-item>
+                <ion-label>Czwartek</ion-label>
+                <ion-checkbox [(ngModel)]="settings.czw" name="czw"></ion-checkbox>
+              </ion-item>
+              <ion-item>
+                  <ion-label>Piątek</ion-label>
+                  <ion-checkbox [(ngModel)]="settings.pt" name="pt"></ion-checkbox>
+              </ion-item>
+              <ion-item>
+                  <ion-label>Sobota</ion-label>
+                  <ion-checkbox [(ngModel)]="settings.sob" name="sob"></ion-checkbox>
+              </ion-item>
+              <ion-item>
+                  <ion-label>Niedziela</ion-label>
+                  <ion-checkbox [(ngModel)]="settings.nd" name="nd"></ion-checkbox>
+              </ion-item>
+            
+            <button ion-button type="submit">Zapisz ustawienia</button>
+          </form>
+    </div>
+  </ion-item>
+</ion-content>

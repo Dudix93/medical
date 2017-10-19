@@ -4,21 +4,23 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
-//import { RouterModule } from '@angular/router';
+import { IonicStorageModule } from '@ionic/storage';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { PreferencesPage } from '../pages/preferences/preferences';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    PreferencesPage
   ],
   imports: [
-    //RouterModule,
+    IonicStorageModule.forRoot(),
     BrowserModule,
     IonicModule.forRoot(MyApp),
     HttpModule
@@ -27,7 +29,8 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
   entryComponents: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    PreferencesPage
   ],
   providers: [
     StatusBar,

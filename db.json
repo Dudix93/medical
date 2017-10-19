@@ -1,24 +1,36 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "title": "czynnosc1"
+      "title": "gdsgsdg",
+      "id": 2
     },
     {
-      "id": 2,
-      "title": "czynnosc2"
+      "title": "czynnosc",
+      "id": 4
     }
   ],
   "users": [
     {
-      "id": 1,
       "login": "dodo",
-      "password": "dodo123"
+      "password": "dodo123",
+      "id": 4
     },
     {
-      "id": 2,
       "login": "dodzik",
-      "password": "dodo123"
+      "password": "dodo123",
+      "id": 8
+    }
+  ],
+    "preferences": [
+    {
+      "user_id": "4",
+	  "pon":1,
+	  "wt":1,
+	  "sr":1,
+	  "czw":1,
+	  "pt":1,
+	  "sob":0,
+	  "nd":0,
     }
   ]
 }
