@@ -18,7 +18,12 @@ export class LoginPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage) {
     this.storage.get('zalogowany').then((val) => {
-      console.log('Zalogowany jako:', val);
+      if(val != null){
+        this.navCtrl.push(HomePage);
+        this.storage.get('zalogowany').then((val) => {
+          console.log('Zalogowany jako:', val);
+        });
+      }
     });
   }
 

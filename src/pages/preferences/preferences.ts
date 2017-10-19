@@ -14,7 +14,7 @@ export class PreferencesPage {
   preferences:any;
   loggedUser = {id:'', login:''}
   settings = {user_id:'', pon: '', wt:'', sr:'', czw:'', pt:'', sob:'', nd:''}
-
+  deleteID:any;
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public navParams: NavParams, public storage:Storage) {
     this.getLoggedUser();
     this.getUserPreferences();
@@ -24,7 +24,22 @@ export class PreferencesPage {
     this.restapiService.getUserPreferences()
     .then(data => {
       this.preferences = data;
-      //console.log(data);
+      for (let entry of data) {
+          this.storage.get('zalogowany_id').then((val) => {
+            if(entry.user_id == val){
+              this.deleteID = entry.id;
+              this.settings.user_id = entry.user_id;
+              this.settings.pon = entry.pon;
+              this.settings.wt = entry.wt;
+              this.settings.sr = entry.sr;
+              this.settings.czw = entry.czw;
+              this.settings.pt = entry.pt;
+              this.settings.sob = entry.sob;
+              this.settings.nd = entry.nd;
+              console.log(this.deleteID);
+            }
+          });
+        }
     });
   }
 
@@ -41,11 +56,7 @@ export class PreferencesPage {
 
   saveUserPreferences() {
     console.log(this.settings);
-    // this.restapiService.saveTask(this.days).then((result) => {
-    //   console.log(this.days);
-    //   this.getUserPreferences();
-    // }, (err) => {
-    //   console.log(err);
-    // });
+    this.restapiService.deleteUserPreferences(this.deleteID);
+    this.restapiService.saveUserPreferences(this.settings);
   }
 }

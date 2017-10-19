@@ -49,6 +49,7 @@ export class HomePage {
 
   logout(){
     this.storage.set('zalogowany', null);
+    this.storage.set('zalogowany_id', null);
     this.navCtrl.push(LoginPage);
   }
 

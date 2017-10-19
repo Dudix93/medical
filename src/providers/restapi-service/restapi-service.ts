@@ -82,4 +82,28 @@ export class RestapiServiceProvider {
         });
     });
   }
+
+  saveUserPreferences(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.http.post(this.apiUrl+'/preferences', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+    });
+  }
+
+  deleteUserPreferences(data){
+    console.log(data);
+    return new Promise((resolve, reject) => {
+      this.http.delete(this.apiUrl+'/preferences/'+data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+    });
+  }
 }

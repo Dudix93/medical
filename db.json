@@ -21,16 +21,28 @@
       "id": 8
     }
   ],
-    "preferences": [
+  "preferences": [
     {
+      "id": 1,
       "user_id": "4",
-	  "pon":1,
-	  "wt":1,
-	  "sr":1,
-	  "czw":1,
-	  "pt":1,
-	  "sob":0,
-	  "nd":0,
+      "pon": true,
+      "wt": true,
+      "sr": true,
+      "czw": true,
+      "pt": true,
+      "sob": false,
+      "nd": false
+    },
+    {
+      "user_id": "8",
+      "pon": false,
+      "wt": true,
+      "sr": false,
+      "czw": true,
+      "pt": true,
+      "sob": true,
+      "nd": true,
+      "id": 2
     }
   ]
 }
