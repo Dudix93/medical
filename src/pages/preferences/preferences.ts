@@ -13,7 +13,14 @@ export class PreferencesPage {
 
   preferences:any;
   loggedUser = {id:'', login:''}
-  settings = {user_id:'', pon: '', wt:'', sr:'', czw:'', pt:'', sob:'', nd:''}
+  settings = {user_id:'', 
+              pon: '', ponOd: '', ponDo: '', 
+              wt:'', wtOd: '', wtDo: '',  
+              sr:'', srOd: '', srDo: '',  
+              czw:'', czwOd: '', czwDo: '',  
+              pt:'', ptOd: '', ptDo: '',  
+              sob:'', sobOd: '', sobDo: '',  
+              nd:'', ndOd: '', ndDo: '', }
   deleteID:any;
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public navParams: NavParams, public storage:Storage) {
     this.getLoggedUser();
@@ -24,7 +31,7 @@ export class PreferencesPage {
     this.restapiService.getUserPreferences()
     .then(data => {
       this.preferences = data;
-      for (let entry of data) {
+      for (let entry of this.preferences) {
           this.storage.get('zalogowany_id').then((val) => {
             if(entry.user_id == val){
               this.deleteID = entry.id;
@@ -36,6 +43,22 @@ export class PreferencesPage {
               this.settings.pt = entry.pt;
               this.settings.sob = entry.sob;
               this.settings.nd = entry.nd;
+              
+              this.settings.ponOd = entry.ponOd;
+              this.settings.wtOd = entry.wtOd;
+              this.settings.srOd = entry.srOd;
+              this.settings.czwOd = entry.czwOd;
+              this.settings.ptOd = entry.ptOd;
+              this.settings.sobOd = entry.sobOd;
+              this.settings.ndOd = entry.ndOd;
+
+              this.settings.ponDo = entry.ponDo;
+              this.settings.wtDo = entry.wtDo;
+              this.settings.srDo = entry.srDo;
+              this.settings.czwDo = entry.czwDo;
+              this.settings.ptDo = entry.ptDo;
+              this.settings.sobDo = entry.sobDo;
+              this.settings.ndDo = entry.ndDo;
               console.log(this.deleteID);
             }
           });
