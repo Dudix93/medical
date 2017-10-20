@@ -13,27 +13,32 @@ import { HomePage } from '../home/home';
 export class LoginPage {
 
   users:any
-  credentials = {login: '', password:''}
-  correct=false;
+  apiUrl:string;
+  credentials = {apiUrl: '', login: '', password:''}
+  correct:boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage) {
+    this.storage.get('apiUrl').then((val) => {
+      this.credentials.apiUrl = val;
+    });
     this.storage.get('zalogowany').then((val) => {
       if(val != null){
         this.navCtrl.push(HomePage);
-        this.storage.get('zalogowany').then((val) => {
-          console.log('Zalogowany jako:', val);
-        });
       }
     });
   }
 
   login() {
-    //console.log(this.credentials);
+    console.log("credentials.apiUrl "+this.credentials.apiUrl);
+    //this.storage.set('apiUrl', this.credentials.apiUrl);
+    this.storage.get('apiUrl').then((value) => {
+      console.log("storage apiurl "+value);
+     });
     this.restapiService.getUsers()
     .then(data => {
       this.correct=false;
       this.users = data;
-     // console.log(this.users);
+      console.log(this.users);
       for (var item of this.users) {
         if(item.login == this.credentials.login){
           if(item.password == this.credentials.password){

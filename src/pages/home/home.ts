@@ -13,12 +13,11 @@ export class HomePage {
 
   tasks: any;
   task = {title: '', id:''}
-
+  login:string;
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
-    // this.storage.set('zalogowany', "dodo");
-    // this.storage.get('zalogowany').then((val) => {
-    //   console.log('Zalogowany jako:', val);
-    // });
+    this.storage.get('zalogowany').then((val) => {
+      this.login = val;
+    });
     this.getTasks();
   }
 

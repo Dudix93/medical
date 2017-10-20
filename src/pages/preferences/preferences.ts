@@ -34,9 +34,13 @@ export class PreferencesPage {
       for (let entry of this.preferences) {
           this.storage.get('zalogowany_id').then((val) => {
             if(entry.user_id == val){
+              console.log(entry.user_id);
+              console.log(this.loggedUser.id);
               this.deleteID = entry.id;
               this.settings.user_id = entry.user_id;
               this.settings.pon = entry.pon;
+              // console.log("pon settings: "+this.settings.pon);
+              // console.log("pon entry: "+entry.pon);
               this.settings.wt = entry.wt;
               this.settings.sr = entry.sr;
               this.settings.czw = entry.czw;
@@ -59,7 +63,7 @@ export class PreferencesPage {
               this.settings.ptDo = entry.ptDo;
               this.settings.sobDo = entry.sobDo;
               this.settings.ndDo = entry.ndDo;
-              console.log(this.deleteID);
+              console.log("Do usunięcia: "+this.deleteID);
             }
           });
         }

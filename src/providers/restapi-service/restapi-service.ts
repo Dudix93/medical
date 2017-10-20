@@ -7,32 +7,47 @@ import 'rxjs/add/operator/map';
 export class RestapiServiceProvider {
 
   data:any;
-  apiUrl = 'http://localhost:3000';
+  apiUrl:string;
+  //apiUrl = 'http://localhost:3000';
   //apiUrl = 'https://projekt-3d99e.firebaseio.com';
   //apiUrl = 'https://my-json-server.typicode.com/Dudix93/raportowanie';
-  constructor(public http: Http, public storage:Storage) {}
+  constructor(public http: Http, public storage:Storage){
+
+  }
+
+  // setApiUrl(){
+  //   //this.apiUrl = 'http://localhost:3000';
+  //   this.storage.get('apiUrl').then((value) => {
+  //     this.apiUrl = value;
+  //     console.log(this.apiUrl);
+  //   });
+  // }
 
   getUsers() {
     return new Promise(resolve => {
-      //console.log(options);
-      this.http.get(this.apiUrl+'/users')
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(value);
+        this.http.get(value+'/users')
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });
+      });
     });
   }
 
   getUserPreferences() {
     return new Promise(resolve => {
-      //console.log(options);
-      this.http.get(this.apiUrl+'/preferences')
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.get(value+'/preferences')
         .map(res => res.json())
         .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
+         this.data = data;
+         resolve(this.data);
         });
+       });
     });
   }
 
@@ -49,61 +64,71 @@ export class RestapiServiceProvider {
     // }
 
     return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
       //console.log(options);
-      this.http.get(this.apiUrl+'/tasks',options)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
+      this.http.get(value+'/tasks',options)
+      .map(res => res.json())
+      .subscribe(data => {
+        this.data = data;
+        resolve(this.data);
+      });
+       });
     });
   }
 
   saveTask(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
-      this.http.post(this.apiUrl+'/tasks', data)
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/tasks', data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
           reject(err);
         });
+      });
     });
   }
 
   deleteTask(data){
     console.log(data);
     return new Promise((resolve, reject) => {
-      this.http.delete(this.apiUrl+'/tasks/'+data)
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/tasks/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
           reject(err);
         });
+      });
     });
   }
 
   saveUserPreferences(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
-      this.http.post(this.apiUrl+'/preferences', data)
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/preferences', data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
           reject(err);
-        });
+        });  
+      });
     });
   }
 
   deleteUserPreferences(data){
     console.log(data);
     return new Promise((resolve, reject) => {
-      this.http.delete(this.apiUrl+'/preferences/'+data)
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/preferences/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
           reject(err);
-        });
+        });  
+      });
     });
   }
 }
