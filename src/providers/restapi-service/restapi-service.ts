@@ -59,10 +59,6 @@ export class RestapiServiceProvider {
     headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     let options = new RequestOptions({headers:headers});
 
-    // if (this.data) {
-    //   return Promise.resolve(this.data);
-    // }
-
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
       //console.log(options);
@@ -73,6 +69,20 @@ export class RestapiServiceProvider {
         resolve(this.data);
       });
        });
+    });
+  }
+
+  getProjects() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(value);
+        this.http.get(value+'/projects')
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
     });
   }
 

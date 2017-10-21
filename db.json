@@ -1,52 +1,77 @@
 {
   "tasks": [
     {
-      "title": "czynnosc",
-      "id": 4
+      "title": "czynnosc2",
+	  "project_id": 1,
+      "id": 1
     },
     {
-      "title": "wabalabadubdub",
+      "title": "czynnosc2",
+	  "project_id": 1,
+      "id": 2
+    },
+	{
+      "title": "czynnosc3",
+	  "project_id": 1,
+      "id": 3
+    },
+    {
+      "title": "czynnosc4",
+	  "project_id": 2,
+      "id": 4
+    },
+	{
+      "title": "czynnosc5",
+	  "project_id": 2,
       "id": 5
+    },
+    {
+      "title": "czynnosc6",
+	  "project_id": 2,
+      "id": 6
+    },
+	{
+      "title": "czynnosc7",
+	  "project_id": 3,
+      "id": 7
+    },
+    {
+      "title": "czynnosc8",
+	  "project_id": 3,
+      "id": 8
+    }
+  ],
+  "projects": [
+    {
+      "title": "projekt1",
+      "id": 1
+    },
+    {
+      "title": "projekt2",
+      "id": 2
+    },
+	{
+      "title": "projekt3",
+      "id": 3
     }
   ],
   "users": [
     {
       "login": "dodo",
       "password": "dodo123",
-      "id": 4
+      "projects": [1],
+	  "tasks": [3,2],
+	  "id": 4
     },
     {
       "login": "dodzik",
       "password": "dodo123",
+	  "projects": null,
+	  "tasks": null,
       "id": 8
     }
   ],
   "preferences": [
-    {
-      "user_id": "8",
-      "pon": true,
-      "ponOd": "05:00",
-      "ponDo": "16:30",
-      "wt": true,
-      "wtOd": "08:40",
-      "wtDo": "12:40",
-      "sr": true,
-      "srOd": "08:40",
-      "srDo": "08:40",
-      "czw": true,
-      "czwOd": "08:40",
-      "czwDo": "08:40",
-      "pt": true,
-      "ptOd": "08:40",
-      "ptDo": "08:40",
-      "sob": false,
-      "sobOd": "08:40",
-      "sobDo": "08:40",
-      "nd": false,
-      "ndOd": "11:40",
-      "ndDo": "08:40",
-      "id": 6
-    },
     {
       "user_id": "4",
       "pon": true,
@@ -71,6 +96,31 @@
       "ndOd": "08:00",
       "ndDo": "08:00",
       "id": 7
+    },
+    {
+      "user_id": "8",
+      "pon": false,
+      "ponOd": "05:00",
+      "ponDo": "16:30",
+      "wt": true,
+      "wtOd": "08:40",
+      "wtDo": "12:40",
+      "sr": true,
+      "srOd": "08:40",
+      "srDo": "08:40",
+      "czw": true,
+      "czwOd": "08:40",
+      "czwDo": "08:40",
+      "pt": true,
+      "ptOd": "08:40",
+      "ptDo": "08:40",
+      "sob": false,
+      "sobOd": "08:40",
+      "sobDo": "08:40",
+      "nd": false,
+      "ndOd": "11:40",
+      "ndDo": "08:40",
+      "id": 8
     }
   ]
 }

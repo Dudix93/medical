@@ -14,6 +14,7 @@ export class HomePage {
   tasks: any;
   task = {title: '', id:''}
   login:string;
+  userProjects:Array<any>;
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
@@ -22,7 +23,7 @@ export class HomePage {
   }
 
   getTasks() {
-    this.restapiService.getTasks()
+    this.restapiService.getProjects()
     .then(data => {
       this.tasks = data;
     });
