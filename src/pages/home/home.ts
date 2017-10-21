@@ -10,35 +10,62 @@ import { PreferencesPage } from '../preferences/preferences';
   templateUrl: 'home.html'
 })
 export class HomePage {
-
+  tmp = new Array<any>();
   tasks: any;
+  user: any;
+  projects: any;
   task = {title: '', id:''}
+  userProject = {project:new Array<any>(), userProjectTasks:new Array<any>()}
   login:string;
-  userProjects:Array<any>;
+  userProjects = new Array<any>()
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
-    this.getTasks();
+    this.getUserProjects();
+  }
+
+  getUserProjects() {
+    this.storage.get('zalogowany_id').then((val) => {
+      this.restapiService.getUser(val)
+      .then(data => {
+        this.user = data;
+          this.restapiService.getProjects()
+          .then(data => {
+            this.projects = data;
+            this.restapiService.getTasks()
+            .then(data => {
+              this.tasks = data;
+              for(let userProject of this.user.projects){
+                for(let project of this.projects){
+                  if(project.id == userProject){
+                    this.tmp.push(project);
+                    this.userProject.project = this.tmp;
+                    console.log(this.tmp);
+                    this.userProjects.push(this.userProject);
+                    // for(let userTask of this.user.tasks){
+                    //   for(let projectTasks of project.tasks){
+                    //     if(userTask == projectTasks){
+                    //       this.userProject.userProjectTasks.push(userTask);
+                    //     }
+                    //   }
+                    // }
+                  }
+                  this.userProject.project.length=0;
+                }
+              }
+              console.log(this.userProjects);
+            });
+          });
+      });
+    });
   }
 
   getTasks() {
-    this.restapiService.getProjects()
-    .then(data => {
-      this.tasks = data;
-      for(let t of this.tasks){
-        console.log(t.title);
-      }
-    });
-    // this.storage.get('zalogowany_id').then((val) => {
-    //   this.restapiService.getUser(val)
-    //   .then(data => {
-    //     this.tasks = data;
-    //     for(let t of this.tasks){
-    //       console.log(t.login);
-    //     }
-    //   });
-    // });
+      this.restapiService.getTasks()
+      .then(data => {
+        this.tasks = data;
+      });
   }
 
   saveTask() {
