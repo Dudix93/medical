@@ -37,6 +37,20 @@ export class RestapiServiceProvider {
     });
   }
 
+  getUser(id:number) {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(value);
+        this.http.get(value+'/users/'+id)
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
+
   getUserPreferences() {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {

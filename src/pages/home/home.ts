@@ -26,7 +26,19 @@ export class HomePage {
     this.restapiService.getProjects()
     .then(data => {
       this.tasks = data;
+      for(let t of this.tasks){
+        console.log(t.title);
+      }
     });
+    // this.storage.get('zalogowany_id').then((val) => {
+    //   this.restapiService.getUser(val)
+    //   .then(data => {
+    //     this.tasks = data;
+    //     for(let t of this.tasks){
+    //       console.log(t.login);
+    //     }
+    //   });
+    // });
   }
 
   saveTask() {
