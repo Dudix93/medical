@@ -1,12 +1,12 @@
 {
   "tasks": [
     {
-      "title": "gdsgsdg",
-      "id": 2
-    },
-    {
       "title": "czynnosc",
       "id": 4
+    },
+    {
+      "title": "wabalabadubdub",
+      "id": 5
     }
   ],
   "users": [
@@ -23,26 +23,54 @@
   ],
   "preferences": [
     {
-      "id": 1,
-      "user_id": "4",
+      "user_id": "8",
       "pon": true,
+      "ponOd": "05:00",
+      "ponDo": "16:30",
       "wt": true,
+      "wtOd": "08:40",
+      "wtDo": "12:40",
       "sr": true,
+      "srOd": "08:40",
+      "srDo": "08:40",
       "czw": true,
+      "czwOd": "08:40",
+      "czwDo": "08:40",
       "pt": true,
+      "ptOd": "08:40",
+      "ptDo": "08:40",
       "sob": false,
-      "nd": false
+      "sobOd": "08:40",
+      "sobDo": "08:40",
+      "nd": false,
+      "ndOd": "11:40",
+      "ndDo": "08:40",
+      "id": 6
     },
     {
-      "user_id": "8",
-      "pon": false,
+      "user_id": "4",
+      "pon": true,
+      "ponOd": "07:00",
+      "ponDo": "19:00",
       "wt": true,
-      "sr": false,
+      "wtOd": "09:13",
+      "wtDo": "17:00",
+      "sr": true,
+      "srOd": "08:00",
+      "srDo": "08:00",
       "czw": true,
+      "czwOd": "08:00",
+      "czwDo": "08:00",
       "pt": true,
+      "ptOd": "08:00",
+      "ptDo": "08:00",
       "sob": true,
+      "sobOd": "08:00",
+      "sobDo": "08:00",
       "nd": true,
-      "id": 2
+      "ndOd": "08:00",
+      "ndDo": "08:00",
+      "id": 7
     }
   ]
 }
