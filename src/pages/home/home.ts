@@ -14,8 +14,10 @@ export class HomePage {
   tasks: any;
   user: any;
   projects: any;
+  project:any;
+  userProjectTasks:Array<any>;
   task = {title: '', id:''}
-  userProject = {project:'', userProjectTasks:new Array<any>()}
+  userProject:Array<any>;
   login:string;
   userProjects = new Array<any>()
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
@@ -37,23 +39,23 @@ export class HomePage {
             .then(data => {
               this.tasks = data;
               for(let userProject of this.user.projects){
-                this.userProject.project = userProject;
+                this.userProjectTasks = new Array<any>();
                 for(let project of this.projects){
                   if(project.id == userProject){
                     //console.log(project);
-                    this.userProject.project = project;
+                    this.project = project;
                     for(let userTask of this.user.tasks){
                       for(let projectTasks of project.tasks){
                         if(userTask == projectTasks){
-                          this.userProject.userProjectTasks.push(userTask);
+                          this.userProjectTasks.push(userTask);
                           continue;
                         }
                       }
                     }
-                    console.log(this.userProject.project);
-                    console.log(this.userProject.userProjectTasks);
+                    this.userProject = new Array<any>();
+                    this.userProject.push(this.project);
+                    this.userProject.push(this.userProjectTasks);
                     this.userProjects.push(this.userProject);
-                    this.userProject.userProjectTasks.length = 0 ;
                   }
                 }
               }
