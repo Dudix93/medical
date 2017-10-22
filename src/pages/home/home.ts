@@ -10,12 +10,12 @@ import { PreferencesPage } from '../preferences/preferences';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  tmp = new Array<any>();
+  tmp = '';
   tasks: any;
   user: any;
   projects: any;
   task = {title: '', id:''}
-  userProject = {project:new Array<any>(), userProjectTasks:new Array<any>()}
+  userProject = {project:'', userProjectTasks:new Array<any>()}
   login:string;
   userProjects = new Array<any>()
   constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
@@ -37,21 +37,24 @@ export class HomePage {
             .then(data => {
               this.tasks = data;
               for(let userProject of this.user.projects){
+                this.userProject.project = userProject;
                 for(let project of this.projects){
                   if(project.id == userProject){
-                    this.tmp.push(project);
-                    this.userProject.project = this.tmp;
-                    console.log(this.tmp);
+                    //console.log(project);
+                    this.userProject.project = project;
+                    for(let userTask of this.user.tasks){
+                      for(let projectTasks of project.tasks){
+                        if(userTask == projectTasks){
+                          this.userProject.userProjectTasks.push(userTask);
+                          continue;
+                        }
+                      }
+                    }
+                    console.log(this.userProject.project);
+                    console.log(this.userProject.userProjectTasks);
                     this.userProjects.push(this.userProject);
-                    // for(let userTask of this.user.tasks){
-                    //   for(let projectTasks of project.tasks){
-                    //     if(userTask == projectTasks){
-                    //       this.userProject.userProjectTasks.push(userTask);
-                    //     }
-                    //   }
-                    // }
+                    this.userProject.userProjectTasks.length = 0 ;
                   }
-                  this.userProject.project.length=0;
                 }
               }
               console.log(this.userProjects);
