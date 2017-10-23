@@ -65,6 +65,20 @@ export class RestapiServiceProvider {
     });
   }
 
+  getUserTask() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.get(value+'/userTask')
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
+    });
+  }
+
   getTasks() {
     let headers = new Headers();
     headers.append('Accept', 'application/json');

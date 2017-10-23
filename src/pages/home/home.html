@@ -22,8 +22,8 @@
           </ion-row>
           <ion-row *ngFor="let task of project[1],let i = index">
               <ion-col col-3><ion-label>{{task.title}}</ion-label></ion-col>
-              <ion-col col-3><ion-label><ion-icon name="ios-flag-outline"></ion-icon></ion-label></ion-col>
-              <ion-col col-3><ion-label><ion-icon name="ios-create-outline"></ion-icon></ion-label></ion-col>
+              <ion-col col-3><ion-label><ion-icon name="ios-flag-outline" (click)="finishTask(task.title)"></ion-icon></ion-label></ion-col>
+              <ion-col col-3><ion-label><ion-icon name="ios-create-outline" (click)="updateTask(task.id,task.title)"></ion-icon></ion-label></ion-col>
               <ion-col col-3><ion-label><ion-icon name="ios-hand-outline"></ion-icon></ion-label></ion-col>
           </ion-row>
       </ion-grid>

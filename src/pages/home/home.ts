@@ -10,7 +10,7 @@ import { PreferencesPage } from '../preferences/preferences';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  tmp = '';
+  userTask: any;
   tasks: any;
   user: any;
   projects: any;
@@ -82,6 +82,22 @@ export class HomePage {
       });
   }
 
+  getUserTask(task_id:number) {
+    this.restapiService.getUserTask()
+    .then(data => {
+      this.userTask = data;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTask){
+          if(user_id == task.user_id && task_id == task.task_id){
+            this.userTask = task;
+            console.log(this.userTask);
+            break;
+          }
+        }
+      });
+    });
+}
+
   saveTask() {
     this.restapiService.saveTask(this.task).then((result) => {
       console.log(this.task);
@@ -130,5 +146,61 @@ export class HomePage {
       ]
     });
     actionSheet.present();
+  }
+
+  updateTaskTime(task_id:number, updateTaskTime:number){
+
+  }
+
+  updateTask(task_id:number, task:string) {
+    this.getUserTask(task_id);
+    const alert = this.alertCtrl.create({
+      title: task,
+      message:"<b>Spędzony czas: "+this.userTask.time_spent+" godzin<br>"
+              +"Ostatnia aktualizacja:<br>"
+              +this.userTask.update_date+" o "+this.userTask.update_time+" godzin<br><b>",
+      inputs: [
+      {
+        name: 'updateTaskTime',
+        placeholder: 'Aktualizuj'
+      }
+    ],        
+      buttons: [
+        {
+          text: 'Anuluj',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Aktualizuj',
+          handler: data => {
+            this.updateTaskTime(task_id, data.updateTaskTime);
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  finishTask(task:number) {
+    const alert = this.alertCtrl.create({
+      title: 'Zkończyć '+task+'?',
+      buttons: [
+        {
+          text: 'Anuluj',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Zakończ',
+          handler: () => {
+
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 }
