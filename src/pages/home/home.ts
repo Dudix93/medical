@@ -19,6 +19,14 @@ export class HomePage {
   task = {title: '', id:''}
   userProject:Array<any>;
   login:string;
+  radioButton =      {
+    name: '',
+    label: '',
+    type: "radio",
+    value: "",
+    checked: false
+  }
+  radioButtons:Array<any>;
   userProjects = new Array<any>()
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -148,6 +156,20 @@ export class HomePage {
     actionSheet.present();
   }
 
+  prepareRadioButtons(){
+    this.radioButtons = new Array(); 
+    for(let project of this.projects){
+      for(let task of project.tasks){
+        this.radioButton.label=task;
+        this.radioButton.name=task;
+        this.radioButton.value=task;
+        console.log(this.radioButton);
+        this.radioButtons.push(this.radioButton);
+      }
+    }
+    return this.radioButtons;
+  }
+
   updateTaskTime(task_id:number, updateTaskTime:number){
 
   }
@@ -197,6 +219,29 @@ export class HomePage {
           text: 'Zakończ',
           handler: () => {
 
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  startTask(project:string) {
+    //this.prepareRadioButtons();
+    const alert = this.alertCtrl.create({
+      title: "Czynnosci w "+project,
+      inputs: this.prepareRadioButtons(),        
+      buttons: [
+        {
+          text: 'Anuluj',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Rozpocznij',
+          handler: data => {
+            //this.updateTaskTime(task_id, data.updateTaskTime);
           }
         }
       ]
