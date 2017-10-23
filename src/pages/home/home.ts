@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController } from 'ionic-angular';
+import {   ActionSheetController, AlertController, ToastController, NavController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
@@ -20,14 +20,19 @@ export class HomePage {
   userProject:Array<any>;
   login:string;
   userProjects = new Array<any>()
-  constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public storage:Storage) {
+  constructor(public navCtrl: NavController, 
+              private restapiService: RestapiServiceProvider, 
+              private storage:Storage,
+              private actionSheetCtrl:ActionSheetController,
+              private alertCtrl:AlertController,
+              private toastCtrl:ToastController) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
-    this.getUserProjects();
+    this.getUserProjectsAndTasks();
   }
 
-  getUserProjects() {
+  getUserProjectsAndTasks() {
     this.storage.get('zalogowany_id').then((val) => {
       this.restapiService.getUser(val)
       .then(data => {
@@ -47,8 +52,12 @@ export class HomePage {
                     for(let userTask of this.user.tasks){
                       for(let projectTasks of project.tasks){
                         if(userTask == projectTasks){
-                          this.userProjectTasks.push(userTask);
-                          continue;
+                          for(let task of this.tasks){
+                            if(task.id == projectTasks){
+                              this.userProjectTasks.push(task);
+                              continue;
+                            }
+                          }
                         }
                       }
                     }
@@ -99,5 +108,27 @@ export class HomePage {
 
   preferences(){
     this.navCtrl.push(PreferencesPage);
+  }
+
+  menu() {
+    const actionSheet = this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: 'Preferencje',
+          icon:'md-options',
+          handler: () => {
+            this.preferences();
+          }
+        },
+        {
+          text: 'Wyloguj',
+          icon:'md-power',
+          handler: () => {
+            this.logout();
+          }
+        }
+      ]
+    });
+    actionSheet.present();
   }
 }
