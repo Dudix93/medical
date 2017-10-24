@@ -69,7 +69,7 @@ export class HomePage {
                   }
                 }
               }
-              console.log(this.userProjects);
+              //console.log(this.userProjects);
             });
           });
       });
@@ -150,20 +150,32 @@ export class HomePage {
   }
 
   prepareRadioButtons(project_id:number){
+    this.radioButtons = [];
+    //console.log(this.userProjectTasks);
     for(let project of this.userProjects){
-      console.log(project);
-      for(let task of project.tasks){
-        if(project_id == project.id){
-          this.radioButtons.push(new RadioButton(task.title,task.title,"radio",task.id,false));
+      if(project.id == project_id){
+        for(let task of this.tasks){
+          if(project_id == task.project_id){
+   
+              if(!this.user.tasks.includes(task.id)){
+                this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",task.id,false));
+                continue;
+              }
+            
+          }
         }
       }
     }
-    console.log(this.radioButtons);
+    //console.log(this.radioButtons);
     return this.radioButtons;
   }
 
   updateTaskTime(task_id:number, updateTaskTime:number){
 
+  }
+
+  startTask(task_id:number){
+    console.log(task_id);
   }
 
   updateTask(task_id:number, task:string) {
@@ -218,7 +230,7 @@ export class HomePage {
     alert.present();
   }
 
-  startTask(project:string, project_id:number) {
+  selectTaskToStart(project:string, project_id:number) {
     //this.prepareRadioButtons();
     const alert = this.alertCtrl.create({
       title: "Czynnosci w "+project,
@@ -233,7 +245,7 @@ export class HomePage {
         {
           text: 'Rozpocznij',
           handler: data => {
-            //this.updateTaskTime(task_id, data.updateTaskTime);
+            this.startTask(data);
           }
         }
       ]
