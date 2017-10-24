@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import {   ActionSheetController, AlertController, ToastController, NavController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
+import { UserProject } from '../../models/userProject';
+import { RadioButton } from '../../models/radioButton';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
 
@@ -9,6 +11,7 @@ import { PreferencesPage } from '../preferences/preferences';
   selector: 'page-home',
   templateUrl: 'home.html'
 })
+
 export class HomePage {
   userTask: any;
   tasks: any;
@@ -17,16 +20,9 @@ export class HomePage {
   project:any;
   userProjectTasks:Array<any>;
   task = {title: '', id:''}
-  userProject:Array<any>;
+  userProject:UserProject[]=[];
   login:string;
-  radioButton =      {
-    name: '',
-    label: '',
-    type: "radio",
-    value: "",
-    checked: false
-  }
-  radioButtons:Array<any>;
+  radioButtons:RadioButton[]=[];
   userProjects = new Array<any>()
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -69,10 +65,7 @@ export class HomePage {
                         }
                       }
                     }
-                    this.userProject = new Array<any>();
-                    this.userProject.push(this.project);
-                    this.userProject.push(this.userProjectTasks);
-                    this.userProjects.push(this.userProject);
+                    this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
                   }
                 }
               }
@@ -156,17 +149,16 @@ export class HomePage {
     actionSheet.present();
   }
 
-  prepareRadioButtons(){
-    this.radioButtons = new Array(); 
-    for(let project of this.projects){
+  prepareRadioButtons(project_id:number){
+    for(let project of this.userProjects){
+      console.log(project);
       for(let task of project.tasks){
-        this.radioButton.label=task;
-        this.radioButton.name=task;
-        this.radioButton.value=task;
-        console.log(this.radioButton);
-        this.radioButtons.push(this.radioButton);
+        if(project_id == project.id){
+          this.radioButtons.push(new RadioButton(task.title,task.title,"radio",task.id,false));
+        }
       }
     }
+    console.log(this.radioButtons);
     return this.radioButtons;
   }
 
@@ -226,11 +218,11 @@ export class HomePage {
     alert.present();
   }
 
-  startTask(project:string) {
+  startTask(project:string, project_id:number) {
     //this.prepareRadioButtons();
     const alert = this.alertCtrl.create({
       title: "Czynnosci w "+project,
-      inputs: this.prepareRadioButtons(),        
+      inputs: this.prepareRadioButtons(project_id),        
       buttons: [
         {
           text: 'Anuluj',
