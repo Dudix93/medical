@@ -175,7 +175,11 @@ export class HomePage {
   }
 
   startTask(task_id:number){
-    console.log(task_id);
+    this.userProjectTasks = new Array<any>();
+    this.userProjectTasks = this.user.tasks;
+    this.userProjectTasks.push(task_id);
+    this.restapiService.startTask(this.userProjectTasks);
+    console.log(this.userProjectTasks);
   }
 
   updateTask(task_id:number, task:string) {

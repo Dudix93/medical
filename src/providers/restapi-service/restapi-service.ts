@@ -169,4 +169,20 @@ export class RestapiServiceProvider {
       });
     });
   }
+
+  startTask(data){
+    console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((apiUrl) => {
+        this.storage.get('zalogowany_id').then((id) => {
+          this.http.patch(apiUrl+'/users/'+id+'/tasks/'+data,Array)
+            .subscribe(res => {
+              resolve(res);
+            }, (err) => {
+              reject(err);
+            }); 
+          }); 
+      });
+    });
+  }
 }
