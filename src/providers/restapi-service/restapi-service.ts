@@ -15,15 +15,83 @@ export class RestapiServiceProvider {
 
   }
 
-  // setApiUrl(){
-  //   //this.apiUrl = 'http://localhost:3000';
-  //   this.storage.get('apiUrl').then((value) => {
-  //     this.apiUrl = value;
-  //     console.log(this.apiUrl);
-  //   });
-  // }
+  get(apiUrl,resource,id,headers):Promise<any>{
+    console.log(apiUrl);
+    if(id == null){
+      console.log("nie ma id");
+      return new Promise(resolve => {
+        this.http.get(apiUrl+'/'+resource)
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+    });
+    }
+    else{
+      console.log("jest id");
+      return new Promise(resolve => {
+        this.http.get(apiUrl+'/'+resource+'/'+id)
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+    });
+    }
+  }
+
+  post(apiUrl,resource,data,headers):Promise<any>{
+    return new Promise((resolve, reject) => {
+        this.http.post(apiUrl+'/'+resource+'/',data,headers)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+    });
+  }
+
+  delete(apiUrl,resource,id):Promise<any>{
+    return new Promise((resolve, reject) => {
+        this.http.delete(apiUrl+'/'+resource+'/',id)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+    });
+  }
+
+  headers():RequestOptions{
+    let headers = new Headers();
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+    headers.append('Access-Control-Allow-Origin', '*');
+    headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    return new RequestOptions({headers:headers});
+  }
+
+  getApiUrl():string {
+    if(this.storage.get('apiUrl')!=null){
+      this.storage.get('apiUrl').then((value) => {
+        return value;
+      });
+    }
+    else return null;
+  }
+
+  getUserId():string {
+    if(this.storage.get('zalogowany_id')!=null){
+      this.storage.get('zalogowany_id').then((value) => {
+        return value;
+      });
+    }
+    else return null;
+  }
 
   getUsers() {
+    //this.get(this.getApiUrl,"users",null,this.headers);
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
@@ -38,6 +106,7 @@ export class RestapiServiceProvider {
   }
 
   getUser(id:number) {
+    //this.get(this.getApiUrl,"users",id,this.headers);
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
@@ -142,11 +211,39 @@ export class RestapiServiceProvider {
     });
   }
 
+  saveUser(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/users', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
   saveUserPreferences(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.post(value+'/preferences', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
+  deleteUser(data){
+    console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/users/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -170,17 +267,29 @@ export class RestapiServiceProvider {
     });
   }
 
-  startTask(data){
-    console.log(data);
+  startTask(user,task){
+    console.log(task);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((apiUrl) => {
         this.storage.get('zalogowany_id').then((id) => {
-          this.http.patch(apiUrl+'/users/'+id+'/tasks/'+data,Array)
-            .subscribe(res => {
-              resolve(res);
-            }, (err) => {
-              reject(err);
-            }); 
+          // this.http.delete(apiUrl+'/users/'+id)
+          //   .subscribe(res => {
+          //     resolve(res);
+          //   }, (err) => {
+          //     reject(err);
+          //   }); 
+          //   this.http.post(apiUrl+'/users/',user)
+          //   .subscribe(res => {
+          //     resolve(res);
+          //   }, (err) => {
+          //     reject(err);
+          //   }); 
+              this.http.post(apiUrl+'/userTask/',task)
+              .subscribe(res => {
+                resolve(res);
+              }, (err) => {
+                reject(err);
+              });
           }); 
       });
     });

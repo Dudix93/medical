@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Edytuj dane</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <form (ngSubmit)="update()" *ngFor="let u of user">
+        <ion-item>
+            <ion-label>Imię</ion-label>
+            <ion-input type="text" [(ngModel)]="u.name" name="name"></ion-input>        
+        </ion-item>    
+      <ion-item>
+          <ion-label>Stare hasło</ion-label>
+          <ion-input type="text" [(ngModel)]="old_password" name="old_password"></ion-input>        
+      </ion-item>
+      <ion-item>
+        <ion-label>Nowe hasło</ion-label>
+        <ion-input type="text" [(ngModel)]="new_password" name="new_password"></ion-input>        
+    </ion-item>
+    <ion-item>
+        <ion-label>Powtórz hasło</ion-label>
+        <ion-input type="text" [(ngModel)]="new_password2" name="new_password2"></ion-input>        
+    </ion-item>
+      <ion-item>
+          <ion-label>Adres e-mail</ion-label>
+          <ion-input type="text" [(ngModel)]="u.email" name="email"></ion-input>    
+      </ion-item>
+      <button ion-button type="submit">Aktualizuj</button>
+    </form>
+</ion-content>

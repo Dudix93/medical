@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { PreferencesPage } from '../pages/preferences/preferences';
+import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 @Component({
   templateUrl: 'app.html'
 })

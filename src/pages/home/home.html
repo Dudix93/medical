@@ -1,8 +1,8 @@
 <ion-header>
   <ion-navbar hideBackButton>
     <ion-title>
-      <ion-buttons end>
-        Witaj {{login}}  
+      <ion-buttons end *ngFor="let u of user">
+        Witaj {{u.name}}  
           <button (click)="menu()"><ion-icon name="menu"></ion-icon></button>
       </ion-buttons>
     </ion-title>
@@ -10,6 +10,11 @@
 </ion-header>
 
 <ion-content padding>
+    <ion-tabs>
+        <ion-tab tabTitle="Recents" [root]="root"></ion-tab>
+        <ion-tab tabTitle="Favorites" [root]="root" tabBadge="23"></ion-tab>
+        <ion-tab tabTitle="Settings" [root]="root"></ion-tab>
+    </ion-tabs>
   <h2>Twoje projekty:</h2>
 
       <ion-grid *ngFor="let project of userProjects,let i = index">

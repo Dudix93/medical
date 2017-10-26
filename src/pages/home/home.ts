@@ -4,8 +4,10 @@ import {   ActionSheetController, AlertController, ToastController, NavControlle
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
+import { StartTask } from '../../models/startTask';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
+import { EditProfilePage } from '../edit-profile/edit-profile';
 
 @Component({
   selector: 'page-home',
@@ -15,15 +17,17 @@ import { PreferencesPage } from '../preferences/preferences';
 export class HomePage {
   userTask: any;
   tasks: any;
-  user: any;
+  user: Array<any>;
   projects: any;
   project:any;
-  userProjectTasks:Array<any>;
-  task = {title: '', id:''}
-  userProject:UserProject[]=[];
   login:string;
+  currentDate:string;
+  currentTime:string;
+  userProjectTasks:Array<any>;
+  userProjects:Array<any>;
+  userProject:UserProject[]=[];
   radioButtons:RadioButton[]=[];
-  userProjects = new Array<any>()
+  task = {title: '', id:''}
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
               private storage:Storage,
@@ -40,20 +44,22 @@ export class HomePage {
     this.storage.get('zalogowany_id').then((val) => {
       this.restapiService.getUser(val)
       .then(data => {
-        this.user = data;
+        this.user = new Array<any>();
+        this.user.push(data);
           this.restapiService.getProjects()
           .then(data => {
             this.projects = data;
             this.restapiService.getTasks()
             .then(data => {
               this.tasks = data;
-              for(let userProject of this.user.projects){
+              this.userProjects = new Array<any>();
+              for(let userProject of this.user[0].projects){
                 this.userProjectTasks = new Array<any>();
                 for(let project of this.projects){
                   if(project.id == userProject){
                     //console.log(project);
                     this.project = project;
-                    for(let userTask of this.user.tasks){
+                    for(let userTask of this.user[0].tasks){
                       for(let projectTasks of project.tasks){
                         if(userTask == projectTasks){
                           for(let task of this.tasks){
@@ -69,7 +75,6 @@ export class HomePage {
                   }
                 }
               }
-              //console.log(this.userProjects);
             });
           });
       });
@@ -124,7 +129,7 @@ export class HomePage {
   }
 
   preferences(){
-    this.navCtrl.push(PreferencesPage);
+    this.navCtrl.push(EditProfilePage);
   }
 
   menu() {
@@ -157,7 +162,7 @@ export class HomePage {
         for(let task of this.tasks){
           if(project_id == task.project_id){
    
-              if(!this.user.tasks.includes(task.id)){
+              if(!this.user[0].tasks.includes(task.id)){
                 this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",task.id,false));
                 continue;
               }
@@ -174,12 +179,24 @@ export class HomePage {
 
   }
 
+  getHour(){
+    var minutes = new Date().getMinutes();
+    if(minutes < 10){
+      return JSON.stringify(new Date().getHours()).concat(':0').concat(JSON.stringify(new Date().getMinutes()));
+    }
+    else{
+      return JSON.stringify(new Date().getHours()).concat(':').concat(JSON.stringify(new Date().getMinutes()));
+    }
+  }
+
   startTask(task_id:number){
-    this.userProjectTasks = new Array<any>();
-    this.userProjectTasks = this.user.tasks;
-    this.userProjectTasks.push(task_id);
-    this.restapiService.startTask(this.userProjectTasks);
-    console.log(this.userProjectTasks);
+    this.currentDate = new Date().toLocaleDateString();
+    this.currentTime = this.getHour();
+    this.user[0].tasks.push(task_id);
+    console.log(this.currentDate);
+    console.log(this.currentTime);
+    this.restapiService.startTask(this.user,new StartTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null));
+    //this.getUserProjectsAndTasks();
   }
 
   updateTask(task_id:number, task:string) {

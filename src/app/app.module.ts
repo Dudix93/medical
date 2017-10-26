@@ -10,6 +10,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { PreferencesPage } from '../pages/preferences/preferences';
+import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
 
 @NgModule({
@@ -17,7 +18,8 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
     MyApp,
     HomePage,
     LoginPage,
-    PreferencesPage
+    PreferencesPage,
+    EditProfilePage
   ],
   imports: [
     IonicStorageModule.forRoot(),
@@ -30,7 +32,8 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
     MyApp,
     HomePage,
     LoginPage,
-    PreferencesPage
+    PreferencesPage,
+    EditProfilePage
   ],
   providers: [
     StatusBar,
