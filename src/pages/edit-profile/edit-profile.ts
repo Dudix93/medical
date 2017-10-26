@@ -41,9 +41,9 @@ update(){
       this.user[0].projects,
       this.user[0].tasks
     ));
+    this.showalert("Zaktualizowano dane.");
   }
-  else{
-    if((this.new_password == this.new_password2) && this.old_password == this.user[0].password && this.old_password != undefined && this.new_password != null && this.new_password2 != null && this.new_password != undefined && this.new_password2 != undefined){
+    else if((this.new_password == this.new_password2) && this.old_password == this.user[0].password && this.old_password != undefined && this.new_password != null && this.new_password2 != null && this.new_password != undefined && this.new_password2 != undefined){
       this.restapiService.deleteUser(this.user[0].id);
       this.restapiService.saveUser(new User(
         this.user[0].id,
@@ -54,7 +54,31 @@ update(){
         this.user[0].projects,
         this.user[0].tasks
       ));
+      this.showalert("Zaktualizowano dane.");
+    }
+    else if((this.old_password != this.user[0].password) && (this.new_password == this.new_password2)){
+      this.showalert("To nie jest aktualne hasło.");
+    }
+    else if((this.old_password == this.user[0].password) && (this.new_password != this.new_password2)){
+      this.showalert("Nowe hasła się nie zgadzają.");
+    }
+    else if((this.old_password != this.user[0].password) && (this.new_password != this.new_password2)){
+      this.showalert("To nie jest aktualne hasło.<br><br>Nowe hasła się nie zgadzają.");
     }
   }
+
+showalert(info:string) {
+  const alert = this.alertCtrl.create({
+    title: info,
+    buttons: [
+      {
+        text: 'Ok',
+        handler: () => {
+          //this.startTask(data);
+        }
+      }
+    ]
+  });
+  alert.present();
 }
 }
