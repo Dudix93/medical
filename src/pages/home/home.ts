@@ -128,13 +128,24 @@ export class HomePage {
     this.navCtrl.push(LoginPage);
   }
 
-  preferences(){
+  editProfile(){
     this.navCtrl.push(EditProfilePage);
+  }
+
+  preferences(){
+    this.navCtrl.push(PreferencesPage);
   }
 
   menu() {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
+        {
+          text: 'Edytuj swoje dane',
+          icon:'ios-contacts',
+          handler: () => {
+            this.editProfile();
+          }
+        },
         {
           text: 'Preferencje',
           icon:'md-options',
