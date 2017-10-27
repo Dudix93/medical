@@ -23,6 +23,7 @@
         <ion-input type="password" [(ngModel)]="credentials.password" name="password"></ion-input>    
     </ion-item>
     <button ion-button type="submit">Zaloguj</button>
+    <button ion-button (click)="register()">Zarejestruj</button>
   </form>
   <p *ngIf="correct == false">Złe dane logowania</p>
 </ion-content>

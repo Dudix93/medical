@@ -5,8 +5,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { RegisterPage } from '../pages/register/register';
 import { PreferencesPage } from '../pages/preferences/preferences';
 import { EditProfilePage } from '../pages/edit-profile/edit-profile';
+import { EditTaskPage } from '../pages/edit-task/edit-task';
 @Component({
   templateUrl: 'app.html'
 })

@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { HomePage } from '../home/home';
+import { RegisterPage } from '../register/register';
 
 
 @IonicPage()
@@ -53,6 +54,11 @@ export class LoginPage {
         this.navCtrl.push(HomePage);
       }
     });
+  }
+
+  register(){
+    this.correct=true;
+    this.navCtrl.push(RegisterPage);
   }
 
 }

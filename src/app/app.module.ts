@@ -9,8 +9,10 @@ import { IonicStorageModule } from '@ionic/storage';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { RegisterPage } from '../pages/register/register';
 import { PreferencesPage } from '../pages/preferences/preferences';
 import { EditProfilePage } from '../pages/edit-profile/edit-profile';
+import { EditTaskPage } from '../pages/edit-task/edit-task';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
 
 @NgModule({
@@ -18,8 +20,10 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
     MyApp,
     HomePage,
     LoginPage,
+    RegisterPage,
     PreferencesPage,
-    EditProfilePage
+    EditProfilePage,
+    EditTaskPage
   ],
   imports: [
     IonicStorageModule.forRoot(),
@@ -32,8 +36,10 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
     MyApp,
     HomePage,
     LoginPage,
+    RegisterPage,
     PreferencesPage,
-    EditProfilePage
+    EditProfilePage,
+    EditTaskPage
   ],
   providers: [
     StatusBar,

@@ -8,6 +8,7 @@ import { UserTask } from '../../models/userTask';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
+import { EditTaskPage } from '../edit-task/edit-task';
 
 @Component({
   selector: 'page-home',
@@ -15,6 +16,7 @@ import { EditProfilePage } from '../edit-profile/edit-profile';
 })
 
 export class HomePage {
+  pushPage = EditTaskPage;
   userTask: any;
   tasks: any;
   user: Array<any>;
@@ -28,6 +30,7 @@ export class HomePage {
   userProject:UserProject[]=[];
   radioButtons:RadioButton[]=[];
   task = {title: '', id:''}
+  params = {task_title: 'aaa', task_id:''}
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
               private storage:Storage,
@@ -137,6 +140,10 @@ export class HomePage {
 
   preferences(){
     this.navCtrl.push(PreferencesPage);
+  }
+
+  editTask(){
+    this.navCtrl.push(EditTaskPage, this.params);
   }
 
   menu() {
