@@ -23,8 +23,10 @@ export class EditTaskPage {
           finish_date:''}
 
   constructor(public navCtrl: NavController, public navParams:NavParams, private restapiService: RestapiServiceProvider, private storage: Storage) {
-    this.params = this.navParams.get('params');
-    console.log("parametry: "+this.navParams.get('params'));
+    this.params.task_title = this.navParams.get('task_title');
+    this.params.task_id = this.navParams.get('task_id');
+    console.log("title: "+this.navParams.get('task_title'));
+    console.log("id: "+this.navParams.get('task_id'));
   }
 
   getUserTask(task_id:number) {

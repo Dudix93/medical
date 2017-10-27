@@ -142,7 +142,9 @@ export class HomePage {
     this.navCtrl.push(PreferencesPage);
   }
 
-  editTask(){
+  editTask(task_id:string, task_title:string){
+    this.params.task_id = task_id;
+    this.params.task_title = task_title;
     this.navCtrl.push(EditTaskPage, this.params);
   }
 
