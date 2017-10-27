@@ -39,12 +39,12 @@ export class LoginPage {
       this.correct=false;
       this.users = data;
       console.log(this.users);
-      for (var item of this.users) {
-        if(item.login == this.credentials.login){
-          if(item.password == this.credentials.password){
+      for (var user of this.users) {
+        if(user.login == this.credentials.login){
+          if(user.password == this.credentials.password && user.active == true){
             this.correct = true;
-            this.storage.set('zalogowany', item.login);
-            this.storage.set('zalogowany_id', item.id);
+            this.storage.set('zalogowany', user.login);
+            this.storage.set('zalogowany_id', user.id);
             break;
           }
         }

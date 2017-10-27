@@ -10,13 +10,8 @@
 </ion-header>
 
 <ion-content padding>
-    <ion-tabs>
-        <ion-tab tabTitle="Recents" [root]="root"></ion-tab>
-        <ion-tab tabTitle="Favorites" [root]="root" tabBadge="23"></ion-tab>
-        <ion-tab tabTitle="Settings" [root]="root"></ion-tab>
-    </ion-tabs>
-  <h2>Twoje projekty:</h2>
-
+  <h2 *ngIf="projects != null">Twoje projekty:</h2>
+  <h2 *ngIf="projects == null">Nie jesteś zapisany do żadnego projektu.</h2>
       <ion-grid *ngFor="let project of userProjects,let i = index">
           <h2>{{project.title}}</h2>
           <ion-row>

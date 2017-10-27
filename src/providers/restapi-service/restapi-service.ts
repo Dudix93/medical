@@ -268,22 +268,22 @@ export class RestapiServiceProvider {
   }
 
   startTask(user,task){
-    console.log(task);
+    console.log(user);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((apiUrl) => {
         this.storage.get('zalogowany_id').then((id) => {
-          // this.http.delete(apiUrl+'/users/'+id)
-          //   .subscribe(res => {
-          //     resolve(res);
-          //   }, (err) => {
-          //     reject(err);
-          //   }); 
-          //   this.http.post(apiUrl+'/users/',user)
-          //   .subscribe(res => {
-          //     resolve(res);
-          //   }, (err) => {
-          //     reject(err);
-          //   }); 
+            this.http.delete(apiUrl+'/users/'+id)
+              .subscribe(res => {
+                resolve(res);
+              }, (err) => {
+                reject(err);
+              }); 
+              this.http.post(apiUrl+'/users/',user)
+              .subscribe(res => {
+                resolve(res);
+              }, (err) => {
+                reject(err);
+              }); 
               this.http.post(apiUrl+'/userTask/',task)
               .subscribe(res => {
                 resolve(res);

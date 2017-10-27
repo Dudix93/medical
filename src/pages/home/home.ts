@@ -4,7 +4,7 @@ import {   ActionSheetController, AlertController, ToastController, NavControlle
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
-import { StartTask } from '../../models/startTask';
+import { UserTask } from '../../models/userTask';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
@@ -53,28 +53,31 @@ export class HomePage {
             .then(data => {
               this.tasks = data;
               this.userProjects = new Array<any>();
-              for(let userProject of this.user[0].projects){
-                this.userProjectTasks = new Array<any>();
-                for(let project of this.projects){
-                  if(project.id == userProject){
-                    //console.log(project);
-                    this.project = project;
-                    for(let userTask of this.user[0].tasks){
-                      for(let projectTasks of project.tasks){
-                        if(userTask == projectTasks){
-                          for(let task of this.tasks){
-                            if(task.id == projectTasks){
-                              this.userProjectTasks.push(task);
-                              continue;
+              if(this.user[0].projects != null){
+                for(let userProject of this.user[0].projects){
+                  this.userProjectTasks = new Array<any>();
+                  for(let project of this.projects){
+                    if(project.id == userProject){
+                      //console.log(project);
+                      this.project = project;
+                      for(let userTask of this.user[0].tasks){
+                        for(let projectTasks of project.tasks){
+                          if(userTask == projectTasks){
+                            for(let task of this.tasks){
+                              if(task.id == projectTasks){
+                                this.userProjectTasks.push(task);
+                                continue;
+                              }
                             }
                           }
                         }
                       }
+                      this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
                     }
-                    this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
                   }
                 }
               }
+              else this.projects = null;
             });
           });
       });
@@ -206,8 +209,8 @@ export class HomePage {
     this.user[0].tasks.push(task_id);
     console.log(this.currentDate);
     console.log(this.currentTime);
-    this.restapiService.startTask(this.user,new StartTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null));
-    //this.getUserProjectsAndTasks();
+    this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null));
+    this.getUserProjectsAndTasks();
   }
 
   updateTask(task_id:number, task:string) {

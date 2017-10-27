@@ -37,6 +37,7 @@ update(){
       this.user[0].login,
       this.user[0].name,
       this.user[0].email,
+      this.user[0].active,
       this.user[0].password,
       this.user[0].projects,
       this.user[0].tasks
@@ -50,6 +51,7 @@ update(){
         this.user[0].login,
         this.user[0].name,
         this.user[0].email,
+        this.user[0].active,
         this.new_password,
         this.user[0].projects,
         this.user[0].tasks

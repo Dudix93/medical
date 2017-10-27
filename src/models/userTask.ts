@@ -1,4 +1,4 @@
-export class StartTask {
+export class UserTask {
     constructor(
         public user_id:any,
         public task_id:any,
