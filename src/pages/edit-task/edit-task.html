@@ -1,18 +1,28 @@
-<!--
-  Generated template for the EditTaskPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
   <ion-navbar>
     <ion-title>Edytuj {{params.task_title}}</ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
 <ion-content padding>
-
+  <ion-item> 
+    Data rozpoczęcia: {{task.start_date}}
+  </ion-item>
+  <ion-item> 
+      Spędzony czas: {{task.time_spent}} godzin.
+  </ion-item>
+  <ion-item> 
+      Ostatnia aktualizacja {{task.update_hour}} {{task.update_date}} o {{task.update_time}} godzin.
+  </ion-item>
+  <form (ngSubmit)="updateTask()">
+      <ion-item>
+          <ion-label floating>Aktualizuj czas</ion-label>
+          <ion-input type="text" [(ngModel)]="updateTime" name="updateTime"></ion-input>        
+      </ion-item>    
+      <ion-item>
+          <ion-label floating>Opis</ion-label>
+          <ion-input type="text" [(ngModel)]="task.description" name="description" clearInput></ion-input>        
+      </ion-item> 
+    <button ion-button type="submit">Aktualizuj</button>
+  </form>
 </ion-content>

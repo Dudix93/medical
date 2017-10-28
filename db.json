@@ -2,98 +2,111 @@
   "tasks": [
     {
       "title": "czynnosc1",
-	  "project_id": 1,
+      "project_id": 1,
       "id": 1
     },
     {
       "title": "czynnosc2",
-	  "project_id": 1,
+      "project_id": 1,
       "id": 2
     },
-	{
+    {
       "title": "czynnosc3",
-	  "project_id": 1,
+      "project_id": 1,
       "id": 3
     },
     {
       "title": "czynnosc4",
-	  "project_id": 2,
+      "project_id": 2,
       "id": 4
     },
-	{
+    {
       "title": "czynnosc5",
-	  "project_id": 2,
+      "project_id": 2,
       "id": 5
     },
     {
       "title": "czynnosc6",
-	  "project_id": 2,
+      "project_id": 2,
       "id": 6
     },
-	{
+    {
       "title": "czynnosc7",
-	  "project_id": 3,
+      "project_id": 3,
       "id": 7
     },
     {
       "title": "czynnosc8",
-	  "project_id": 3,
+      "project_id": 3,
       "id": 8
     }
   ],
   "projects": [
     {
       "title": "projekt1",
-	  "tasks": [1,2,3],
+      "tasks": [
+        1,
+        2,
+        3
+      ],
       "id": 1
     },
     {
       "title": "projekt2",
-	  "tasks": [4,5,6],
+      "tasks": [
+        4,
+        5,
+        6
+      ],
       "id": 2
     },
-	{
+    {
       "title": "projekt3",
-	  "tasks": [7,8],
+      "tasks": [
+        7,
+        8
+      ],
       "id": 3
     }
   ],
   "users": [
     {
-      "login": "dodo",
-      "password": "dodo123",
-      "name": "Michal",
-      "email": "m.dodo@wp.pl",
-	  "active":true,
-      "projects": [3,1],
-	  "tasks": [7,3,2],
-	  "id": 4
-    },
-    {
       "login": "dodzik",
       "password": "dodo123",
-	  "name": "Maciej",
-      "email": "dodzio@o2.pl",
-	  "active":true,
-	  "projects": null,
-	  "tasks": null,
+      "projects": null,
+      "tasks": null,
       "id": 8
+    },
+    {
+      "id": 4,
+      "login": "dodo",
+      "name": "Michal",
+      "email": "m.dodo@wp.pl",
+      "password": "dodo123",
+      "projects": [
+        3,
+        1
+      ],
+      "tasks": [
+        7,
+        3,
+        2
+      ]
     }
   ],
-  "userTask":[
-	{
-    "id": 1,
-		"user_id":4,
-		"task_id":2,
-    "update_date":"23.10.2017",
-    "update_hour":"13:30",
-		"update_time":2,
-		"time_spent":12,
-    "start_date":"20.10.2017",
-    "start_hour":"12:00",
-	"descriprion":"",
-		"finish_date":null
-	}
+  "userTask": [
+    {
+      "user_id": 4,
+      "task_id": 2,
+      "update_date": "23.10.2017",
+      "update_hour": "13:30",
+      "update_time": 2,
+      "time_spent": 12,
+      "start_date": "20.10.2017",
+      "start_hour": "12:00",
+	  "description":"wabalabadubdub",
+      "finish_date": null
+    }
   ],
   "preferences": [
     {
