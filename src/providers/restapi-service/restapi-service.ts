@@ -197,11 +197,39 @@ export class RestapiServiceProvider {
     });
   }
 
+  saveUserTask(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/userTask', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
   deleteTask(data){
     console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.delete(value+'/tasks/'+data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  deleteUserTask(data){
+    console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/userTask/'+data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {

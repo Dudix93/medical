@@ -73,6 +73,7 @@
     {
       "login": "dodzik",
       "password": "dodo123",
+      "active": true,
       "projects": null,
       "tasks": null,
       "id": 8
@@ -83,6 +84,7 @@
       "name": "Michal",
       "email": "m.dodo@wp.pl",
       "password": "dodo123",
+      "active": true,
       "projects": [
         3,
         1
@@ -96,15 +98,16 @@
   ],
   "userTask": [
     {
+      "id": 1,
       "user_id": 4,
       "task_id": 2,
-      "update_date": "23.10.2017",
-      "update_hour": "13:30",
-      "update_time": 2,
+      "update_date": "29.10.2017",
+      "update_hour": "13:14",
+      "update_time": 3,
       "time_spent": 12,
       "start_date": "20.10.2017",
       "start_hour": "12:00",
-	  "description":"wabalabadubdub",
+      "description": "wabalabadubdub",
       "finish_date": null
     }
   ],

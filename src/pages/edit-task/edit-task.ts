@@ -11,8 +11,9 @@ export class EditTaskPage {
 
   params = {task_title: '', task_id:0}
   userTasks:any;
-  updateTime:number;
-  task = {user_id: '', 
+  updateTime:string;
+  task = {id:0,
+          user_id: '', 
           task_id: '', 
           update_date:'', 
           update_hour:'', 
@@ -21,7 +22,8 @@ export class EditTaskPage {
           start_date:'', 
           start_hour:'',
           description:'', 
-          finish_date:''}
+          finish_date:'',
+          finish_hour:''}
 
   constructor(public navCtrl: NavController, public navParams:NavParams, private restapiService: RestapiServiceProvider, private storage: Storage) {
     this.params.task_title = this.navParams.get('task_title');
@@ -48,6 +50,7 @@ export class EditTaskPage {
           //console.log(task);
           if(user_id == task.user_id && task_id == task.task_id){
             this.task = task;
+            //console.log(task);
             break;
           }
         }
@@ -56,13 +59,15 @@ export class EditTaskPage {
 }
 
 updateTask(){
-  this.restapiService.deleteTask(this.task.task_id);
-  this.task.time_spent += this.updateTime;
-  this.task.update_time = this.updateTime;
-  this.task.update_date = new Date().toLocaleDateString();
-  this.task.update_hour = this.getHour();
-  this.restapiService.saveTask(this.task);
-
+  this.restapiService.deleteUserTask(this.task.id);
+  console.log(this.updateTime);
+  if(this.updateTime != undefined && this.updateTime != ''){
+    this.task.time_spent += Number(this.updateTime);
+    this.task.update_time = Number(this.updateTime);
+    this.task.update_date = new Date().toLocaleDateString();
+    this.task.update_hour = this.getHour();
+  }
+  this.restapiService.saveUserTask(this.task);
 }
 
 }

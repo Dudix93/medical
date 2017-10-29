@@ -17,7 +17,19 @@ import { EditTaskPage } from '../edit-task/edit-task';
 
 export class HomePage {
   pushPage = EditTaskPage;
-  userTask: any;
+  userTask = {id:0,
+    user_id: '', 
+    task_id: '', 
+    update_date:'', 
+    update_hour:'', 
+    update_time:0, 
+    time_spent:0, 
+    start_date:'', 
+    start_hour:'',
+    description:'', 
+    finish_date:'',
+    finish_hour:''}
+  userTasks: any;
   tasks: any;
   user: Array<any>;
   projects: any;
@@ -97,9 +109,9 @@ export class HomePage {
   getUserTask(task_id:number) {
     this.restapiService.getUserTask()
     .then(data => {
-      this.userTask = data;
+      this.userTasks = data;
       this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTask){
+        for(let task of this.userTasks){
           if(user_id == task.user_id && task_id == task.task_id){
             this.userTask = task;
             console.log(this.userTask);
@@ -222,40 +234,29 @@ export class HomePage {
     this.getUserProjectsAndTasks();
   }
 
-  updateTask(task_id:number, task:string) {
-    this.getUserTask(task_id);
-    const alert = this.alertCtrl.create({
-      title: task,
-      message:"<b>Spędzony czas: "+this.userTask.time_spent+" godzin<br>"
-              +"Ostatnia aktualizacja:<br>"
-              +this.userTask.update_date+" o "+this.userTask.update_time+" godzin<br><b>",
-      inputs: [
-      {
-        name: 'updateTaskTime',
-        placeholder: 'Aktualizuj'
-      }
-    ],        
-      buttons: [
-        {
-          text: 'Anuluj',
-          role: 'cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'Aktualizuj',
-          handler: data => {
-            this.updateTaskTime(task_id, data.updateTaskTime);
-          }
-        }
-      ]
-    });
-    alert.present();
+  finishTask(){
+    this.userTask.finish_date = new Date().toLocaleDateString();
+    this.userTask.finish_hour = this.getHour();
+    this.restapiService.deleteUserTask(this.userTask.id);
+    this.restapiService.saveUserTask(this.userTask);
   }
 
-  finishTask(task:number) {
+  finishTaskPrompt(task_id:number, task_title:string) {
+    this.restapiService.getUserTask()
+    .then(userTasks => {
+      this.userTasks = userTasks;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTasks){
+          //console.log(task);
+          if(user_id == task.user_id && task_id == task.task_id){
+            this.userTask = task;
+            break;
+          }
+        }
+      });
+    });
     const alert = this.alertCtrl.create({
-      title: 'Zkończyć '+task+'?',
+      title: 'Zkończyć '+task_title+'?',
       buttons: [
         {
           text: 'Anuluj',
@@ -266,7 +267,7 @@ export class HomePage {
         {
           text: 'Zakończ',
           handler: () => {
-
+            this.finishTask();
           }
         }
       ]
