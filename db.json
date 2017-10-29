@@ -91,20 +91,31 @@
       ],
       "tasks": [
         7,
-        3,
         2
       ]
     }
   ],
   "userTask": [
     {
+      "user_id": 4,
+      "task_id": 7,
+      "update_date": "10/29/2017",
+      "update_hour": "22:42",
+      "update_time": 3,
+      "time_spent": 3,
+      "start_date": "10/29/2017",
+      "start_hour": "22:35",
+      "finish_date": null,
+      "id": 2
+    },
+    {
       "id": 1,
       "user_id": 4,
       "task_id": 2,
-      "update_date": "29.10.2017",
-      "update_hour": "13:14",
-      "update_time": 3,
-      "time_spent": 12,
+      "update_date": "10/29/2017",
+      "update_hour": "22:42",
+      "update_time": 2,
+      "time_spent": 14,
       "start_date": "20.10.2017",
       "start_hour": "12:00",
       "description": "wabalabadubdub",
