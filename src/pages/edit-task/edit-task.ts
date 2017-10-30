@@ -12,9 +12,17 @@ export class EditTaskPage {
   params = {task_title: '', task_id:0}
   userTasks:any;
   updateTime:string;
+
+  dayTask = {
+  task_id:0,
+  user_id:0,
+  date:'',
+  hour:'',
+  time_spent:0}
+  
   task = {id:0,
-          user_id: '', 
-          task_id: '', 
+          user_id:0, 
+          task_id:0, 
           update_date:'', 
           update_hour:'', 
           update_time:0, 
@@ -60,12 +68,21 @@ export class EditTaskPage {
 
 updateTask(){
   this.restapiService.deleteUserTask(this.task.id);
-  console.log(this.updateTime);
+  console.log(this.task);
   if(this.updateTime != undefined && this.updateTime != ''){
+    if(this.task.update_date == new Date().toLocaleDateString()){
+      //remove
+    }
     this.task.time_spent += Number(this.updateTime);
     this.task.update_time = Number(this.updateTime);
     this.task.update_date = new Date().toLocaleDateString();
     this.task.update_hour = this.getHour();
+    this.dayTask.date = new Date().toLocaleDateString();
+    this.dayTask.hour = this.getHour();
+    this.dayTask.time_spent = this.task.time_spent;
+    this.dayTask.task_id = this.task.id;
+    this.dayTask.user_id = this.task.user_id;
+    this.restapiService.saveDayTask(this.dayTask);
   }
   this.restapiService.saveUserTask(this.task);
 }

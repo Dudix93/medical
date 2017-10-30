@@ -16,7 +16,6 @@ import { EditTaskPage } from '../edit-task/edit-task';
 })
 
 export class HomePage {
-  pushPage = EditTaskPage;
   userTask = {id:0,
     user_id: '', 
     task_id: '', 
@@ -29,9 +28,20 @@ export class HomePage {
     description:'', 
     finish_date:'',
     finish_hour:''}
+
+  dayTask = {
+      task_id:0,
+      user_id:0,
+      date:'',
+      hour:'',
+      time_spent:0}
+  
+  pushPage = EditTaskPage;
+  dayTasksObjects:any;
   userTasks: any;
   tasks: any;
   user: Array<any>;
+  dayTasks: Array<number>;
   projects: any;
   project:any;
   login:string;
@@ -43,6 +53,7 @@ export class HomePage {
   radioButtons:RadioButton[]=[];
   task = {title: '', id:''}
   params = {task_title: '', task_id:0}
+
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
               private storage:Storage,
@@ -53,6 +64,7 @@ export class HomePage {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
+    
   }
 
   getUserProjectsAndTasks() {
@@ -225,13 +237,28 @@ export class HomePage {
   }
 
   startTask(task_id:number){
+    this.dayTasks = new Array<any>();
     this.currentDate = new Date().toLocaleDateString();
     this.currentTime = this.getHour();
     this.user[0].tasks.push(task_id);
-    console.log(this.currentDate);
-    console.log(this.currentTime);
-    this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null));
     this.getUserProjectsAndTasks();
+    this.dayTask.hour = this.currentTime;
+    this.dayTask.date = this.currentDate;
+    this.dayTask.task_id = task_id;
+    this.dayTask.user_id = this.user[0].id;
+    this.restapiService.saveDayTask(this.dayTask);
+    this.restapiService.getDayTask().then(data => {
+      this.dayTasks = new Array<number>();
+      this.dayTasksObjects = data;
+      for(let dayTask of this.dayTasksObjects){
+        if(dayTask.date == new Date().toLocaleDateString()){
+          console.log(dayTask);
+          this.dayTasks.push(dayTask.id);
+        }
+      }
+      console.log(this.dayTasks[this.dayTasks.length-1]);
+    });
+    this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,this.dayTasks[this.dayTasks.length-1],null));
   }
 
   finishTask(){

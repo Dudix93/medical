@@ -8,5 +8,6 @@ export class UserTask {
         public time_spent:any,
         public start_date:any,
         public start_hour:any,
+        public latest_dayTask:any,
         public finish_date){}
   }

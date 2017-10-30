@@ -105,6 +105,8 @@
       "time_spent": 3,
       "start_date": "10/29/2017",
       "start_hour": "22:35",
+      "description": "",
+      "latest_dayTask":1,
       "finish_date": null,
       "id": 2
     },
@@ -119,7 +121,24 @@
       "start_date": "20.10.2017",
       "start_hour": "12:00",
       "description": "wabalabadubdub",
+      "latest_dayTask":0,
       "finish_date": null
+    }
+  ],
+  "dayTask":[
+    {
+      "user_id": 4,
+      "task_id": 7,
+      "date":"10/28/2017",
+      "hour":"13:00",
+      "time_spent":2
+    },
+    {
+      "user_id": 4,
+      "task_id": 2,
+      "date":"10/25/2017",
+      "hour":"15:00",
+      "time_spent":4
     }
   ],
   "preferences": [
