@@ -25,7 +25,8 @@ export class HomePage {
     time_spent:0, 
     start_date:'', 
     start_hour:'',
-    description:'', 
+    description:'',
+    latest_dayTask:0, 
     finish_date:'',
     finish_hour:''}
 
@@ -64,7 +65,7 @@ export class HomePage {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
-    
+    //this.restapiService.getDayTask().then(data => {console.log("DayTasks:");console.log(data);});
   }
 
   getUserProjectsAndTasks() {
@@ -241,7 +242,6 @@ export class HomePage {
     this.currentDate = new Date().toLocaleDateString();
     this.currentTime = this.getHour();
     this.user[0].tasks.push(task_id);
-    this.getUserProjectsAndTasks();
     this.dayTask.hour = this.currentTime;
     this.dayTask.date = this.currentDate;
     this.dayTask.task_id = task_id;
@@ -252,13 +252,12 @@ export class HomePage {
       this.dayTasksObjects = data;
       for(let dayTask of this.dayTasksObjects){
         if(dayTask.date == new Date().toLocaleDateString()){
-          console.log(dayTask);
           this.dayTasks.push(dayTask.id);
         }
       }
-      console.log(this.dayTasks[this.dayTasks.length-1]);
+      this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,this.dayTasks[this.dayTasks.length-1],null));
+      console.log("latestDayTask: "+this.dayTasks[this.dayTasks.length-1]);
     });
-    this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,this.dayTasks[this.dayTasks.length-1],null));
   }
 
   finishTask(){

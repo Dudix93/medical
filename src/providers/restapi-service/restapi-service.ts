@@ -95,7 +95,7 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
-        this.http.get(value+'/users')
+        this.http.get(value+'/users',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -124,7 +124,7 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(options);
-        this.http.get(value+'/preferences')
+        this.http.get(value+'/preferences',this.headers())
         .map(res => res.json())
         .subscribe(data => {
          this.data = data;
@@ -138,7 +138,7 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(options);
-        this.http.get(value+'/userTask')
+        this.http.get(value+'/userTask',this.headers())
         .map(res => res.json())
         .subscribe(data => {
          this.data = data;
@@ -149,17 +149,10 @@ export class RestapiServiceProvider {
   }
 
   getTasks() {
-    let headers = new Headers();
-    headers.append('Accept', 'application/json');
-    headers.append('Content-Type', 'application/json');
-    headers.append('Access-Control-Allow-Origin', '*');
-    headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    let options = new RequestOptions({headers:headers});
-
-    return new Promise(resolve => {
+     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
       //console.log(options);
-      this.http.get(value+'/tasks',options)
+      this.http.get(value+'/tasks',this.headers())
       .map(res => res.json())
       .subscribe(data => {
         this.data = data;
@@ -198,9 +191,9 @@ export class RestapiServiceProvider {
   }
 
   getDayTask() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.get(value+'/dayTask')
+        this.http.get(value+'/dayTask',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -211,7 +204,6 @@ export class RestapiServiceProvider {
   }
 
   saveDayTask(data) {
-    console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.post(value+'/dayTask', data)
@@ -224,8 +216,21 @@ export class RestapiServiceProvider {
     });
   }
 
+  deleteDayTask(id) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/dayTask/'+id)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
   saveUserTask(data) {
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.post(value+'/userTask', data)
@@ -253,7 +258,7 @@ export class RestapiServiceProvider {
   }
 
   deleteUserTask(data){
-    console.log(data);
+    //console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.delete(value+'/userTask/'+data)
