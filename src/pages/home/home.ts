@@ -17,7 +17,7 @@ import { EditTaskPage } from '../edit-task/edit-task';
 
 export class HomePage {
   userTask = {
-    //id:0,
+    id:0,
     user_id: '', 
     task_id: '', 
     update_date:'', 
@@ -67,6 +67,7 @@ export class HomePage {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
+    this.inProgress = false;
     //this.restapiService.getDayTask().then(data => {console.log("DayTasks:");console.log(data);});
   }
 
@@ -241,23 +242,6 @@ export class HomePage {
     }
   }
 
-  ifInProgress(){
-    this.inProgress = false;
-    this.restapiService.getUserTask()
-    .then(userTasks => {
-      this.userTasks = userTasks;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          if(user_id == task.user_id && task.finish_date == null){
-            this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: ");
-            this.inProgress = true;
-            break;
-          }
-        }
-      });
-    });
-  }
-
   startTask(task_id:number){
     if(task_id != undefined){
       this.dayTasks = new Array<any>();
@@ -287,8 +271,7 @@ export class HomePage {
   finishTask(){
     this.userTask.finish_date = new Date().toLocaleDateString();
     this.userTask.finish_hour = this.getHour();
-    this.restapiService.deleteUserTask(this.userTask.id);
-    this.restapiService.saveUserTask(this.userTask);
+    this.restapiService.updateUserTask(this.userTask.id, this.userTask);
   }
 
   finishTaskPrompt(task_id:number, task_title:string) {
@@ -326,28 +309,42 @@ export class HomePage {
   }
 
   selectTaskToStart(project:string, project_id:number) {
-    this.ifInProgress();
-    if(this.inProgress == false){
-      const alert = this.alertCtrl.create({
-        title: "Czynnosci w "+project,
-        inputs: this.prepareRadioButtons(project_id),        
-        buttons: [
-          {
-            text: 'Anuluj',
-            role: 'cancel',
-            handler: () => {
-            }
-          },
-          {
-            text: 'Rozpocznij',
-            handler: data => {
-              this.startTask(data);
-            }
+    this.restapiService.getUserTask()
+    .then(userTasks => {
+      this.inProgress = false;
+      this.userTasks = userTasks;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTasks){
+          if(user_id == task.user_id && task.finish_date == null){
+            console.log(task);
+            this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: ");
+            this.inProgress = true;
+            break;
           }
-        ]
+        }
+        if(this.inProgress == false){
+          const alert = this.alertCtrl.create({
+            title: "Czynnosci w "+project,
+            inputs: this.prepareRadioButtons(project_id),        
+            buttons: [
+              {
+                text: 'Anuluj',
+                role: 'cancel',
+                handler: () => {
+                }
+              },
+              {
+                text: 'Rozpocznij',
+                handler: data => {
+                  this.startTask(data);
+                }
+              }
+            ]
+          });
+          alert.present();
+        }
       });
-      alert.present();
-    }
+    });
   }
 
   showalert(info:string) {
