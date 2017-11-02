@@ -70,11 +70,11 @@ export class EditTaskPage {
 }
 
 updateTask(){
-  console.log("date "+this.task.update_date+" hour "+this.task.update_hour+" time "+this.task.update_time+" latest_dayTask "+this.task.latest_dayTask);
+  //console.log("date "+this.task.update_date+" hour "+this.task.update_hour+" time "+this.task.update_time+" latest_dayTask "+this.task.latest_dayTask);
   this.restapiService.deleteUserTask(this.task.id);
   if(this.updateTime != undefined && this.updateTime != ''){
     if(this.task.update_date == new Date().toLocaleDateString()){
-      console.log("do usunecia: "+this.task.latest_dayTask);
+      //console.log("do usunecia: "+this.task.latest_dayTask);
       this.restapiService.deleteDayTask(this.task.latest_dayTask);
       this.dayTask.id = this.task.latest_dayTask;
     }
@@ -82,29 +82,31 @@ updateTask(){
     this.task.update_time = Number(this.updateTime);
     this.task.update_date = new Date().toLocaleDateString();
     this.task.update_hour = this.getHour();
+
     this.dayTask.date = new Date().toLocaleDateString();
     this.dayTask.hour = this.getHour();
     this.dayTask.time_spent = this.task.time_spent;
     this.dayTask.task_id = this.task.task_id;
     this.dayTask.user_id = this.task.user_id;
+    
     this.restapiService.saveDayTask(this.dayTask);
     this.restapiService.getDayTask().then(data => {
       this.dayTasks = new Array<number>();
       this.dayTasksObjects = data;
       for(let dayTask of this.dayTasksObjects){
-        //console.log("task: "+dayTask.task_id+" user "+dayTask.user_id+" date "+dayTask.date);
+        console.log("task: "+dayTask.task_id+" user "+dayTask.user_id+" date "+dayTask.date);
         if(dayTask.date == new Date().toLocaleDateString() && dayTask.task_id == this.task.task_id && dayTask.user_id == this.task.user_id){
-          console.log(dayTask);
+          console.log(dayTask.id);
           this.dayTasks.push(dayTask.id);
         }
       }
       console.log("latest_dayTask "+this.dayTasks[this.dayTasks.length-1]);
       this.task.latest_dayTask = this.dayTasks[this.dayTasks.length-1];
       console.log("date "+this.task.update_date+" hour "+this.task.update_hour+" time "+this.task.update_time+" latest_dayTask "+this.task.latest_dayTask);
-      this.restapiService.saveUserTask(this.task);
-      this.getUserTask(this.params.task_id);
     });
   }
+  this.restapiService.saveUserTask(this.task);
+  this.getUserTask(this.params.task_id);
 }
 
 }

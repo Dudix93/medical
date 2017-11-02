@@ -206,7 +206,7 @@ export class RestapiServiceProvider {
   saveDayTask(data) {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/dayTask', data)
+        this.http.post(value+'/dayTask', data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -219,7 +219,7 @@ export class RestapiServiceProvider {
   deleteDayTask(id) {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/dayTask/'+id)
+        this.http.delete(value+'/dayTask/'+id,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -247,7 +247,7 @@ export class RestapiServiceProvider {
     console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/tasks/'+data)
+        this.http.delete(value+'/tasks/'+data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -261,7 +261,7 @@ export class RestapiServiceProvider {
     //console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/userTask/'+data)
+        this.http.delete(value+'/userTask/'+data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {

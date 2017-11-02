@@ -16,7 +16,8 @@ import { EditTaskPage } from '../edit-task/edit-task';
 })
 
 export class HomePage {
-  userTask = {id:0,
+  userTask = {
+    //id:0,
     user_id: '', 
     task_id: '', 
     update_date:'', 
@@ -38,6 +39,7 @@ export class HomePage {
       time_spent:0}
   
   pushPage = EditTaskPage;
+  inProgress:boolean;
   dayTasksObjects:any;
   userTasks: any;
   tasks: any;
@@ -219,6 +221,8 @@ export class HomePage {
         }
       }
     }
+    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatycznie",false));
+    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manualnie",false));
     //console.log(this.radioButtons);
     return this.radioButtons;
   }
@@ -237,27 +241,47 @@ export class HomePage {
     }
   }
 
-  startTask(task_id:number){
-    this.dayTasks = new Array<any>();
-    this.currentDate = new Date().toLocaleDateString();
-    this.currentTime = this.getHour();
-    this.user[0].tasks.push(task_id);
-    this.dayTask.hour = this.currentTime;
-    this.dayTask.date = this.currentDate;
-    this.dayTask.task_id = task_id;
-    this.dayTask.user_id = this.user[0].id;
-    this.restapiService.saveDayTask(this.dayTask);
-    this.restapiService.getDayTask().then(data => {
-      this.dayTasks = new Array<number>();
-      this.dayTasksObjects = data;
-      for(let dayTask of this.dayTasksObjects){
-        if(dayTask.date == new Date().toLocaleDateString()){
-          this.dayTasks.push(dayTask.id);
+  ifInProgress(){
+    this.inProgress = false;
+    this.restapiService.getUserTask()
+    .then(userTasks => {
+      this.userTasks = userTasks;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTasks){
+          if(user_id == task.user_id && task.finish_date == null){
+            this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: ");
+            this.inProgress = true;
+            break;
+          }
         }
-      }
-      this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,this.dayTasks[this.dayTasks.length-1],null));
-      console.log("latestDayTask: "+this.dayTasks[this.dayTasks.length-1]);
+      });
     });
+  }
+
+  startTask(task_id:number){
+    if(task_id != undefined){
+      this.dayTasks = new Array<any>();
+      this.currentDate = new Date().toLocaleDateString();
+      this.currentTime = this.getHour();
+      this.user[0].tasks.push(task_id);
+      this.dayTask.hour = this.currentTime;
+      this.dayTask.date = this.currentDate;
+      this.dayTask.task_id = task_id;
+      this.dayTask.user_id = this.user[0].id;
+      // this.restapiService.saveDayTask(this.dayTask);
+      // this.restapiService.getDayTask().then(data => {
+      //   this.dayTasks = new Array<number>();
+      //   this.dayTasksObjects = data;
+      //   for(let dayTask of this.dayTasksObjects){
+      //     if(dayTask.date == new Date().toLocaleDateString()){
+      //       this.dayTasks.push(dayTask.id);
+      //     }
+      //   }
+      //   this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null,null));
+      //   console.log("latestDayTask: "+this.dayTasks[this.dayTasks.length-1]);
+      // });
+      this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null,null));
+    }
   }
 
   finishTask(){
@@ -302,21 +326,38 @@ export class HomePage {
   }
 
   selectTaskToStart(project:string, project_id:number) {
-    //this.prepareRadioButtons();
+    this.ifInProgress();
+    if(this.inProgress == false){
+      const alert = this.alertCtrl.create({
+        title: "Czynnosci w "+project,
+        inputs: this.prepareRadioButtons(project_id),        
+        buttons: [
+          {
+            text: 'Anuluj',
+            role: 'cancel',
+            handler: () => {
+            }
+          },
+          {
+            text: 'Rozpocznij',
+            handler: data => {
+              this.startTask(data);
+            }
+          }
+        ]
+      });
+      alert.present();
+    }
+  }
+
+  showalert(info:string) {
     const alert = this.alertCtrl.create({
-      title: "Czynnosci w "+project,
-      inputs: this.prepareRadioButtons(project_id),        
+      title: info,
       buttons: [
         {
-          text: 'Anuluj',
-          role: 'cancel',
+          text: 'Ok',
           handler: () => {
-          }
-        },
-        {
-          text: 'Rozpocznij',
-          handler: data => {
-            this.startTask(data);
+            //this.startTask(data);
           }
         }
       ]
