@@ -90,42 +90,15 @@
         1
       ],
       "tasks": [
-        7,
-        3,
-        1
+        7
       ]
     }
   ],
   "userTask": [
     {
       "user_id": 4,
-      "task_id": 3,
-      "update_date": null,
-      "update_hour": null,
-      "update_time": null,
-      "time_spent": null,
-      "start_date": "2.11.2017",
-      "start_hour": "10:53",
-      "latest_dayTask": null,
-      "finish_date": null,
-      "id": 2
-    },
-    {
-      "user_id": 4,
-      "task_id": 1,
-      "update_date": null,
-      "update_hour": null,
-      "update_time": null,
-      "time_spent": null,
-      "start_date": "2.11.2017",
-      "start_hour": "10:53",
-      "latest_dayTask": null,
-      "finish_date": null,
-      "id": 3
-    },
-    {
-      "user_id": 4,
       "task_id": 7,
+      "task_title": "czynnosc7",
       "update_date": "2.11.2017",
       "update_hour": "10:53",
       "update_time": 2,
@@ -133,8 +106,9 @@
       "start_date": "2.11.2017",
       "start_hour": "10:53",
       "latest_dayTask": 4,
-      "finish_date": null,
-      "id": 1
+      "finish_date": "3.11.2017",
+      "id": 1,
+      "finish_hour": "11:32"
     }
   ],
   "dayTask": [

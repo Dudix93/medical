@@ -19,7 +19,8 @@ export class HomePage {
   userTask = {
     id:0,
     user_id: '', 
-    task_id: '', 
+    task_id: '',
+    task_title:'', 
     update_date:'', 
     update_hour:'', 
     update_time:0, 
@@ -30,6 +31,21 @@ export class HomePage {
     latest_dayTask:0, 
     finish_date:'',
     finish_hour:''}
+
+    newUserTask = {
+      user_id:null, 
+      task_id:null,
+      task_title:null, 
+      update_date:null, 
+      update_hour:null, 
+      update_time:null, 
+      time_spent:null, 
+      start_date:null, 
+      start_hour:null,
+      description:null,
+      latest_dayTask:null, 
+      finish_date:null,
+      finish_hour:null}
 
   dayTask = {
       task_id:0,
@@ -68,7 +84,6 @@ export class HomePage {
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
-    //this.restapiService.getDayTask().then(data => {console.log("DayTasks:");console.log(data);});
   }
 
   getUserProjectsAndTasks() {
@@ -83,32 +98,40 @@ export class HomePage {
             this.restapiService.getTasks()
             .then(data => {
               this.tasks = data;
-              this.userProjects = new Array<any>();
-              if(this.user[0].projects != null){
-                for(let userProject of this.user[0].projects){
-                  this.userProjectTasks = new Array<any>();
-                  for(let project of this.projects){
-                    if(project.id == userProject){
-                      //console.log(project);
-                      this.project = project;
-                      for(let userTask of this.user[0].tasks){
-                        for(let projectTasks of project.tasks){
-                          if(userTask == projectTasks){
-                            for(let task of this.tasks){
-                              if(task.id == projectTasks){
-                                this.userProjectTasks.push(task);
-                                continue;
+              this.restapiService.getUserTask()
+              .then(data => {
+                this.userTasks = data;
+                this.userProjects = new Array<any>();
+                if(this.user[0].projects != null){
+                  for(let userProject of this.user[0].projects){
+                    this.userProjectTasks = new Array<any>();
+                    for(let project of this.projects){
+                      if(project.id == userProject){
+                        //console.log(project);
+                        this.project = project;
+
+                          for(let userTask of this.userTasks){
+                            for(let projectTasks of project.tasks){
+                              if(userTask.finish_date == null){
+                                this.storage.set('current_task_id', userTask.task_id);
+                                this.storage.set('current_task_title', userTask.task_title);
+                              }
+                              if(userTask.task_id == projectTasks){
+                                    this.userProjectTasks.push(userTask);
+                                    //console.log(userTask);
+                                    continue;
                               }
                             }
-                          }
                         }
-                      }
+                      
                       this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
+                      //console.log(this.userProjectTasks);
                     }
                   }
                 }
               }
               else this.projects = null;
+              });
             });
           });
       });
@@ -171,9 +194,13 @@ export class HomePage {
   }
 
   editTask(task_id:number, task_title:string){
-    this.params.task_id = task_id;
-    this.params.task_title = task_title;
-    this.navCtrl.push(EditTaskPage, this.params);
+    this.storage.get('current_task_id').then((id) => {
+      this.storage.get('current_task_title').then((title) => {
+        this.params.task_id = id;
+        this.params.task_title = title;
+        this.navCtrl.push(EditTaskPage, this.params);
+      });
+    });
   }
 
   menu() {
@@ -214,7 +241,7 @@ export class HomePage {
           if(project_id == task.project_id){
    
               if(!this.user[0].tasks.includes(task.id)){
-                this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",task.id,false));
+                this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},false));
                 continue;
               }
             
@@ -222,14 +249,10 @@ export class HomePage {
         }
       }
     }
-    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatycznie",false));
-    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manualnie",false));
+    //this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatycznie",false));
+    //this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manualnie",false));
     //console.log(this.radioButtons);
     return this.radioButtons;
-  }
-
-  updateTaskTime(task_id:number, updateTaskTime:number){
-
   }
 
   getHour(){
@@ -242,29 +265,26 @@ export class HomePage {
     }
   }
 
-  startTask(task_id:number){
-    if(task_id != undefined){
+  startTask(task:any){
+    console.log(task);
+    if(task != undefined){
       this.dayTasks = new Array<any>();
       this.currentDate = new Date().toLocaleDateString();
       this.currentTime = this.getHour();
-      this.user[0].tasks.push(task_id);
+      this.user[0].tasks.push(task.id);
       this.dayTask.hour = this.currentTime;
       this.dayTask.date = this.currentDate;
-      this.dayTask.task_id = task_id;
+      this.dayTask.task_id = task.id;
       this.dayTask.user_id = this.user[0].id;
-      // this.restapiService.saveDayTask(this.dayTask);
-      // this.restapiService.getDayTask().then(data => {
-      //   this.dayTasks = new Array<number>();
-      //   this.dayTasksObjects = data;
-      //   for(let dayTask of this.dayTasksObjects){
-      //     if(dayTask.date == new Date().toLocaleDateString()){
-      //       this.dayTasks.push(dayTask.id);
-      //     }
-      //   }
-      //   this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null,null));
-      //   console.log("latestDayTask: "+this.dayTasks[this.dayTasks.length-1]);
-      // });
-      this.restapiService.startTask(this.user[0],new UserTask(this.user[0].id,task_id,null,null,null,null,this.currentDate,this.currentTime,null,null));
+      this.newUserTask.start_date = this.currentDate;
+      this.newUserTask.start_hour = this.currentTime;
+      this.newUserTask.user_id = this.user[0].id;
+      this.newUserTask.task_id = task.id;
+      this.newUserTask.task_title = task.title;
+      this.restapiService.startTask(this.user[0], this.newUserTask);
+      this.restapiService.saveDayTask(this.dayTask);
+      this.storage.set('current_task_id', task.id);
+      this.storage.set('current_task_title', task.title);
     }
   }
 
@@ -272,19 +292,21 @@ export class HomePage {
     this.userTask.finish_date = new Date().toLocaleDateString();
     this.userTask.finish_hour = this.getHour();
     this.restapiService.updateUserTask(this.userTask.id, this.userTask);
+    this.storage.set('current_task_id', null);
+    this.storage.set('current_task_title', null);
   }
 
   finishTaskPrompt(task_id:number, task_title:string) {
     this.restapiService.getUserTask()
-    .then(userTasks => {
-      this.userTasks = userTasks;
+    .then(data => {
+      this.userTasks = data;
       this.storage.get('zalogowany_id').then((user_id) => {
         for(let task of this.userTasks){
-          //console.log(task);
-          if(user_id == task.user_id && task_id == task.task_id){
-            this.userTask = task;
-            break;
-          }
+          this.storage.get("current_task_id").then((id) => {
+            if(id == task.task_id){
+              this.userTask = task;
+            }
+          });
         }
       });
     });
@@ -316,8 +338,10 @@ export class HomePage {
       this.storage.get('zalogowany_id').then((user_id) => {
         for(let task of this.userTasks){
           if(user_id == task.user_id && task.finish_date == null){
-            console.log(task);
-            this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: ");
+            //console.log(task);
+            this.storage.get('current_task_title').then((title) => {
+              this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: "+title);
+            });
             this.inProgress = true;
             break;
           }

@@ -22,23 +22,26 @@ export class EditTaskPage {
   hour:'',
   time_spent:0}
   
-  task = {id:0,
-          user_id:0, 
-          task_id:0, 
-          update_date:'', 
-          update_hour:'', 
-          update_time:0, 
-          time_spent:0, 
-          start_date:'', 
-          start_hour:'',
-          description:'',
-          latest_dayTask:0, 
-          finish_date:'',
-          finish_hour:''}
+  task = {
+    id:0,
+    user_id: '', 
+    task_id: '',
+    task_title:'', 
+    update_date:'', 
+    update_hour:'', 
+    update_time:0, 
+    time_spent:0, 
+    start_date:'', 
+    start_hour:'',
+    description:'',
+    latest_dayTask:0, 
+    finish_date:'',
+    finish_hour:''}
 
   constructor(public navCtrl: NavController, public navParams:NavParams, private restapiService: RestapiServiceProvider, private storage: Storage) {
     this.params.task_title = this.navParams.get('task_title');
     this.params.task_id = this.navParams.get('task_id');
+    console.log(this.params);
     this.getUserTask(this.params.task_id);
   }
 

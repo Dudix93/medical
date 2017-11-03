@@ -229,6 +229,19 @@ export class RestapiServiceProvider {
     });
   }
 
+  updateDayTask(id,data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/dayTask/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
   saveUserTask(data) {
     //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
@@ -299,6 +312,20 @@ export class RestapiServiceProvider {
     });
   }
 
+  updateUser(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/users/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
   saveUserPreferences(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
@@ -346,8 +373,7 @@ export class RestapiServiceProvider {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((apiUrl) => {
         this.storage.get('zalogowany_id').then((id) => {
-          this.deleteUser(id);
-          this.saveUser(user);
+          this.updateUser(id,user)
           this.saveUserTask(task);
           }); 
       });
