@@ -281,10 +281,20 @@ export class HomePage {
       this.newUserTask.user_id = this.user[0].id;
       this.newUserTask.task_id = task.id;
       this.newUserTask.task_title = task.title;
-      this.restapiService.startTask(this.user[0], this.newUserTask);
       this.restapiService.saveDayTask(this.dayTask);
-      this.storage.set('current_task_id', task.id);
-      this.storage.set('current_task_title', task.title);
+      this.restapiService.getLatestDayTask(task.id).then(data => {
+        this.dayTasks = new Array<number>();
+        this.dayTasksObjects = data;
+        console.log(data);
+        for(let dayTask of this.dayTasksObjects){
+          this.newUserTask.latest_dayTask = dayTask.id;
+          console.log(dayTask.id);
+          break;
+        }
+        this.restapiService.startTask(this.user[0], this.newUserTask);
+        this.storage.set('current_task_id', task.id);
+        this.storage.set('current_task_title', task.title);
+      });
     }
   }
 

@@ -379,4 +379,17 @@ export class RestapiServiceProvider {
       });
     });
   }
+
+  getLatestDayTask(task_id:number) {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/dayTask?_sort=id&_order=desc&task_id='+task_id,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
 }
