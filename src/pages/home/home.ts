@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import {   ActionSheetController, AlertController, ToastController, NavController } from 'ionic-angular';
+import { Push, PushToken } from '@ionic/cloud-angular';
+import { ActionSheetController, AlertController, ToastController, NavController, Platform } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
@@ -78,13 +79,28 @@ export class HomePage {
               private storage:Storage,
               private actionSheetCtrl:ActionSheetController,
               private alertCtrl:AlertController,
-              private toastCtrl:ToastController) {
+              private toastCtrl:ToastController,
+              public push:Push,
+              platform: Platform) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
-  }
+    
+    if (platform.is('cordova')){
+      this.push.register().then((t: PushToken) => {
+        return this.push.saveToken(t);
+      }).then((t: PushToken) => {
+        console.log('Token saved:', t.token);
+      });
+  
+      this.push.rx.notification()
+      .subscribe((msg) => {
+        alert(msg.title + ': ' + msg.text);
+      });
+    }
+    }
 
   getUserProjectsAndTasks() {
     this.storage.get('zalogowany_id').then((val) => {

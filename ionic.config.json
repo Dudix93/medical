@@ -1,6 +1,6 @@
 {
   "name": "raportowanie",
-  "app_id": "",
+  "app_id": "raport123",
   "type": "ionic-angular",
   "integrations": {}
 }

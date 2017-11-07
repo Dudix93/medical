@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
+import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -14,6 +15,24 @@ import { PreferencesPage } from '../pages/preferences/preferences';
 import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { EditTaskPage } from '../pages/edit-task/edit-task';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
+
+const cloudSettings: CloudSettings = {
+  'core': {
+    'app_id': 'raport123'
+  },
+  'push': {
+    'sender_id': '160370676742',
+    'pluginConfig': {
+      'ios': {
+        'badge': true,
+        'sound': true
+      },
+      'android': {
+        'iconColor': '#343434'
+      }
+    }
+  }
+};
 
 @NgModule({
   declarations: [
@@ -29,7 +48,8 @@ import { RestapiServiceProvider } from '../providers/restapi-service/restapi-ser
     IonicStorageModule.forRoot(),
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    HttpModule
+    HttpModule,
+    CloudModule.forRoot(cloudSettings)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
