@@ -90,7 +90,8 @@
         1
       ],
       "tasks": [
-        7
+        7,
+        8
       ]
     }
   ],
@@ -109,6 +110,22 @@
       "finish_date": "3.11.2017",
       "id": 1,
       "finish_hour": "11:32"
+    },
+    {
+      "user_id": 4,
+      "task_id": 8,
+      "task_title": "czynnosc8",
+      "update_date": "11/8/2017",
+      "update_hour": "22:50",
+      "update_time": 2,
+      "time_spent": 9,
+      "start_date": "11/8/2017",
+      "start_hour": "22:50",
+      "description": null,
+      "latest_dayTask": 5,
+      "finish_date": null,
+      "finish_hour": null,
+      "id": 2
     }
   ],
   "dayTask": [
@@ -119,6 +136,14 @@
       "date": "2.11.2017",
       "hour": "10:53",
       "time_spent": 2
+    },
+    {
+      "id": 5,
+      "task_id": 8,
+      "user_id": 4,
+      "date": "11/8/2017",
+      "hour": "22:50",
+      "time_spent": 9
     }
   ],
   "preferences": [
