@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { CommonModule } from '@angular/common';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 
 @IonicPage()
@@ -13,7 +13,10 @@ export class PreferencesPage {
 
   preferences:any;
   loggedUser = {id:'', login:''}
-  settings = {user_id:'', 
+  settings = {id:0,
+              user_id:'',
+              method_for_all:false,
+              count_method: '',
               pon: '', ponOd: '', ponDo: '', 
               wt:'', wtOd: '', wtDo: '',  
               sr:'', srOd: '', srDo: '',  
@@ -21,10 +24,14 @@ export class PreferencesPage {
               pt:'', ptOd: '', ptDo: '',  
               sob:'', sobOd: '', sobDo: '',  
               nd:'', ndOd: '', ndDo: '', }
-  deleteID:any;
-  constructor(public navCtrl: NavController, public restapiService: RestapiServiceProvider, public navParams: NavParams, public storage:Storage) {
+  constructor(public navCtrl: NavController, 
+              public restapiService: RestapiServiceProvider, 
+              public navParams: NavParams, 
+              public storage:Storage,
+              public alertCtrl:AlertController) {
     this.getLoggedUser();
     this.getUserPreferences();
+    //console.log(this.settings);
   }
 
   getUserPreferences() {
@@ -33,8 +40,11 @@ export class PreferencesPage {
       this.preferences = data;
       for (let entry of this.preferences) {
           this.storage.get('zalogowany_id').then((val) => {
+            console.log(entry.user_id+" "+val);
             if(entry.user_id == val){
-              this.deleteID = entry.id;
+              this.settings.id = entry.id;
+              this.settings.method_for_all = entry.method_for_all;
+              this.settings.count_method = entry.count_method;
               this.settings.user_id = entry.user_id;
               this.settings.pon = entry.pon;
               this.settings.wt = entry.wt;
@@ -59,7 +69,6 @@ export class PreferencesPage {
               this.settings.ptDo = entry.ptDo;
               this.settings.sobDo = entry.sobDo;
               this.settings.ndDo = entry.ndDo;
-
               // console.log("pon settings: "+this.settings.sobDo);
               // console.log("pon entry: "+entry.sobDo);
               //console.log("Do usunięcia: "+this.deleteID);
@@ -82,7 +91,22 @@ export class PreferencesPage {
 
   saveUserPreferences() {
     console.log(this.settings);
-    this.restapiService.deleteUserPreferences(this.deleteID);
-    this.restapiService.saveUserPreferences(this.settings);
+    this.restapiService.updateUserPreferences(this.settings.id,this.settings);
+    this.showalert("Zapisano preferencje.");
+  }
+
+  showalert(info:string) {
+    const alert = this.alertCtrl.create({
+      title: info,
+      buttons: [
+        {
+          text: 'Ok',
+          handler: () => {
+            //this.startTask(data);
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 }

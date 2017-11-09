@@ -340,6 +340,20 @@ export class RestapiServiceProvider {
     });
   }
 
+  updateUserPreferences(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/preferences/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
   deleteUser(data){
     console.log(data);
     return new Promise((resolve, reject) => {

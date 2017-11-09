@@ -149,6 +149,7 @@
   "preferences": [
     {
       "user_id": "4",
+      "count_method":"", 
       "pon": true,
       "ponOd": "07:00",
       "ponDo": "19:00",
@@ -174,6 +175,7 @@
     },
     {
       "user_id": "8",
+      "count_method":"", 
       "pon": false,
       "ponOd": "05:00",
       "ponDo": "16:30",
