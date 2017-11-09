@@ -1,0 +1,6 @@
+ 
+Poprawki do rozmyślenia: 
+-co jeśli ktoś zapomni skończyć czynność? (można wysylac cykliczne proźby o potwierdzenie pracy, w przeciwnym wypadku, czynnoćś automatycznie się skończy) 
+- możnaby akceptować wysyłane raporty 
+- edycja nie jest możliwa bezpośrednio z poziomu aplikacji, a zamiast tego wysyłana jest proźba o wniesienie poprawki do administora 
+- rojekt może mieć pulę godzin do wykorzystania; pracownik może otrzymywać powiadomienia o przekroczeniu/zblizeniu się do limitu 

@@ -30,7 +30,8 @@ export class HomePage {
     start_hour:'',
     description:'',
     latest_dayTask:0,
-    count_method:'', 
+    count_method:'',
+    paused:false,  
     finish_date:'',
     finish_hour:''}
 
@@ -46,7 +47,8 @@ export class HomePage {
       start_hour:null,
       description:null,
       latest_dayTask:null,
-      count_method:null, 
+      count_method:null,
+      paused:false, 
       finish_date:null,
       finish_hour:null}
 
