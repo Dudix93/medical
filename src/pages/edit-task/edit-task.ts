@@ -117,11 +117,13 @@ updateTask(){
         //console.log("date "+this.task.update_date+" hour "+this.task.update_hour+" time "+this.task.update_time+" latest_dayTask "+this.task.latest_dayTask);
         this.restapiService.updateUserTask(this.task.id,this.task);
         this.getUserTask(this.params.task_id);
+        this.showalert("Zaktualizowano.");
       });
     }
     else{
       this.restapiService.updateUserTask(this.task.id,this.task);
       this.getUserTask(this.params.task_id);
+      this.showalert("Zaktualizowano.");
     } 
   }
 }

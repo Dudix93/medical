@@ -29,7 +29,8 @@ export class HomePage {
     start_date:'', 
     start_hour:'',
     description:'',
-    latest_dayTask:0, 
+    latest_dayTask:0,
+    count_method:'', 
     finish_date:'',
     finish_hour:''}
 
@@ -44,7 +45,8 @@ export class HomePage {
       start_date:null, 
       start_hour:null,
       description:null,
-      latest_dayTask:null, 
+      latest_dayTask:null,
+      count_method:null, 
       finish_date:null,
       finish_hour:null}
 
@@ -248,7 +250,7 @@ export class HomePage {
     actionSheet.present();
   }
 
-  prepareRadioButtons(project_id:number){
+  prepareTasksRadioButtons(project_id:number){
     this.radioButtons = [];
     //console.log(this.userProjectTasks);
     for(let project of this.userProjects){
@@ -257,7 +259,12 @@ export class HomePage {
           if(project_id == task.project_id){
    
               if(!this.user[0].tasks.includes(task.id)){
-                this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},false));
+                if(this.radioButtons.length == 0){
+                  this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},true));
+                }
+                else{
+                  this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},false));
+                }
                 continue;
               }
             
@@ -265,9 +272,13 @@ export class HomePage {
         }
       }
     }
-    //this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatycznie",false));
-    //this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manualnie",false));
-    //console.log(this.radioButtons);
+    return this.radioButtons;
+  }
+
+  prepareCountMethodRadioButtons(){
+    this.radioButtons = [];
+    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manual",true));
+    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatic",false));
     return this.radioButtons;
   }
 
@@ -281,8 +292,9 @@ export class HomePage {
     }
   }
 
-  startTask(task:any){
+  startTask(task:any, countMethod:any){
     console.log(task);
+    console.log(countMethod);
     if(task != undefined){
       this.dayTasks = new Array<any>();
       this.currentDate = new Date().toLocaleDateString();
@@ -297,6 +309,7 @@ export class HomePage {
       this.newUserTask.user_id = this.user[0].id;
       this.newUserTask.task_id = task.id;
       this.newUserTask.task_title = task.title;
+      this.newUserTask.count_method = countMethod;
       this.restapiService.saveDayTask(this.dayTask);
       this.restapiService.getLatestDayTask(task.id).then(data => {
         this.dayTasks = new Array<number>();
@@ -373,9 +386,9 @@ export class HomePage {
           }
         }
         if(this.inProgress == false){
-          const alert = this.alertCtrl.create({
+          const tasksAlert = this.alertCtrl.create({
             title: "Czynnosci w "+project,
-            inputs: this.prepareRadioButtons(project_id),        
+            inputs: this.prepareTasksRadioButtons(project_id),        
             buttons: [
               {
                 text: 'Anuluj',
@@ -386,16 +399,33 @@ export class HomePage {
               {
                 text: 'Rozpocznij',
                 handler: data => {
-                  this.startTask(data);
+                  this.selectCountMethod(data);
                 }
               }
             ]
           });
-          alert.present();
+          tasksAlert.present();
         }
       });
     });
   }
+
+  selectCountMethod(taskToStart:any) {
+          const tasksAlert = this.alertCtrl.create({
+            title: "Metoda zliczania czasu:",
+            inputs: this.prepareCountMethodRadioButtons(),      
+            buttons: [
+              {
+                text: 'OK',
+                handler: data => {
+                  this.startTask(taskToStart, data);
+                }
+              }
+            ]
+          });
+          tasksAlert.present();
+  }
+  
 
   showalert(info:string) {
     const alert = this.alertCtrl.create({
