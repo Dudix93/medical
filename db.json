@@ -123,6 +123,7 @@
       "start_hour": "22:50",
       "description": null,
       "latest_dayTask": 5,
+      "count_method":"manual",
       "finish_date": null,
       "finish_hour": null,
       "id": 2
@@ -146,6 +147,7 @@
       "time_spent": 9
     }
   ],
+  "pausedTask": [],
   "preferences": [
     {
       "user_id": "4",
