@@ -30,6 +30,7 @@ export class HomePage {
     start_hour:'',
     description:'',
     latest_dayTask:0,
+    latest_pausedTask:0,
     count_method:'',
     paused:false,  
     finish_date:'',
@@ -47,6 +48,7 @@ export class HomePage {
       start_hour:null,
       description:null,
       latest_dayTask:null,
+      latest_pausedTask:null,
       count_method:null,
       paused:false, 
       finish_date:null,
@@ -58,10 +60,30 @@ export class HomePage {
       date:'',
       hour:'',
       time_spent:0}
+
+      
+  pausedTask = {
+    task_id:0,
+    user_id:0,
+    pause_date:null,
+    pause_hour:null,
+    restart_date:null,
+    restart_hour:null,
+  }    
   
+  newPausedTask = {
+    id:0,
+    task_id:0,
+    user_id:0,
+    pause_date:null,
+    pause_hour:null,
+    restart_date:null,
+    restart_hour:null,
+  } 
   pushPage = EditTaskPage;
   inProgress:boolean;
   dayTasksObjects:any;
+  pausedTaskObjects:any;
   userTasks: any;
   tasks: any;
   user: Array<any>;
@@ -335,6 +357,59 @@ export class HomePage {
     this.restapiService.updateUserTask(this.userTask.id, this.userTask);
     this.storage.set('current_task_id', null);
     this.storage.set('current_task_title', null);
+  }
+
+  pauseTask(task_id:number){
+    this.restapiService.getUserTask()
+    .then(data => {
+      this.userTasks = data;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTasks){
+          this.storage.get("current_task_id").then((id) => {
+            if(id == task.task_id){
+              this.userTask = task;
+              this.userTask.paused = true;
+              this.pausedTask.task_id = id;
+              this.pausedTask.user_id = user_id;
+              this.pausedTask.pause_date = new Date().toLocaleDateString();
+              this.pausedTask.pause_hour = this.getHour();
+              this.restapiService.savePausedTask(this.pausedTask);
+              this.restapiService.updateUserTask(this.userTask.id,this.userTask);
+              this.showalert("Wstrzymano czynność.");
+            }
+          });
+        }
+      });
+    });
+  }
+
+  restartTask(task_id:number){
+    this.restapiService.getUserTask()
+    .then(data => {
+      this.userTasks = data;
+      this.storage.get('zalogowany_id').then((user_id) => {
+        for(let task of this.userTasks){
+          this.storage.get("current_task_id").then((id) => {
+            if(id == task.task_id){
+              this.restapiService.getLatestPausedTask(id,user_id)
+              .then(data => {
+                this.userTask = task;
+                this.userTask.paused = false;
+                this.pausedTaskObjects = new Array<any>();
+                this.pausedTaskObjects = data;
+                this.newPausedTask = this.pausedTaskObjects[0];
+                this.newPausedTask.restart_date = new Date().toLocaleDateString();
+                this.newPausedTask.restart_hour = this.getHour();
+                this.restapiService.updatePausedTask(this.newPausedTask.id,this.newPausedTask);
+                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
+                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
+                this.showalert("Wznowiono czynność.");
+              });
+            }
+          });
+        }
+      });
+    });
   }
 
   finishTaskPrompt(task_id:number, task_title:string) {

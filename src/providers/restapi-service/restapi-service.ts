@@ -326,6 +326,20 @@ export class RestapiServiceProvider {
     });
   }
 
+  deleteUser(data){
+    console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/users/'+data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
   saveUserPreferences(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
@@ -354,20 +368,6 @@ export class RestapiServiceProvider {
     });
   }
 
-  deleteUser(data){
-    console.log(data);
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/users/'+data)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });  
-      });
-    });
-  }
-
   deleteUserPreferences(data){
     console.log(data);
     return new Promise((resolve, reject) => {
@@ -378,6 +378,34 @@ export class RestapiServiceProvider {
         }, (err) => {
           reject(err);
         });  
+      });
+    });
+  }
+
+  savePausedTask(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/pausedTask', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
+  updatePausedTask(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/pausedTask/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
       });
     });
   }
@@ -398,6 +426,19 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         this.http.get(value+'/dayTask?_sort=id&_order=desc&task_id='+task_id,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
+
+  getLatestPausedTask(task_id:number,user_id:number) {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/pausedTask?_sort=pause_date,pause_hour&_order=desc,desc&task_id='+task_id+'&user_id='+user_id,this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
