@@ -10,6 +10,7 @@ import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
 import { EditTaskPage } from '../edit-task/edit-task';
+import { CalendarPage } from '../calendar/calendar';
 
 @Component({
   selector: 'page-home',
@@ -235,6 +236,10 @@ export class HomePage {
     this.navCtrl.push(PreferencesPage);
   }
 
+  calendar(){
+    this.navCtrl.push(CalendarPage);
+  }
+
   editTask(task_id:number, task_title:string){
     this.storage.get('current_task_id').then((id) => {
       this.storage.get('current_task_title').then((title) => {
@@ -248,6 +253,13 @@ export class HomePage {
   menu() {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
+        {
+          text: 'Kalendarz',
+          icon:'md-calendar',
+          handler: () => {
+            this.calendar();
+          }
+        },
         {
           text: 'Edytuj swoje dane',
           icon:'ios-contacts',
