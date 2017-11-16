@@ -8,5 +8,14 @@
 
 
 <ion-content padding>
+  <ion-list *ngFor="let project of userProjects,let i = index">
+    <h2>{{project.title}}</h2>
+    <ion-list *ngFor="let task of project.tasks,let i = index">
+      {{task.task_title}}
+      <ion-item *ngFor="let dayTask of task.day_tasks">
+          Dnia {{dayTask.date}} przepracowano {{dayTask.time_spent}}
+      </ion-item>
+    </ion-list>
+  </ion-list>
 
 </ion-content>

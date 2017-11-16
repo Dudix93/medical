@@ -145,6 +145,14 @@
       "date": "11/8/2017",
       "hour": "22:50",
       "time_spent": 9
+    },
+    {
+      "id": 5,
+      "task_id": 8,
+      "user_id": 4,
+      "date": "12/8/2017",
+      "hour": "22:50",
+      "time_spent": 10
     }
   ],
   "pausedTask": [],
