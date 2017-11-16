@@ -1,21 +1,39 @@
 <ion-header>
-
   <ion-navbar>
     <ion-title>Kalendarz</ion-title>
   </ion-navbar>
-
 </ion-header>
 
 
 <ion-content padding>
-  <ion-list *ngFor="let project of userProjects,let i = index">
-    <h2>{{project.title}}</h2>
-    <ion-list *ngFor="let task of project.tasks,let i = index">
-      {{task.task_title}}
-      <ion-item *ngFor="let dayTask of task.day_tasks">
-          Dnia {{dayTask.date}} przepracowano {{dayTask.time_spent}}
-      </ion-item>
-    </ion-list>
-  </ion-list>
+    <ion-item>
+        <ion-label>Projekt</ion-label>
+        <ion-select [(ngModel)]="selectedProject">
+          <ion-option *ngFor="let project of userProjects" value="{{project.title}}">{{project.title}}</ion-option>
+        </ion-select>
+    </ion-item>
+    
+    <ion-item *ngIf="selectedProject != null">
+        <ion-label>Czynność</ion-label>
+        <ion-select [(ngModel)]="selectedTask">
+          <ng-container *ngFor="let project of userProjects">
+            <ng-container *ngIf="project.title == selectedProject">
+              <ion-option *ngFor="let task of project.tasks" value="{{task.task_title}}">{{task.task_title}}</ion-option>
+            </ng-container>
+          </ng-container>
+        </ion-select>
+    </ion-item>
+  
 
+    <ion-list *ngFor="let project of userProjects,let i = index">
+      <ng-container *ngIf="project.title == selectedProject">
+        <ion-list *ngFor="let task of project.tasks,let i = index">
+          <ng-container *ngIf="task.task_title == selectedTask">
+            <ion-item *ngFor="let dayTask of task.day_tasks">
+                Dnia {{dayTask.date}} przepracowano {{dayTask.time_spent}}
+            </ion-item>
+          </ng-container>
+        </ion-list>
+      </ng-container>
+  </ion-list>
 </ion-content>

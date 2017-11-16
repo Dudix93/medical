@@ -11,7 +11,8 @@ import { DayTask } from '../../models/dayTask';
   templateUrl: 'calendar.html',
 })
 export class CalendarPage {
-
+  selectedProject:any = null;
+  selectedTask:any = null;
   user: Array<any>;
   userProjects:Array<any>;
   userProjectTasks:Array<any>;
@@ -74,7 +75,7 @@ export class CalendarPage {
                           }
                         
                         this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
-                       console.log(this.userProjects);
+                       //console.log(this.userProjects);
                       }
                     }
                   }
