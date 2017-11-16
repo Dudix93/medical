@@ -29,9 +29,18 @@
       <ng-container *ngIf="project.title == selectedProject">
         <ion-list *ngFor="let task of project.tasks,let i = index">
           <ng-container *ngIf="task.task_title == selectedTask">
-            <ion-item *ngFor="let dayTask of task.day_tasks">
-                Dnia {{dayTask.date}} przepracowano {{dayTask.time_spent}}
-            </ion-item>
+            <ion-grid>
+              <ion-row>
+                  <ion-col col-4>Data</ion-col>
+                  <ion-col col-4>Czas(godz.)</ion-col>
+                  <ion-col col-4>Edytuj</ion-col>
+              </ion-row>
+              <ion-row *ngFor="let dayTask of task.day_tasks">
+                  <ion-col col-4>{{dayTask.date}}</ion-col>
+                  <ion-col col-4>{{dayTask.time_spent}}</ion-col>
+                  <ion-col col-4><ion-icon name="ios-create-outline" (click)="updateTimePrompt(task.task_title,dayTask.date,dayTask.time_spent)"></ion-icon></ion-col>
+              </ion-row>
+            </ion-grid>
           </ng-container>
         </ion-list>
       </ng-container>

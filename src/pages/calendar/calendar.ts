@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { UserTask } from '../../models/userTask';
@@ -17,6 +17,7 @@ export class CalendarPage {
   userProjects:Array<any>;
   userProjectTasks:Array<any>;
   dayTasks:Array<any>;
+  updateDayTask:Array<any>;
   projects: any;
   tasks: any;
   userTasks: any;
@@ -25,7 +26,8 @@ export class CalendarPage {
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public storage: Storage,
-              public restapiService: RestapiServiceProvider) {
+              public restapiService: RestapiServiceProvider,
+              public alertCtrl:AlertController,) {
                 this.getUserProjectsAndTasks();
   }
 
@@ -87,6 +89,37 @@ export class CalendarPage {
           });
       });
     });
+  }
+
+  addDayTaskToUpdate(){
+
+  }
+
+  updateTimePrompt(task_title:string, date:string, time:number) {
+    const alert = this.alertCtrl.create({
+      title: 'Edytujesz '+task_title+'<br>'+'z dnia '+date,
+      inputs: [
+        {
+          name: 'time',
+          value: time.toString()
+        }
+      ],
+      buttons: [
+        {
+          text: 'Anuluj',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'OK',
+          handler: () => {
+            this.addDayTaskToUpdate();
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
 }
