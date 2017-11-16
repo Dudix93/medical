@@ -5,6 +5,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 import { UserProject } from '../../models/userProject';
 import { UserTask } from '../../models/userTask';
 import { DayTask } from '../../models/dayTask';
+import { EditTaskPage } from '../../pages/edit-task/edit-task';
 @IonicPage()
 @Component({
   selector: 'page-calendar',
@@ -23,6 +24,7 @@ export class CalendarPage {
   userTasks: any;
   allDayTasks: any;
   project:any;
+  params = {past:true}
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public storage: Storage,
@@ -92,34 +94,34 @@ export class CalendarPage {
   }
 
   addDayTaskToUpdate(){
-
+    this.navCtrl.push(EditTaskPage,this.params);
   }
 
-  updateTimePrompt(task_title:string, date:string, time:number) {
-    const alert = this.alertCtrl.create({
-      title: 'Edytujesz '+task_title+'<br>'+'z dnia '+date,
-      inputs: [
-        {
-          name: 'time',
-          value: time.toString()
-        }
-      ],
-      buttons: [
-        {
-          text: 'Anuluj',
-          role: 'cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'OK',
-          handler: () => {
-            this.addDayTaskToUpdate();
-          }
-        }
-      ]
-    });
-    alert.present();
-  }
+  // updateTimePrompt(task_title:string, date:string, time:number) {
+  //   const alert = this.alertCtrl.create({
+  //     title: 'Edytujesz '+task_title+'<br>'+'z dnia '+date,
+  //     inputs: [
+  //       {
+  //         name: 'time',
+  //         value: time.toString()
+  //       }
+  //     ],
+  //     buttons: [
+  //       {
+  //         text: 'Anuluj',
+  //         role: 'cancel',
+  //         handler: () => {
+  //         }
+  //       },
+  //       {
+  //         text: 'OK',
+  //         handler: () => {
+  //           this.addDayTaskToUpdate();
+  //         }
+  //       }
+  //     ]
+  //   });
+  //   alert.present();
+  // }
 
 }

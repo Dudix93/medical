@@ -4,7 +4,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding *ngIf="params.past != true">
   <ion-item> 
     Data rozpoczęcia: {{task.start_date}}
   </ion-item>
