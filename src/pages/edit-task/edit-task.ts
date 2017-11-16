@@ -38,6 +38,15 @@ export class EditTaskPage {
     finish_date:'',
     finish_hour:''}
 
+    taskToEdit = {
+      past:true,
+      date:'',
+      task_id:0,
+      user_id:0,
+      time:0,
+      description:''
+    }
+
   constructor(public navCtrl: NavController, 
               public navParams:NavParams, 
               private restapiService: RestapiServiceProvider, 
@@ -50,8 +59,13 @@ export class EditTaskPage {
     }
     else{
       this.params.past = this.navParams.get('past');
+      this.taskToEdit.date = this.navParams.get('date');
+      this.taskToEdit.task_id = this.navParams.get('task_id');
+      this.taskToEdit.user_id = this.navParams.get('user_id');
+      this.taskToEdit.time = this.navParams.get('time');
+      this.taskToEdit.description =this.navParams.get('description');
     }
-    //console.log(this.task);
+    console.log(this.taskToEdit);
   }
 
   getHour(){
@@ -132,6 +146,8 @@ updateTask(){
     } 
   }
 }
+
+
 
 showalert(info:string) {
   const alert = this.alertCtrl.create({

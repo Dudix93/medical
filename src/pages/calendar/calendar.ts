@@ -24,7 +24,14 @@ export class CalendarPage {
   userTasks: any;
   allDayTasks: any;
   project:any;
-  params = {past:true}
+  taskToEdit = {
+    past:true,
+    date:'',
+    task_id:0,
+    user_id:0,
+    time:0,
+    description:''
+  }
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public storage: Storage,
@@ -72,7 +79,7 @@ export class CalendarPage {
                                       this.dayTasks.push(new DayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent))
                                     }
                                   }
-                                  this.userProjectTasks.push(new UserTask(userTask.task_id,userTask.user_id,userTask.task_title,this.dayTasks));
+                                  this.userProjectTasks.push(new UserTask(userTask.user_id,userTask.task_id,userTask.task_title,this.dayTasks));
                                   continue;
                                 }
                               }
@@ -93,8 +100,13 @@ export class CalendarPage {
     });
   }
 
-  addDayTaskToUpdate(){
-    this.navCtrl.push(EditTaskPage,this.params);
+  addDayTaskToUpdate(date:string,task_id:number,user_id:number,time:number,description:string){
+    this.taskToEdit.date = date;
+    this.taskToEdit.task_id = task_id;
+    this.taskToEdit.user_id = user_id;
+    this.taskToEdit.time = time;
+    this.taskToEdit.description =description;
+    this.navCtrl.push(EditTaskPage,this.taskToEdit);
   }
 
   // updateTimePrompt(task_title:string, date:string, time:number) {

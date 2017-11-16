@@ -27,3 +27,17 @@
     <button ion-button type="submit">Aktualizuj</button>
   </form>
 </ion-content>
+
+<ion-content padding *ngIf="params.past == true">
+  <form (ngSubmit)="updateTask()">
+    <ion-item> 
+          <ion-label floating>Aktualizuj czas</ion-label>
+          <ion-input type="text" [(ngModel)]="taskToEdit.time" name="updateTime"></ion-input>        
+      </ion-item>    
+      <ion-item>
+          <ion-label floating>Opis</ion-label>
+          <ion-input type="text" [(ngModel)]="taskToEdit.description" name="description" clearInput></ion-input>        
+      </ion-item> 
+    <button ion-button type="submit">Aktualizuj</button>
+  </form>
+</ion-content>
