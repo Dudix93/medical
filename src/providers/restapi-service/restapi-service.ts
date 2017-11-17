@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class RestapiServiceProvider {
-
+  err:any;
   data:any;
   apiUrl:string;
   //apiUrl = 'http://localhost:3000';
@@ -100,6 +100,9 @@ export class RestapiServiceProvider {
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
         });
       });
     });
@@ -410,6 +413,34 @@ export class RestapiServiceProvider {
     });
   }
 
+  saveDayTaskUpdate(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/dayTaskUpdate', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
+  updateDayTaskUpdate(id,data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/dayTaskUpdate/'+id, data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
+    });
+  }
+
   startTask(user,task){
     console.log(user);
     return new Promise((resolve, reject) => {
@@ -430,6 +461,38 @@ export class RestapiServiceProvider {
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
+        });
+      });
+    });
+  }
+
+  getDayTaskUpdate(task_id:number,user_id:number,date:string) {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/dayTaskUpdate?user_id='+user_id+'&task_id='+task_id+'&date='+date,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
+        });
+      });
+    });
+  }
+
+  getAllDayTaskUpdate() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/dayTaskUpdate',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
         });
       });
     });

@@ -38,12 +38,18 @@ export class EditTaskPage {
     finish_date:'',
     finish_hour:''}
 
-    taskToEdit = {
-      past:true,
+    getEditedTask:any;
+
+    editedTask = {
       date:'',
       task_id:0,
       user_id:0,
       time:0,
+      description:''
+    }
+
+    taskToEdit = {
+      time:-1,
       description:''
     }
 
@@ -54,18 +60,20 @@ export class EditTaskPage {
               private alertCtrl: AlertController) {
     this.params.task_title = this.navParams.get('task_title');
     this.params.task_id = this.navParams.get('task_id');
-    if(this.navParams.get('past') != true){
+    if(this.navParams.get('date') == undefined){
       this.getUserTask(this.params.task_id);
     }
     else{
-      this.params.past = this.navParams.get('past');
-      this.taskToEdit.date = this.navParams.get('date');
-      this.taskToEdit.task_id = this.navParams.get('task_id');
-      this.taskToEdit.user_id = this.navParams.get('user_id');
+      this.editedTask.date = this.navParams.get('date');
+      this.editedTask.task_id = this.navParams.get('task_id');
+      this.editedTask.user_id = this.navParams.get('user_id');
+      this.editedTask.time = this.navParams.get('time');
+      this.editedTask.description =this.navParams.get('description');
+      
       this.taskToEdit.time = this.navParams.get('time');
       this.taskToEdit.description =this.navParams.get('description');
     }
-    console.log(this.taskToEdit);
+    console.log("date "+this.navParams.get('date'));
   }
 
   getHour(){
@@ -147,6 +155,35 @@ updateTask(){
   }
 }
 
+updatePastTask(){
+  if(isNaN(Number(this.taskToEdit.time)) == true){
+    this.showalert("Wpisz liczbę!");
+  }
+  else if(this.taskToEdit.time != parseInt(this.taskToEdit.time.toString(), 10)){
+    this.showalert("Wpisz pełną godzine!");
+  }
+  else if(this.taskToEdit.time == this.editedTask.time && this.taskToEdit.description == this.editedTask.description){
+    this.showalert("Nie dokonałeś żadnej zmiany!");
+  }
+  else{
+    this.editedTask.time = this.taskToEdit.time;
+    this.editedTask.description = this.taskToEdit.description;
+    this.restapiService.getDayTaskUpdate(this.editedTask.task_id,this.editedTask.user_id,this.editedTask.date)
+    .then(data => {
+      this.getEditedTask = data;
+      if(this.getEditedTask != ''){
+        for(let et of this.getEditedTask){
+          this.restapiService.updateDayTaskUpdate(et.id,this.editedTask);
+          this.navCtrl.pop();
+        }
+      }
+      else{
+        this.restapiService.saveDayTaskUpdate(this.editedTask);
+        this.navCtrl.pop();
+      }
+    });
+  }
+}
 
 
 showalert(info:string) {

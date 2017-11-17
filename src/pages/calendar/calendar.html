@@ -37,7 +37,9 @@
               </ion-row>
               <ion-row *ngFor="let dayTask of task.day_tasks">
                   <ion-col col-4>{{dayTask.date}}</ion-col>
-                  <ion-col col-4>{{dayTask.time_spent}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask.time_update > dayTask.time_spent">{{dayTask.time_spent}} + {{dayTask.time_update - dayTask.time_spent}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask.time_update < dayTask.time_spent && dayTask.time_update != null">{{dayTask.time_spent}} - {{dayTask.time_spent - dayTask.time_update}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask.time_update == null">{{dayTask.time_spent}}</ion-col>
                   <ion-col col-4><ion-icon name="ios-create-outline" (click)="addDayTaskToUpdate(dayTask.date,task.task_id,task.user_id,dayTask.time_spent,dayTask.description)"></ion-icon></ion-col>
               </ion-row>
             </ion-grid>
