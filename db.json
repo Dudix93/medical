@@ -107,6 +107,7 @@
       "start_date": "2.11.2017",
       "start_hour": "10:53",
       "latest_dayTask": 4,
+      "count_method": "manual",
       "finish_date": "3.11.2017",
       "id": 1,
       "finish_hour": "11:32"
@@ -115,15 +116,16 @@
       "user_id": 4,
       "task_id": 8,
       "task_title": "czynnosc8",
-      "update_date": "11/8/2017",
-      "update_hour": "22:50",
+      "update_date": "18.11.2017",
+      "update_hour": "16:42",
       "update_time": 2,
-      "time_spent": 9,
-      "start_date": "11/8/2017",
-      "start_hour": "22:50",
+      "time_spent": 12,
+      "start_date": "11.19.2017",
+      "start_hour": "16:30",
       "description": null,
-      "latest_dayTask": 5,
-      "count_method":"manual",
+      "latest_dayTask": 6,
+      "count_method": "automatic",
+      "paused":false,
       "finish_date": null,
       "finish_hour": null,
       "id": 2
@@ -153,14 +155,22 @@
       "date": "12/8/2017",
       "hour": "22:50",
       "time_spent": 10
+    },
+    {
+      "id": 6,
+      "task_id": 8,
+      "user_id": 4,
+      "date": "18.11.2017",
+      "hour": "16:42",
+      "time_spent": 12
     }
   ],
-  "dayTaskUpdate":[],
+  "dayTaskUpdate": [],
   "pausedTask": [],
   "preferences": [
     {
       "user_id": "4",
-      "count_method":"", 
+      "count_method": "",
       "pon": true,
       "ponOd": "07:00",
       "ponDo": "19:00",
@@ -186,7 +196,7 @@
     },
     {
       "user_id": "8",
-      "count_method":"", 
+      "count_method": "",
       "pon": false,
       "ponOd": "05:00",
       "ponDo": "16:30",

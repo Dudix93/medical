@@ -6,6 +6,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
 import { UserTask } from '../../models/userTask';
+import { AutoTaskTime } from '../../models/autoTaskTime';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
@@ -87,6 +88,7 @@ export class HomePage {
   pausedTaskObjects:any;
   userTasks: any;
   tasks: any;
+  userPreferences:any;
   user: Array<any>;
   dayTasks: Array<number>;
   projects: any;
@@ -94,12 +96,18 @@ export class HomePage {
   login:string;
   currentDate:string;
   currentTime:string;
+  autoTasks:Array<any>;
   userProjectTasks:Array<any>;
   userProjects:Array<any>;
   userProject:UserProject[]=[];
   radioButtons:RadioButton[]=[];
   task = {title: '', id:''}
-  params = {task_title: '', task_id:0}
+  params = {
+    task_title: '', 
+    task_id:0,
+    hours:0,
+    minutes:0 
+  }
 
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -114,22 +122,22 @@ export class HomePage {
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
-    
-    if (platform.is('cordova')){
-      this.push.register().then((t: PushToken) => {
-        return this.push.saveToken(t);
-      }).then((t: PushToken) => {
-        console.log('Token saved:', t.token);
-      });
+    // if (platform.is('cordova')){
+    //   this.push.register().then((t: PushToken) => {
+    //     return this.push.saveToken(t);
+    //   }).then((t: PushToken) => {
+    //     console.log('Token saved:', t.token);
+    //   });
   
-      this.push.rx.notification()
-      .subscribe((msg) => {
-        alert(msg.title + ': ' + msg.text);
-      });
-    }
+    //   this.push.rx.notification()
+    //   .subscribe((msg) => {
+    //     alert(msg.title + ': ' + msg.text);
+    //   });
+    // }
     }
 
   getUserProjectsAndTasks() {
+    this.autoTasks = new Array<any>();
     this.storage.get('zalogowany_id').then((val) => {
       this.restapiService.getUser(val)
       .then(data => {
@@ -161,7 +169,14 @@ export class HomePage {
                               }
                               if(userTask.task_id == projectTasks){
                                     this.userProjectTasks.push(userTask);
-                                    //console.log(userTask);
+                                    if(userTask.count_method == 'automatic'){
+                                      let time = (new Date().getTime()-new Date(userTask.start_date.concat("/".concat(userTask.start_hour))).getTime())/3600000;
+                                      let hours = Math.floor(time);
+                                      let minutes = Math.floor(60*(time - Math.floor(time)));
+                                      console.log("h:"+hours+"m:"+minutes);
+                                      this.autoTasks.push(new AutoTaskTime(userTask.task_id,userTask.start_date,hours,minutes));
+                                      this.countTime(new Date(userTask.start_date.concat("/".concat(userTask.start_hour))));
+                                    }
                                     continue;
                               }
                             }
@@ -173,8 +188,8 @@ export class HomePage {
                   }
                 }
               }
-              else this.projects = null;
-              });
+              else this.projects = null; 
+            });
             });
           });
       });
@@ -240,11 +255,13 @@ export class HomePage {
     this.navCtrl.push(CalendarPage);
   }
 
-  editTask(task_id:number, task_title:string){
+  editTask(task_id:number, task_title:string, hours:number, minutes:number){
     this.storage.get('current_task_id').then((id) => {
       this.storage.get('current_task_title').then((title) => {
         this.params.task_id = id;
         this.params.task_title = title;
+        this.params.hours = hours;
+        this.params.minutes = minutes;
         this.navCtrl.push(EditTaskPage, this.params);
       });
     });
@@ -419,6 +436,29 @@ export class HomePage {
               });
             }
           });
+        }
+      });
+    });
+  }
+
+  countTime(date:Date){
+    let time = 0;
+    let hour = '';
+    this.restapiService.getUserPreferences()
+    .then(data =>{
+      this.userPreferences = data;
+      this.storage.get('zalogowany_id').then(user_id =>{
+        for(let pref of this.userPreferences){
+          if(pref.user_id == user_id){
+            for(let data = date;data<=new Date();data.setDate(data.getDate()+1)){
+              hour = data.getHours().toString().concat(":".concat(data.getMinutes().toString()));
+              console.log();
+              if(data.getDay() == 0){
+                if(data == date){time += ((24-data.getHours())*3600)-(data.getMinutes()*60)}
+                console.log(hour+" "+time/3600+" ");
+              }
+            }
+          }
         }
       });
     });

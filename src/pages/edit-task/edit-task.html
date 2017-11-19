@@ -11,12 +11,15 @@
   <ion-item *ngIf="task.count_method=='manual'"> 
       Spędzony czas: {{task.time_spent}} godzin.
   </ion-item>
+  <ion-item *ngIf="task.count_method=='automatic'"> 
+      Spędzony czas: {{params.hours}} godzin {{params.minutes}} minut.
+  </ion-item>
   <ion-item *ngIf="task.count_method=='manual'">  
       Ostatnia aktualizacja:<br> 
       {{task.update_hour}} {{task.update_date}} o {{task.update_time}} godzin.
   </ion-item>
   <form (ngSubmit)="updateTask()">
-    <ion-item *ngIf="task.count_method=='manual'"> 
+      <ion-item *ngIf="task.count_method=='manual'"> 
           <ion-label floating>Aktualizuj czas</ion-label>
           <ion-input type="text" [(ngModel)]="updateTime" name="updateTime"></ion-input>        
       </ion-item>    

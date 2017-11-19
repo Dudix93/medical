@@ -9,7 +9,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 })
 export class EditTaskPage {
 
-  params = {task_title: '', task_id:0, past:false}
+  params = {task_title: '', task_id:0, past:false, hours:0, minutes:0}
   userTasks:any;
   updateTime:string;
   dayTasksObjects:any;
@@ -60,6 +60,8 @@ export class EditTaskPage {
               private alertCtrl: AlertController) {
     this.params.task_title = this.navParams.get('task_title');
     this.params.task_id = this.navParams.get('task_id');
+    this.params.hours = this.navParams.get('hours');
+    this.params.minutes = this.navParams.get('minutes');
     if(this.navParams.get('date') == undefined){
       this.getUserTask(this.params.task_id);
     }
