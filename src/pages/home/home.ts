@@ -450,12 +450,21 @@ export class HomePage {
       this.storage.get('zalogowany_id').then(user_id =>{
         for(let pref of this.userPreferences){
           if(pref.user_id == user_id){
-            for(let data = date;data<=new Date();data.setDate(data.getDate()+1)){
-              hour = data.getHours().toString().concat(":".concat(data.getMinutes().toString()));
+            for(let d = date;d<=new Date();d.setDate(d.getDate()+1)){
+              hour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
               console.log();
-              if(data.getDay() == 0){
-                if(data == date){time += ((24-data.getHours())*3600)-(data.getMinutes()*60)}
-                console.log(hour+" "+time/3600+" ");
+              if(d.getDay() == 0){
+                let prefTime = pref.ndDo.split(':');
+                if(d == date){
+                  time += (new Date("01.01.2000/".concat(pref.ndDo)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
+                  }
+                else{
+                  time += (new Date("01.01.2000/".concat(pref.ndDo)).getTime()-new Date("01.01.2000/".concat(pref.ndOd)).getTime());
+                }
+                time = time/3600000;
+                let hours = Math.floor(time);
+                let minutes = Math.floor(60*(time - Math.floor(time)));
+                console.log(pref.ndDo+" "+hour+" "+hours+"h "+minutes+"m");
               }
             }
           }
