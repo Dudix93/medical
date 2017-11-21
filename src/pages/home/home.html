@@ -31,7 +31,14 @@
                 <ion-col col-6 *ngIf="task.finish_date != null && time.task_id == task.task_id"><ion-label>{{task.task_title}} {{time.hours}}:{{time.minutes}}</ion-label><ion-label>(zakończono)</ion-label></ion-col>
               </ng-container>
             </ng-container>
-              <ion-col col-2 *ngIf="task.finish_date == null"><ion-label><ion-icon name="ios-flag-outline" (click)="finishTaskPrompt(task.id,task.task_title)"></ion-icon></ion-label></ion-col>
+            <ng-container *ngIf="task.count_method == 'automatic'">
+              <ng-container *ngFor="let time of autoTasks">
+              <ion-col col-2 *ngIf="task.finish_date == null"><ion-label><ion-icon name="ios-flag-outline" (click)="finishTaskPrompt(task.id,task.task_title,time.hours,time.minutes)"></ion-icon></ion-label></ion-col>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="task.count_method == 'manual'">
+              <ion-col col-2 *ngIf="task.finish_date == null"><ion-label><ion-icon name="ios-flag-outline" (click)="finishTaskPrompt(task.id,task.task_title,null,null)"></ion-icon></ion-label></ion-col>
+            </ng-container>
               <ng-container *ngIf="task.count_method == 'automatic'">
               <ng-container *ngFor="let time of autoTasks">
               <ion-col col-2 *ngIf="task.finish_date == null && time.task_id == task.task_id"><ion-label><ion-icon name="ios-create-outline" (click)="editTask(task.id,task.task_title,time.hours,time.minutes)"></ion-icon></ion-label></ion-col>
