@@ -448,7 +448,7 @@ export class HomePage {
       this.storage.get('zalogowany_id').then(user_id =>{
         for(let pref of this.userPreferences){
           if(pref.user_id == user_id){
-            for(let d = date;d<=new Date();d.setDate(d.getDate()+1)){
+            for(let d = date;d.getDay()<=new Date().getDay() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
               console.log(d);
               hour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
               if(d.getDay() == 0 && pref.nd == true){
@@ -496,18 +496,18 @@ export class HomePage {
       else if(d.getDay() == new Date().getDay() && d.getMonth() == new Date().getMonth()){
         let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
         if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
-          time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
+          time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(dayOd)).getTime());
           time = time/3600000;
           let hours = Math.floor(time);
           let minutes = Math.floor(60*(time - Math.floor(time)));
-          console.log(dayDo+" "+hour+" "+hours+"h "+minutes+"m");
+          console.log(dayDo+" "+dayOd+" "+hours+"h "+minutes+"m");
         }
         else{
-          time += (new Date("01.01.2000/".concat(nowHour)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
+          time += (new Date("01.01.2000/".concat(nowHour)).getTime()-new Date("01.01.2000/".concat(dayOd)).getTime());
           time = time/3600000;
           let hours = Math.floor(time);
           let minutes = Math.floor(60*(time - Math.floor(time)));
-          console.log(nowHour+" "+hour+" "+hours+"h "+minutes+"m");
+          console.log(nowHour+" "+dayOd+" "+hours+"h "+minutes+"m");
         }
         }
     else{
