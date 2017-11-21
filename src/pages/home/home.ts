@@ -342,9 +342,10 @@ export class HomePage {
     }
   }
 
-  startTask(task:any, countMethod:any){
+  startTask(task:any, countMethod:any, startHour:any){
     console.log(task);
     console.log(countMethod);
+    console.log(startHour);
     if(task != undefined){
       this.dayTasks = new Array<any>();
       this.currentDate = new Date().toLocaleDateString();
@@ -355,7 +356,8 @@ export class HomePage {
       this.dayTask.task_id = task.id;
       this.dayTask.user_id = this.user[0].id;
       this.newUserTask.start_date = this.currentDate;
-      this.newUserTask.start_hour = this.currentTime;
+      if(startHour == null)this.newUserTask.start_hour = this.currentTime;
+      else this.newUserTask.start_hour = startHour.startHour;
       this.newUserTask.user_id = this.user[0].id;
       this.newUserTask.task_id = task.id;
       this.newUserTask.task_title = task.title;
@@ -596,6 +598,27 @@ export class HomePage {
     });
   }
 
+  selectStartDate(taskToStart:any, data:any) {
+    const tasksAlert = this.alertCtrl.create({
+      title: "Godzina rozpoczęcia:",
+      inputs: [
+        {
+        name: 'startHour',
+        type: 'time'
+        }
+      ],      
+      buttons: [
+        {
+          text: 'OK',
+          handler: startHour => {
+            this.startTask(taskToStart, data, startHour);
+          }
+        }
+      ]
+    });
+    tasksAlert.present();
+}
+
   selectCountMethod(taskToStart:any) {
           const tasksAlert = this.alertCtrl.create({
             title: "Metoda zliczania czasu:",
@@ -604,7 +627,9 @@ export class HomePage {
               {
                 text: 'OK',
                 handler: data => {
-                  this.startTask(taskToStart, data);
+                  console.log(data);
+                  if(data == 'manual') this.startTask(taskToStart, data, null);
+                  else this.selectStartDate(taskToStart, data);
                 }
               }
             ]
