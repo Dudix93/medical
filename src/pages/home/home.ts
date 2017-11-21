@@ -384,7 +384,7 @@ export class HomePage {
     this.userTask.finish_date = new Date().toLocaleDateString();
     this.userTask.finish_hour = this.getHour();
     if(hours != null && minutes != null){
-      this.userTask.time_spent = hours.concat(":".concat(minutes));
+      this.userTask.time_spent = hours.toString().concat(":".concat(minutes));
     }
     this.restapiService.updateUserTask(this.userTask.id, this.userTask);
     this.storage.set('current_task_id', null);
