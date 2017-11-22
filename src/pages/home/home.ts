@@ -460,7 +460,10 @@ export class HomePage {
             this.restapiService.getLatestPausedTask(task_id,user_id)
             .then(data =>{
               this.pausedTaskObjects = data;
-              if(this.pausedTaskObjects[0].restart_hour == null) pausedHour = this.pausedTaskObjects[0].pause_hour;
+              console.log(this.pausedTaskObjects);
+              if(this.pausedTaskObjects != ''){
+                if(this.pausedTaskObjects[0].restart_hour == null) pausedHour = this.pausedTaskObjects[0].pause_hour;
+              }
               for(let pause of this.pausedTaskObjects){
                 if(pause.restart_hour != null){
                   pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
@@ -499,9 +502,12 @@ export class HomePage {
                 }
                 this.firstDay = false;
               }
-              time = time - (pausedTime/3600000);
               let hours = Math.floor(time);
               let minutes = Math.floor(60*(time - Math.floor(time)));
+              console.log("h:"+hours+"m:"+minutes);
+              time = time - (pausedTime/3600000);
+               hours = Math.floor(time);
+               minutes = Math.floor(60*(time - Math.floor(time)));
               console.log("h:"+hours+"m:"+minutes);
               this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
             });
@@ -579,18 +585,6 @@ export class HomePage {
     return time;
   }
 
-  countPausedTime(task_id:any,user_id:any){
-    let pausedTime = 0;
-              this.restapiService.getLatestPausedTask(task_id,user_id)
-              .then(data =>{
-                this.pausedTaskObjects = data;
-                for(let pause of this.pausedTaskObjects){
-                  if(pause.restart_hour != null){
-                    pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
-                  }
-                }
-              });
-  }
 
   finishTaskPrompt(task_id:number, task_title:string, hours:any, minutes:any) {
     this.restapiService.getUserTask()
