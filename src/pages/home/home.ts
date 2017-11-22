@@ -349,7 +349,7 @@ export class HomePage {
     console.log(startHour);
     if(task != undefined){
       this.dayTasks = new Array<any>();
-      this.currentDate = new Date().getMonth().toString().concat(new Date().getDay().toString().concat(new Date().getFullYear().toString()));
+      this.currentDate = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
       this.currentTime = this.getHour();
       this.user[0].tasks.push(task.id);
       this.dayTask.hour = this.currentTime;
