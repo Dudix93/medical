@@ -110,6 +110,7 @@ export class HomePage {
     hours:0,
     minutes:0 
   }
+  today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
 
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -349,7 +350,7 @@ export class HomePage {
     console.log(startHour);
     if(task != undefined){
       this.dayTasks = new Array<any>();
-      this.currentDate = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
+      this.currentDate = this.today;
       this.currentTime = this.getHour();
       this.user[0].tasks.push(task.id);
       this.dayTask.hour = this.currentTime;
@@ -403,7 +404,7 @@ export class HomePage {
               this.userTask.paused = true;
               this.pausedTask.task_id = id;
               this.pausedTask.user_id = user_id;
-              this.pausedTask.pause_date = new Date().toLocaleDateString();
+              this.pausedTask.pause_date = this.today;
               this.pausedTask.pause_hour = this.getHour();
               this.restapiService.savePausedTask(this.pausedTask);
               this.restapiService.updateUserTask(this.userTask.id,this.userTask);
@@ -448,6 +449,7 @@ export class HomePage {
     let time = 0;
     let pausedTime = 0;
     let pausedHour = null;
+    let pausedDate = null;
     let hour = '';
     let startHour = date.getHours().toString().concat(":".concat(date.getMinutes().toString()));
     this.firstDay = true;
@@ -460,15 +462,19 @@ export class HomePage {
             this.restapiService.getLatestPausedTask(task_id,user_id)
             .then(data =>{
               this.pausedTaskObjects = data;
-              console.log(this.pausedTaskObjects);
               if(this.pausedTaskObjects != ''){
-                if(this.pausedTaskObjects[0].restart_hour == null) pausedHour = this.pausedTaskObjects[0].pause_hour;
+                if(this.pausedTaskObjects[0].restart_hour == null){
+                  pausedHour = this.pausedTaskObjects[0].pause_hour;
+                  pausedDate = this.pausedTaskObjects[0].pause_date;
+                }
               }
               for(let pause of this.pausedTaskObjects){
                 if(pause.restart_hour != null){
                   pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
                 }
               }
+              console.log("paused hour: "+pausedHour);
+              console.log("paused date: "+pausedDate);
               for(let d = date;d.getDay()<=new Date().getDay() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
                 hour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
                 // this.restapiService.getLatestPausedTask(task_id,pref.user_id)
@@ -480,26 +486,29 @@ export class HomePage {
                 //   }
                 // });
                 if(d.getDay() == 0 && pref.nd == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ndOd,pref.ndDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ndOd,pref.ndDo,startHour,task_id,pausedHour,pausedDate);
                 }
                 else if(d.getDay() == 1 && pref.pon == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ponOd,pref.ponDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ponOd,pref.ponDo,startHour,task_id,pausedHour,pausedDate);
                 }
                 else if(d.getDay() == 2 && pref.wt == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.wtOd,pref.wtDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.wtOd,pref.wtDo,startHour,task_id,pausedHour,pausedDate);
                 }
                 else if(d.getDay() == 3 && pref.sr == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.srOd,pref.srDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.srOd,pref.srDo,startHour,task_id,pausedHour,pausedDate);
                 }
                 else if(d.getDay() == 4 && pref.czw == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.czwOd,pref.czwDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.czwOd,pref.czwDo,startHour,task_id,pausedHour,pausedDate);
                 } 
                 else if(d.getDay() == 5 && pref.pt == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ptOd,pref.ptDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.ptOd,pref.ptDo,startHour,task_id,pausedHour,pausedDate);
                 }
                 else if(d.getDay() == 6 && pref.sob == true){
-                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.sobOd,pref.sobDo,startHour,task_id,pausedHour);
+                  time += this.timeForDay(pref,this.firstDay,d,hour,pref.sobOd,pref.sobDo,startHour,task_id,pausedHour,pausedDate);
                 }
+                let h = Math.floor(time);
+                let m = Math.floor(60*((time) - Math.floor(time)));
+                console.log(d.toLocaleDateString()+" "+h+"h "+m+"m");
                 this.firstDay = false;
               }
               let hours = Math.floor(time);
@@ -509,6 +518,7 @@ export class HomePage {
                hours = Math.floor(time);
                minutes = Math.floor(60*(time - Math.floor(time)));
               console.log("h:"+hours+"m:"+minutes);
+              //this.storage.forEach((key,value) => {console.log(value+": "+key)});   
               this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
             });
           }
@@ -517,26 +527,24 @@ export class HomePage {
     });
   }
 
-  timeForDay(pref:any,firstDay:any,d:any,hour:string,dayOd:any,dayDo:any,startHour:any,task_id:any,pausedHour:any){
+  timeForDay(pref:any,firstDay:any,d:any,hour:string,dayOd:any,dayDo:any,startHour:any,task_id:any,pausedHour:any,pausedDate:any){
     let time = 0;
     this.pausedTaskObjects = new Array<any>();
-    console.log("pasued hour: "+pausedHour);
-    console.log(d.toLocaleDateString());
+    //console.log(d.toLocaleDateString()+" "+new Date(pausedDate).toLocaleDateString());
       if(firstDay == true){
-        // if(d.toLocaleDateString() != new Date().toLocaleDateString()){
-        // time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
-        // // time = time/3600000;
-        // // let hours = Math.floor(time);
-        // // let minutes = Math.floor(60*(time - Math.floor(time)));
-        // // console.log(dayDo+" "+hour+" "+hours+"h "+minutes+"m");
-        // }
-        // else
+        if(d.toLocaleDateString() != new Date().toLocaleDateString() && pausedHour == null){
+        time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
+        }
+        else
         {
           
           let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
           if(d.getDay() == new Date().getDay() && d.getMonth() == new Date().getMonth()){
-            if(pausedHour != null){
-              time += (new Date("01.01.2000/".concat(pausedHour)).getTime()-new Date("01.01.2000/".concat(startHour)).getTime());
+            if(pausedHour != null && pausedDate != null){
+              if(d.toLocaleDateString()== new Date(pausedDate).toLocaleDateString()){
+                //console.log(d.toLocaleDateString()+" "+pausedDate);
+                time += (new Date("01.01.2000/".concat(pausedHour)).getTime()-new Date("01.01.2000/".concat(startHour)).getTime());
+              }
             }
             else{
               time += (new Date("01.01.2000/".concat(nowHour)).getTime()-new Date("01.01.2000/".concat(startHour)).getTime());
@@ -575,12 +583,15 @@ export class HomePage {
         //każdy dzień pomiędzy dzisiaj a dniem rozpoczęcia czynności
       else{
         time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(dayOd)).getTime());
+        time = time/3600000;
+        let hours = Math.floor(time);
+        let minutes = Math.floor(60*(time - Math.floor(time)));
+        console.log(dayDo+" "+dayOd+" "+hours+"h "+minutes+"m");
       }
               // time = time/3600000;
         // let hours = Math.floor(time);
         // let minutes = Math.floor(60*(time - Math.floor(time)));
         // console.log(dayDo+" "+dayOd+" "+hours+"h "+minutes+"m");
-    console.log(" ");
     time = time/3600000;
     return time;
   }

@@ -8,9 +8,8 @@ export class RestapiServiceProvider {
   err:any;
   data:any;
   apiUrl:string;
+  //apiUrl = 'http://192.168.137.1:9090';
   //apiUrl = 'http://localhost:3000';
-  //apiUrl = 'https://projekt-3d99e.firebaseio.com';
-  //apiUrl = 'https://my-json-server.typicode.com/Dudix93/raportowanie';
   constructor(public http: Http, public storage:Storage){
 
   }
@@ -507,6 +506,23 @@ export class RestapiServiceProvider {
           this.data = data;
           resolve(this.data);
         });
+      });
+    });
+  }
+
+  login(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/api/authenticate', data)
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          console.log("token: "+this.data.id_token);
+          resolve(this.data);
+        }, (err) => {
+          reject(err);
+        });  
       });
     });
   }

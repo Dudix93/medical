@@ -16,6 +16,7 @@ export class LoginPage {
   users:any
   apiUrl:string;
   credentials = {apiUrl: '', login: '', password:''}
+  loginData = {password:'',rememberMe:true,username:''}
   correct:boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage) {
@@ -54,6 +55,18 @@ export class LoginPage {
         this.navCtrl.push(HomePage);
       }
     });
+  }
+
+  login2() {
+    console.log("credentials.apiUrl "+this.credentials.apiUrl);
+    this.storage.set('apiUrl', this.credentials.apiUrl);
+    this.storage.get('apiUrl').then((value) => {
+      console.log("storage apiurl "+value);
+     });
+    this.loginData.username = this.credentials.login;
+    this.loginData.password = this.credentials.password;
+    this.restapiService.login(this.loginData);
+    //console.log(this.credentials.login+" "+this.credentials.password);
   }
 
   register(){
