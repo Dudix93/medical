@@ -16,6 +16,7 @@ import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { EditTaskPage } from '../pages/edit-task/edit-task';
 import { CalendarPage } from '../pages/calendar/calendar';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
+import { LocalNotifications} from '@ionic-native/local-notifications'
 
 const cloudSettings: CloudSettings = {
   'core': {
@@ -68,7 +69,8 @@ const cloudSettings: CloudSettings = {
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    RestapiServiceProvider
+    RestapiServiceProvider,
+    LocalNotifications
   ]
 })
 export class AppModule {}

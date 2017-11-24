@@ -13,6 +13,7 @@ import { EditProfilePage } from '../edit-profile/edit-profile';
 import { EditTaskPage } from '../edit-task/edit-task';
 import { CalendarPage } from '../calendar/calendar';
 import { DayTask } from '../../models/dayTask';
+import { LocalNotifications} from '@ionic-native/local-notifications'
 
 @Component({
   selector: 'page-home',
@@ -120,24 +121,22 @@ export class HomePage {
               private alertCtrl:AlertController,
               private toastCtrl:ToastController,
               public push:Push,
+              private localNotifications: LocalNotifications,
               platform: Platform) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
-    // if (platform.is('cordova')){
-    //   this.push.register().then((t: PushToken) => {
-    //     return this.push.saveToken(t);
-    //   }).then((t: PushToken) => {
-    //     console.log('Token saved:', t.token);
-    //   });
-  
-    //   this.push.rx.notification()
-    //   .subscribe((msg) => {
-    //     alert(msg.title + ': ' + msg.text);
-    //   });
-    // }
+    if (platform.is('cordova')){
+      this.localNotifications.schedule({
+        id:1,
+        title: 'Mniemanie',
+        text:'bla bla bla',
+        at: new Date(new Date().getTime()+5*1000),
+        data:{mydata:'my hidden message'}
+      });
+    }
     }
 
   getUserProjectsAndTasks() {
