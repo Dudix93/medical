@@ -128,15 +128,6 @@ export class HomePage {
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
-    if (platform.is('cordova')){
-      this.localNotifications.schedule({
-        id:1,
-        title: 'Mniemanie',
-        text:'bla bla bla',
-        at: new Date(new Date().getTime()+5*1000),
-        data:{mydata:'my hidden message'}
-      });
-    }
     }
 
   getUserProjectsAndTasks() {

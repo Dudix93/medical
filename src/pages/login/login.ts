@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { HomePage } from '../home/home';
 import { RegisterPage } from '../register/register';
-
+import { LocalNotifications} from '@ionic-native/local-notifications'
 
 @IonicPage()
 @Component({
@@ -19,7 +19,7 @@ export class LoginPage {
   loginData = {password:'',rememberMe:true,username:''}
   correct:boolean;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage, public localNotifications:LocalNotifications, public platform:Platform, public alertCtrl:AlertController) {
     this.storage.get('apiUrl').then((val) => {
       this.credentials.apiUrl = val;
     });
@@ -27,6 +27,28 @@ export class LoginPage {
       if(val != null){
         this.navCtrl.push(HomePage);
       }
+    });
+
+    // this.platform.ready().then((readySource) => {
+    //   this.localNotifications.on('click', (notification, state) => {
+    //     let json = JSON.parse(notification.data);
+   
+    //     let alert = alertCtrl.create({
+    //       title: notification.title,
+    //       subTitle: json.mydata
+    //     });
+    //     alert.present();
+    //   })
+    // });
+  }
+
+  scheduleNotification() {
+    this.localNotifications.schedule({
+      id: 1,
+      title: 'Attention',
+      text: 'Simons Notification',
+      data: { mydata: 'My hidden message this is' },
+      at: new Date(new Date().getTime() + 5 * 1000)
     });
   }
 

@@ -4,7 +4,7 @@ import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angu
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { UserTask } from '../../models/userTask';
-import { DayTask } from '../../models/dayTask';
+import { UpdateDayTask } from '../../models/updateDayTask';
 import { EditTaskPage } from '../../pages/edit-task/edit-task';
 @IonicPage()
 @Component({
@@ -83,13 +83,13 @@ export class CalendarPage {
                                         this.alreadyEdited = false;
                                         for(let et of this.allEditedTask){
                                           if(dayTask.user_id == et.user_id && dayTask.task_id == et.task_id && dayTask.date == et.date){
-                                            this.dayTasks.push(new DayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,et.time,et.description));
+                                            this.dayTasks.push(new UpdateDayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,et.time,et.description));
                                             this.alreadyEdited = true;
                                             continue;
                                           }
                                         }
                                         if(this.alreadyEdited == false){
-                                          this.dayTasks.push(new DayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,null,null));
+                                          this.dayTasks.push(new UpdateDayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,null,null));
                                         }
                                       }
                                     }
