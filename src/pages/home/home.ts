@@ -12,6 +12,7 @@ import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
 import { EditTaskPage } from '../edit-task/edit-task';
 import { CalendarPage } from '../calendar/calendar';
+import { DayTask } from '../../models/dayTask';
 
 @Component({
   selector: 'page-home',
@@ -61,7 +62,7 @@ export class HomePage {
       user_id:0,
       date:'',
       hour:'',
-      time_spent:0}
+      time_spent:''}
 
       
   pausedTask = {
@@ -382,14 +383,31 @@ export class HomePage {
   }
 
   finishTask(hours:any,minutes:any){
+    let k = new Array<any>();
     this.userTask.finish_date = new Date().toLocaleDateString();
     this.userTask.finish_hour = this.getHour();
+    if(this.userTask.count_method == 'automatic'){
+      this.storage.forEach((value,key)=>{
+        k = key.split(' ');
+        if(k[0] == this.userTask.task_id)
+        {
+          console.log(key+" "+value);
+          this.restapiService.saveDayTask(new DayTask(
+            Number(this.userTask.task_id),
+            Number(this.userTask.user_id),
+            k[1].replace(/\//g,'.'),//date
+            value,//time spent
+          ));
+        }
+      });
+    }
     if(hours != null && minutes != null){
       this.userTask.time_spent = hours.toString().concat(":".concat(minutes));
     }
-    this.restapiService.updateUserTask(this.userTask.id, this.userTask);
-    this.storage.set('current_task_id', null);
-    this.storage.set('current_task_title', null);
+    console.log(this.userTask);
+    // this.restapiService.updateUserTask(this.userTask.id, this.userTask);
+    // this.storage.set('current_task_id', null);
+    // this.storage.set('current_task_title', null);
   }
 
   pauseTask(task_id:number){
@@ -447,6 +465,7 @@ export class HomePage {
 
   countTime(task_id:number,start_date:string,date:Date){
     let time = 0;
+    let DayTime = 0;
     let pausedTime = 0;
     let pausedHour = null;
     let pausedDate = null;
@@ -462,6 +481,10 @@ export class HomePage {
             this.restapiService.getLatestPausedTask(task_id,user_id)
             .then(data =>{
               this.pausedTaskObjects = data;
+<<<<<<< HEAD
+=======
+              //console.log(this.pausedTaskObjects);
+>>>>>>> 33c46e176f5fa6bf6430e43923b5fd3dacd3cee9
               if(this.pausedTaskObjects != ''){
                 if(this.pausedTaskObjects[0].restart_hour == null){
                   pausedHour = this.pausedTaskObjects[0].pause_hour;
@@ -473,8 +496,12 @@ export class HomePage {
                   pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
                 }
               }
+<<<<<<< HEAD
               console.log("paused hour: "+pausedHour);
               console.log("paused date: "+pausedDate);
+=======
+              console.log("pasued hour: "+pausedHour);
+>>>>>>> 33c46e176f5fa6bf6430e43923b5fd3dacd3cee9
               for(let d = date;d.getDay()<=new Date().getDay() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
                 hour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
                 // this.restapiService.getLatestPausedTask(task_id,pref.user_id)
@@ -510,15 +537,27 @@ export class HomePage {
                 let m = Math.floor(60*((time) - Math.floor(time)));
                 console.log(d.toLocaleDateString()+" "+h+"h "+m+"m");
                 this.firstDay = false;
+                DayTime = time - DayTime;
+                let hours = Math.floor(DayTime);
+                let minutes = Math.floor(60*(DayTime - Math.floor(DayTime)));
+                this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
+                DayTime = time;
               }
+              pausedTime = pausedTime/3600000;
               let hours = Math.floor(time);
               let minutes = Math.floor(60*(time - Math.floor(time)));
-              console.log("h:"+hours+"m:"+minutes);
-              time = time - (pausedTime/3600000);
+              let hp = Math.floor(pausedTime);
+              let mp = Math.floor(60*(pausedTime - Math.floor(pausedTime)));
+              console.log(hours+":"+minutes+" - "+hp+":"+mp);
+              time = time - (pausedTime);
                hours = Math.floor(time);
                minutes = Math.floor(60*(time - Math.floor(time)));
+<<<<<<< HEAD
               console.log("h:"+hours+"m:"+minutes);
               //this.storage.forEach((key,value) => {console.log(value+": "+key)});   
+=======
+               console.log(hours+":"+minutes);
+>>>>>>> 33c46e176f5fa6bf6430e43923b5fd3dacd3cee9
               this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
             });
           }
@@ -530,7 +569,10 @@ export class HomePage {
   timeForDay(pref:any,firstDay:any,d:any,hour:string,dayOd:any,dayDo:any,startHour:any,task_id:any,pausedHour:any,pausedDate:any){
     let time = 0;
     this.pausedTaskObjects = new Array<any>();
+<<<<<<< HEAD
     //console.log(d.toLocaleDateString()+" "+new Date(pausedDate).toLocaleDateString());
+=======
+>>>>>>> 33c46e176f5fa6bf6430e43923b5fd3dacd3cee9
       if(firstDay == true){
         if(d.toLocaleDateString() != new Date().toLocaleDateString() && pausedHour == null){
         time += (new Date("01.01.2000/".concat(dayDo)).getTime()-new Date("01.01.2000/".concat(hour)).getTime());
@@ -593,6 +635,10 @@ export class HomePage {
         // let minutes = Math.floor(60*(time - Math.floor(time)));
         // console.log(dayDo+" "+dayOd+" "+hours+"h "+minutes+"m");
     time = time/3600000;
+    let h = Math.floor(time);
+    let m = Math.floor(60*(time - Math.floor(time)));
+    console.log(d.toLocaleDateString()+" "+"h:"+h+"m:"+m);
+    console.log(" ");
     return time;
   }
 
