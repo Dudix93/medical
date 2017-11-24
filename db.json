@@ -125,7 +125,7 @@
       "description": null,
       "latest_dayTask": 6,
       "count_method": "automatic",
-      "paused":false,
+      "paused": false,
       "finish_date": null,
       "finish_hour": null,
       "id": 2
@@ -169,13 +169,14 @@
   "pausedTask": [],
   "preferences": [
     {
+      "id": 7,
       "user_id": "4",
       "count_method": "",
       "pon": true,
-      "ponOd": "07:00",
+      "ponOd": "08:00",
       "ponDo": "16:00",
       "wt": true,
-      "wtOd": "09:13",
+      "wtOd": "08:00",
       "wtDo": "16:00",
       "sr": true,
       "srOd": "08:00",
@@ -191,8 +192,7 @@
       "sobDo": "16:00",
       "nd": true,
       "ndOd": "08:00",
-      "ndDo": "16:00",
-      "id": 7
+      "ndDo": "16:00"
     },
     {
       "user_id": "8",
