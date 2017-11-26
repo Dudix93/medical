@@ -28,27 +28,15 @@ export class LoginPage {
         this.navCtrl.push(HomePage);
       }
     });
-
-    // this.platform.ready().then((readySource) => {
-    //   this.localNotifications.on('click', (notification, state) => {
-    //     let json = JSON.parse(notification.data);
-   
-    //     let alert = alertCtrl.create({
-    //       title: notification.title,
-    //       subTitle: json.mydata
-    //     });
-    //     alert.present();
-    //   })
-    // });
   }
 
   scheduleNotification() {
     this.localNotifications.schedule({
       id: 1,
-      title: 'Attention',
-      text: 'Simons Notification',
-      data: { mydata: 'My hidden message this is' },
-      at: new Date(new Date().getTime() + 5 * 1000)
+      title: 'Powiadomienie',
+      text: 'Treść powiadomienia',
+      data: { mydata: 'My hidden message' },
+      at: new Date()
     });
   }
 

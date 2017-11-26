@@ -14,6 +14,7 @@ import { EditTaskPage } from '../edit-task/edit-task';
 import { CalendarPage } from '../calendar/calendar';
 import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
+declare let cordova: any;
 
 @Component({
   selector: 'page-home',
@@ -122,12 +123,36 @@ export class HomePage {
               private toastCtrl:ToastController,
               public push:Push,
               private localNotifications: LocalNotifications,
-              platform: Platform) {
+              private platform: Platform) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
     this.inProgress = false;
+    this.platform.ready().then((readySource) => {
+      this.localNotifications.on('click', (notification, state) => {
+        let json = JSON.parse(notification.data);
+   
+        let alert = alertCtrl.create({
+          title: notification.title,
+          subTitle: json.mydata
+        });
+        alert.present();
+      })
+    });
+    this.scheduleNotification();
+    }
+
+    scheduleNotification() {
+      this.storage.get('not_id').then((ajdi) => {
+        cordova.plugins.notification.local.schedule({
+          //id: ajdi,
+          title: 'Powiadomienie',
+          text: 'Treść powiadomienia',
+          //data: { mydata: 'My hidden message' },
+          trigger: { every: 'minute', count: 10 }
+        });
+      });
     }
 
   getUserProjectsAndTasks() {
