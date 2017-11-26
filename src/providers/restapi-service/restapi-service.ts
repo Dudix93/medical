@@ -510,6 +510,34 @@ export class RestapiServiceProvider {
     });
   }
 
+  getMessages() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.get(value+'/messages',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
+    });
+  }
+
+  updateMessages(id,data) {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.put(value+'/messages/'+id,data)
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
+    });
+  }
+
   login(data) {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {

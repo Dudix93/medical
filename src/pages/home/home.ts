@@ -114,6 +114,11 @@ export class HomePage {
     minutes:0 
   }
   today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
+  messages:any;
+  message = {
+    "message":'',
+    "sent":true
+  }
 
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -141,16 +146,37 @@ export class HomePage {
       })
     });
     this.scheduleNotification();
+    this.getMessages();
+    setInterval(() => {
+      this.getMessages();
+    }, 10000);
+    }
+
+    getMessages() {
+      this.restapiService.getMessages().then(data => {
+        this.messages = data;
+        for(let msg of this.messages){
+          if(msg.sent == false){
+            cordova.plugins.notification.local.schedule({
+              id: 2,
+              title: 'Wiadomosc',
+              text: msg.message
+            });
+            this.message.message = msg.message;
+            this.restapiService.updateMessages(msg.id,this.message);
+          }
+        }
+      });
     }
 
     scheduleNotification() {
       this.storage.get('not_id').then((ajdi) => {
         cordova.plugins.notification.local.schedule({
-          //id: ajdi,
+          id: 1,
           title: 'Powiadomienie',
           text: 'Treść powiadomienia',
           //data: { mydata: 'My hidden message' },
-          trigger: { every: 'minute', count: 10 }
+          trigger: { every: 'minute', count: 2 }
         });
       });
     }
