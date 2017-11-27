@@ -12,6 +12,7 @@ import { PreferencesPage } from '../preferences/preferences';
 import { EditProfilePage } from '../edit-profile/edit-profile';
 import { EditTaskPage } from '../edit-task/edit-task';
 import { CalendarPage } from '../calendar/calendar';
+import { MessagesPage } from '../messages/messages';
 import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
 declare let cordova: any;
@@ -145,20 +146,22 @@ export class HomePage {
         alert.present();
       })
     });
-    this.scheduleNotification();
-    this.getMessages();
-    setInterval(() => {
+    if(this.platform.is('cordova')){
+      this.scheduleNotification();
       this.getMessages();
-    }, 10000);
+      setInterval(() => {
+        this.getMessages();
+      }, 10000);
+    }
     }
 
     getMessages() {
-      this.restapiService.getMessages().then(data => {
+      this.restapiService.getMessages(null).then(data => {
         this.messages = data;
         for(let msg of this.messages){
           if(msg.sent == false){
             cordova.plugins.notification.local.schedule({
-              id: 2,
+              id: msg.id,
               title: 'Wiadomosc',
               text: msg.message
             });
@@ -284,16 +287,20 @@ export class HomePage {
     this.navCtrl.push(LoginPage);
   }
 
-  editProfile(){
+  pushEditProfilePage(){
     this.navCtrl.push(EditProfilePage);
   }
 
-  preferences(){
+  pushPreferencesPage(){
     this.navCtrl.push(PreferencesPage);
   }
 
-  calendar(){
+  pushCalendarPage(){
     this.navCtrl.push(CalendarPage);
+  }
+
+  pushMessagesPage(){
+    this.navCtrl.push(MessagesPage);
   }
 
   editTask(task_id:number, task_title:string, hours:number, minutes:number){
@@ -312,24 +319,31 @@ export class HomePage {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
         {
-          text: 'Kalendarz',
+          text: 'Wiadomosci',
+          icon:'md-chatboxes',
+          handler: () => {
+            this.pushMessagesPage();
+          }
+        },
+        {
+          text: 'Czynności skończone',
           icon:'md-calendar',
           handler: () => {
-            this.calendar();
+            this.pushCalendarPage();
           }
         },
         {
           text: 'Edytuj swoje dane',
           icon:'ios-contacts',
           handler: () => {
-            this.editProfile();
+            this.pushEditProfilePage();
           }
         },
         {
           text: 'Preferencje',
           icon:'md-options',
           handler: () => {
-            this.preferences();
+            this.pushPreferencesPage();
           }
         },
         {

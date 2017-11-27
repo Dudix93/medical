@@ -2,6 +2,7 @@
   <ion-navbar hideBackButton>
     <ion-title>
       <ion-buttons end *ngFor="let u of user">
+          <!-- <ion-icon name="ios-flag-outline" (click)="pushMessagesPage()"></ion-icon> -->
         Witaj {{u.name}}  
           <button (click)="menu()"><ion-icon name="menu"></ion-icon></button>
       </ion-buttons>

@@ -15,6 +15,7 @@ import { PreferencesPage } from '../pages/preferences/preferences';
 import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { EditTaskPage } from '../pages/edit-task/edit-task';
 import { CalendarPage } from '../pages/calendar/calendar';
+import { MessagesPage } from '../pages/messages/messages';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
 import { LocalNotifications} from '@ionic-native/local-notifications'
 
@@ -45,7 +46,8 @@ const cloudSettings: CloudSettings = {
     PreferencesPage,
     EditProfilePage,
     EditTaskPage,
-    CalendarPage
+    CalendarPage,
+    MessagesPage
   ],
   imports: [
     IonicStorageModule.forRoot(),
@@ -63,7 +65,8 @@ const cloudSettings: CloudSettings = {
     PreferencesPage,
     EditProfilePage,
     EditTaskPage,
-    CalendarPage
+    CalendarPage,
+    MessagesPage
   ],
   providers: [
     StatusBar,

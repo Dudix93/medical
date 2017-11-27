@@ -10,11 +10,12 @@ import { PreferencesPage } from '../pages/preferences/preferences';
 import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { EditTaskPage } from '../pages/edit-task/edit-task';
 import { CalendarPage } from '../pages/calendar/calendar';
+import { MessagesPage } from '../pages/messages/messages';
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = LoginPage;
+  rootPage:any = MessagesPage;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
     platform.ready().then(() => {
