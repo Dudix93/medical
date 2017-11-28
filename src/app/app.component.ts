@@ -15,7 +15,7 @@ import { MessagesPage } from '../pages/messages/messages';
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = MessagesPage;
+  rootPage:any = LoginPage;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
     platform.ready().then(() => {

@@ -529,7 +529,7 @@ export class RestapiServiceProvider {
           resolve(this.data);
           });
         }
-        else{
+        else if(id == null && read == null){
           this.http.get(value+'/messages',this.headers())
           .map(res => res.json())
           .subscribe(data => {

@@ -118,7 +118,10 @@ export class HomePage {
   messages:any;
   message = {
     "message":'',
-    "sent":true
+    "sent":true,
+    "date":'',
+    "time":'',
+    "read":'',
   }
 
   constructor(public navCtrl: NavController, 
@@ -151,12 +154,12 @@ export class HomePage {
       this.getMessages();
       setInterval(() => {
         this.getMessages();
-      }, 10000);
+      }, 30000);
     }
     }
 
     getMessages() {
-      this.restapiService.getMessages(null).then(data => {
+      this.restapiService.getMessages(null,null).then(data => {
         this.messages = data;
         for(let msg of this.messages){
           if(msg.sent == false){
@@ -166,6 +169,9 @@ export class HomePage {
               text: msg.message
             });
             this.message.message = msg.message;
+            this.message.date = msg.date;
+            this.message.time = msg.time;
+            this.message.read = msg.read;
             this.restapiService.updateMessages(msg.id,this.message);
           }
         }
@@ -552,7 +558,8 @@ export class HomePage {
               }
               console.log("paused hour: "+pausedHour);
               console.log("paused date: "+pausedDate);
-              for(let d = date;d.getDay()<=new Date().getDay() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
+              console.log(date.getUTCDate()+":"+date.getMonth()+" ? "+new Date().getUTCDate()+":"+new Date().getMonth());
+              for(let d = date;d.getUTCDate()<=new Date().getUTCDate() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
                 taskStartHour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
                 // this.restapiService.getLatestPausedTask(task_id,pref.user_id)
                 // .then(data =>{
