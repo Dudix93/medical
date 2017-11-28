@@ -13,6 +13,9 @@ allMessages:any;
 sort:string = 'all';
 newMessages:any;
 oldMessages:any;
+currentDate:any;
+dates:Array<any>;
+
 
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
@@ -22,9 +25,16 @@ oldMessages:any;
   }
 
 getMessages(){
+  this.dates = new Array<any>();
   this.restapiService.getMessages(null,null).then(data =>{
     console.log(data);
     this.allMessages = data;
+    for(let msg of this.allMessages){
+      if(this.dates.indexOf(msg.date) == -1){
+        this.dates.push(msg.date);
+      }
+    }
+    console.log(this.dates);
   });
 
   this.restapiService.getMessages(null,false).then(nju =>{

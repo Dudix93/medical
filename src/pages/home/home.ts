@@ -123,6 +123,7 @@ export class HomePage {
     "time":'',
     "read":'',
   }
+  amountNewMessages:number = 0;
 
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
@@ -162,11 +163,13 @@ export class HomePage {
       this.restapiService.getMessages(null,null).then(data => {
         this.messages = data;
         for(let msg of this.messages){
+          if(msg.read == false) this.amountNewMessages++;
           if(msg.sent == false){
             cordova.plugins.notification.local.schedule({
               id: msg.id,
               title: 'Wiadomosc',
-              text: msg.message
+              text: msg.message,
+              icon:'ios-mail-outline'
             });
             this.message.message = msg.message;
             this.message.date = msg.date;
@@ -175,6 +178,7 @@ export class HomePage {
             this.restapiService.updateMessages(msg.id,this.message);
           }
         }
+        console.log("new messages: "+this.amountNewMessages);
       });
     }
 
@@ -185,7 +189,8 @@ export class HomePage {
           title: 'Powiadomienie',
           text: 'Treść powiadomienia',
           //data: { mydata: 'My hidden message' },
-          trigger: { every: 'minute', count: 2 }
+          trigger: { every: 'minute', count: 2 },
+          icon:'md-alarm'
         });
       });
     }
@@ -306,6 +311,7 @@ export class HomePage {
   }
 
   pushMessagesPage(){
+    console.log('messagePage');
     this.navCtrl.push(MessagesPage);
   }
 

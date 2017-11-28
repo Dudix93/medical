@@ -2,9 +2,12 @@
   <ion-navbar hideBackButton>
     <ion-title>
       <ion-buttons end *ngFor="let u of user">
-          <!-- <ion-icon name="ios-flag-outline" (click)="pushMessagesPage()"></ion-icon> -->
+        <button (click)="pushMessagesPage()" style='background-color: Transparent;'>
+          <ion-badge>{{amountNewMessages}}</ion-badge>
+          <ion-icon name="md-chatboxes"></ion-icon>
+        </button>
         Witaj {{u.name}}  
-          <button (click)="menu()"><ion-icon name="menu"></ion-icon></button>
+          <button (click)="menu()" style='background-color: Transparent;'><ion-icon name="menu"></ion-icon></button>
       </ion-buttons>
     </ion-title>
   </ion-navbar>
