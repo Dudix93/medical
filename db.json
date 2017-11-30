@@ -220,5 +220,31 @@
       "ndDo": "08:40",
       "id": 8
     }
-  ]
+  ],
+"messages": [
+  {
+    "message": "info od Bartka",
+    "sent": true,
+    "date": "2.11.2017",
+    "time": "12:24",
+    "read": false,
+    "id": 1
+  },
+  {
+    "message": "wysłana wiadomość",
+    "sent": true,
+    "date": "3.11.2017",
+    "time": "12:24",
+    "read": true,
+    "id": 2
+  },
+  {
+    "message": "lorem ipsum bla bla bla bla",
+    "sent": true,
+    "date": "2.11.2017",
+    "time": "12:24",
+    "read": false,
+    "id": 3
+  }
+]
 }

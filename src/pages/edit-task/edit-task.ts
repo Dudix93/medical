@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 
 @Component({
@@ -57,7 +57,8 @@ export class EditTaskPage {
               public navParams:NavParams, 
               private restapiService: RestapiServiceProvider, 
               private storage: Storage,
-              private alertCtrl: AlertController) {
+              private alertCtrl: AlertController,
+              private events: Events) {
     this.params.task_title = this.navParams.get('task_title');
     this.params.task_id = this.navParams.get('task_id');
     this.params.hours = this.navParams.get('hours');
@@ -155,6 +156,7 @@ updateTask(){
       this.showalert("Zaktualizowano.");
     } 
   }
+  this.events.publish('updateViewAfterEdit');
 }
 
 updatePastTask(){

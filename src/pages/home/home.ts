@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Push, PushToken } from '@ionic/cloud-angular';
-import { ActionSheetController, AlertController, ToastController, NavController, Platform } from 'ionic-angular';
+import { ActionSheetController, AlertController, ToastController, NavController, Platform, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
@@ -133,12 +133,17 @@ export class HomePage {
               private toastCtrl:ToastController,
               public push:Push,
               private localNotifications: LocalNotifications,
-              private platform: Platform) {
+              private platform: Platform,
+              private events: Events) {
     this.storage.get('zalogowany').then((val) => {
       this.login = val;
     });
     this.getUserProjectsAndTasks();
+    //this.getProjects();
     this.inProgress = false;
+    this.events.subscribe('updateViewAfterEdit',()=>{
+      this.getUserProjectsAndTasks();
+    });
     this.platform.ready().then((readySource) => {
       this.localNotifications.on('click', (notification, state) => {
         let json = JSON.parse(notification.data);
@@ -195,6 +200,11 @@ export class HomePage {
       });
     }
 
+    getProjects(){
+      this.restapiService.getProjects().then(data => {
+        console.log(data);
+      })
+    }
   getUserProjectsAndTasks() {
     this.autoTasks = new Array<any>();
     this.storage.get('zalogowany_id').then((val) => {
@@ -238,7 +248,7 @@ export class HomePage {
                         }
                       
                       this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
-                      //console.log(this.userProjectTasks);
+                      console.log(this.userProjectTasks);
                     }
                   }
                 }
@@ -447,6 +457,7 @@ export class HomePage {
         this.storage.set('current_task_title', task.title);
       });
     }
+    this.getUserProjectsAndTasks();
   }
 
   finishTask(hours:any,minutes:any){
@@ -475,9 +486,10 @@ export class HomePage {
       this.userTask.time_spent = hours.toString().concat(":".concat(minutes));
     }
     //console.log(this.userTask);
-    // this.restapiService.updateUserTask(this.userTask.id, this.userTask);
-    // this.storage.set('current_task_id', null);
-    // this.storage.set('current_task_title', null);
+    this.restapiService.updateUserTask(this.userTask.id, this.userTask);
+    this.storage.set('current_task_id', null);
+    this.storage.set('current_task_title', null);
+    this.getUserProjectsAndTasks();
   }
 
   pauseTask(task_id:number){
@@ -502,6 +514,7 @@ export class HomePage {
         }
       });
     });
+    this.getUserProjectsAndTasks();
   }
 
   restartTask(task_id:number){
@@ -531,6 +544,7 @@ export class HomePage {
         }
       });
     });
+    this.getUserProjectsAndTasks();
   }
 
   countTime(task_id:number,start_date:string,date:Date){
@@ -669,7 +683,7 @@ export class HomePage {
         }
         }
         //------------------------------------------------------------------------------------------------------------------------
-      else if(d.getDay() == new Date().getDay() && d.getMonth() == new Date().getMonth()){
+      else if(d.getUTCDate() == new Date().getUTCDate() && d.getMonth() == new Date().getMonth()){
         if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
         if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
             time += this.timeBetween(pausedHour,startHour);
@@ -685,7 +699,7 @@ export class HomePage {
           else{
             time += this.timeBetween(nowHour,dayOd);
           }
-        }
+        }// SPRAWDŹ CZY NOW NIE JEST ZANIM ZACZYNASZ PRACĘ, BO BĘDZIE NA MINUSIE
       }
         }
         //------------------------------------------------------------------------------------------------------------------------

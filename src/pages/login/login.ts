@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, ToastController  } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { HomePage } from '../home/home';
 import { RegisterPage } from '../register/register';
@@ -19,7 +19,13 @@ export class LoginPage {
   loginData = {password:'',rememberMe:true,username:''}
   correct:boolean;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public restapiService: RestapiServiceProvider, public storage:Storage, public localNotifications:LocalNotifications, public platform:Platform, public alertCtrl:AlertController) {
+  constructor(public navCtrl: NavController, 
+              public navParams: NavParams, 
+              public restapiService: RestapiServiceProvider, 
+              public storage:Storage, 
+              public localNotifications:LocalNotifications, 
+              public platform:Platform, 
+              public toastCtrl:ToastController) {
     this.storage.get('apiUrl').then((val) => {
       this.credentials.apiUrl = val;
     });
@@ -50,10 +56,12 @@ export class LoginPage {
     .then(data => {
       this.correct=false;
       this.users = data;
+      console.log("dejta: "+data);
       console.log(this.users);
       for (var user of this.users) {
         if(user.login == this.credentials.login){
           if(user.password == this.credentials.password && user.active == true){
+            console.log('wszystko pasi');
             this.correct = true;
             this.storage.set('zalogowany', user.login);
             this.storage.set('zalogowany_id', user.id);
@@ -62,7 +70,11 @@ export class LoginPage {
         }
       }
       if(this.correct == true){
+        console.log('odpalam');
         this.navCtrl.push(HomePage);
+      }
+      else{
+        this.showToast("Podałeś zły login lub hasło.");
       }
     });
   }
@@ -76,12 +88,22 @@ export class LoginPage {
     this.loginData.username = this.credentials.login;
     this.loginData.password = this.credentials.password;
     this.restapiService.login(this.loginData);
+    this.navCtrl.push(HomePage);
     //console.log(this.credentials.login+" "+this.credentials.password);
   }
 
   register(){
     this.correct=true;
     this.navCtrl.push(RegisterPage);
+  }
+
+  showToast(message:any) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 }
