@@ -26,6 +26,7 @@ export class LoginPage {
               public localNotifications:LocalNotifications, 
               public platform:Platform, 
               public toastCtrl:ToastController) {
+                console.log('login view');   
     this.storage.get('apiUrl').then((val) => {
       this.credentials.apiUrl = val;
     });
@@ -61,7 +62,6 @@ export class LoginPage {
       for (var user of this.users) {
         if(user.login == this.credentials.login){
           if(user.password == this.credentials.password && user.active == true){
-            console.log('wszystko pasi');
             this.correct = true;
             this.storage.set('zalogowany', user.login);
             this.storage.set('zalogowany_id', user.id);
@@ -80,15 +80,21 @@ export class LoginPage {
   }
 
   login2() {
-    console.log("credentials.apiUrl "+this.credentials.apiUrl);
-    this.storage.set('apiUrl', this.credentials.apiUrl);
-    this.storage.get('apiUrl').then((value) => {
-      console.log("storage apiurl "+value);
-     });
+    // console.log("credentials.apiUrl "+this.credentials.apiUrl);
+    // this.storage.set('apiUrl', this.credentials.apiUrl);
+    // this.storage.get('apiUrl').then((value) => {
+    //   console.log("storage apiurl "+value);
+    //  });
     this.loginData.username = this.credentials.login;
     this.loginData.password = this.credentials.password;
-    this.restapiService.login(this.loginData);
-    this.navCtrl.push(HomePage);
+    this.restapiService.login(this.loginData).subscribe((data) => {
+      console.log(data);
+      this.storage.set('isLoggedIn',true);
+      this.navCtrl.push(HomePage);
+      //console.log(this.credentials.login+" "+this.credentials.password);
+    });
+    // this.storage.set('isLoggedIn',true);
+    // this.navCtrl.push(HomePage);
     //console.log(this.credentials.login+" "+this.credentials.password);
   }
 

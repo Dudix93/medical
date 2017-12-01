@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Response, Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
+import {GlobalVars} from '../../app/globalVars'
 
 @Injectable()
 export class RestapiServiceProvider {
@@ -10,8 +11,9 @@ export class RestapiServiceProvider {
   apiUrl:string;
   //apiUrl = 'http://192.168.137.1:9090';
   //apiUrl = 'http://localhost:3000';
-  constructor(public http: Http, public storage:Storage){
-
+  constructor(public http: Http, 
+              public storage:Storage,
+              public globalVar:GlobalVars){
   }
 
   get(apiUrl,resource,id,headers):Promise<any>{
@@ -63,10 +65,18 @@ export class RestapiServiceProvider {
   }
 
   headers():RequestOptions{
+    console.log('headery');
     let headers = new Headers();
     headers.append('Accept', 'application/json');
     headers.append('Content-Type', 'application/json');
     headers.append('Access-Control-Allow-Origin', '*');
+    // this.storage.get('token').then((value) => {
+    //   let tkn = value;
+    //   console.log('header token: '+tkn);
+    //   headers.append('Authorization', 'Bearer '+tkn);
+    // });
+    console.log('header token: '+this.globalVar.getToken());
+    headers.append('Authorization', 'Bearer '+this.globalVar.getToken());
     headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     return new RequestOptions({headers:headers});
   }
@@ -87,6 +97,30 @@ export class RestapiServiceProvider {
       });
     }
     else return null;
+  }
+
+  login(data) {
+      // this.storage.get('apiUrl').then((value) => {
+        return this.http.post('http://192.168.137.1:8080'+'/api/authenticate', data)
+        // .map(res => res.json())
+        // .subscribe(response => {
+        //   console.log('logowanie storage');
+        //   let dejta = response;
+        //   console.log("response: "+response);
+        //   console.log("login token: "+dejta.id_token);
+        //   //this.storage.set('token',dejta.id_token);
+        //   this.globalVar.setToken(dejta.id_token);
+        //   //return true;
+        // }, (err) => {
+        //   console.log(err);
+        // });  
+        .map((response:Response) => {
+          console.log("token: "+response.json().id_token);
+          this.globalVar.setToken(response.json().id_token);
+          return response.json().id_token;
+        });
+      // });
+ 
   }
 
   getUsers() {
@@ -165,10 +199,12 @@ export class RestapiServiceProvider {
   }
 
   getProjects() {
+    console.log('projekty');
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        //console.log(value);
-        this.http.get(value+'/projects')
+        //console.log(this.headers());
+        console.log('projekty storage');
+        this.http.get(value+'/api/projects/user',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -553,23 +589,6 @@ export class RestapiServiceProvider {
          resolve(this.data);
         });
        });
-    });
-  }
-
-  login(data) {
-    console.log(JSON.stringify(data));
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/api/authenticate', data)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          console.log("token: "+this.data.id_token);
-          resolve(this.data);
-        }, (err) => {
-          reject(err);
-        });  
-      });
     });
   }
 }

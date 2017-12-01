@@ -135,33 +135,39 @@ export class HomePage {
               private localNotifications: LocalNotifications,
               private platform: Platform,
               private events: Events) {
-    this.storage.get('zalogowany').then((val) => {
-      this.login = val;
-    });
-    this.getUserProjectsAndTasks();
-    //this.getProjects();
-    this.inProgress = false;
-    this.events.subscribe('updateViewAfterEdit',()=>{
-      this.getUserProjectsAndTasks();
-    });
-    this.platform.ready().then((readySource) => {
-      this.localNotifications.on('click', (notification, state) => {
-        let json = JSON.parse(notification.data);
-   
-        let alert = alertCtrl.create({
-          title: notification.title,
-          subTitle: json.mydata
+        console.log('home view');      
+        this.storage.get('isLoggedIn').then(value =>{
+          if(value == true){
+            console.log("ZALOGOWANO");
+            this.storage.get('zalogowany').then((val) => {
+              this.login = val;
+                  //this.getUserProjectsAndTasks();
+            this.getProjects();
+            this.inProgress = false;
+            this.events.subscribe('updateViewAfterEdit',()=>{
+              this.getUserProjectsAndTasks();
+            });
+            this.platform.ready().then((readySource) => {
+              this.localNotifications.on('click', (notification, state) => {
+                let json = JSON.parse(notification.data);
+           
+                let alert = alertCtrl.create({
+                  title: notification.title,
+                  subTitle: json.mydata
+                });
+                alert.present();
+              })
+            });
+            if(this.platform.is('cordova')){
+              this.scheduleNotification();
+              this.getMessages();
+              setInterval(() => {
+                this.getMessages();
+              }, 30000);
+            }
+            });
+          }
         });
-        alert.present();
-      })
-    });
-    if(this.platform.is('cordova')){
-      this.scheduleNotification();
-      this.getMessages();
-      setInterval(() => {
-        this.getMessages();
-      }, 30000);
-    }
     }
 
     getMessages() {

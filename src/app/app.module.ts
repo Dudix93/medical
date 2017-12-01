@@ -18,6 +18,7 @@ import { CalendarPage } from '../pages/calendar/calendar';
 import { MessagesPage } from '../pages/messages/messages';
 import { RestapiServiceProvider } from '../providers/restapi-service/restapi-service';
 import { LocalNotifications} from '@ionic-native/local-notifications'
+import {GlobalVars} from '../app/globalVars'
 
 const cloudSettings: CloudSettings = {
   'core': {
@@ -73,7 +74,8 @@ const cloudSettings: CloudSettings = {
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     RestapiServiceProvider,
-    LocalNotifications
+    LocalNotifications,
+    GlobalVars
   ]
 })
 export class AppModule {}
