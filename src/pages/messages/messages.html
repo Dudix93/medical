@@ -20,7 +20,7 @@
 
 
     <h2 *ngIf="allMessages == null">Nie masz żadnych wiadomości.</h2>
-            <ng-container *ngFor="let date of dates,let i = index">
+      <ng-container *ngFor="let date of dates,let i = index">
               <h1>Z dnia: {{date}}</h1>
         <ion-grid>
             <ion-row>
@@ -30,9 +30,9 @@
               </ion-row>
             <ng-container *ngIf="sort == 'all'">
             <ion-row *ngFor="let msg of allMessages,let i = index">
-                <ng-container *ngIf="msg.date == date">
-                <ion-col col-3><ion-label>{{msg.time}}</ion-label></ion-col>
-                <ion-col col-7><ion-label>{{msg.message}}</ion-label></ion-col>
+              <ng-container *ngIf="msg.date == date">
+                <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
+                <ion-col col-7><ion-label>{{msg.title}}</ion-label></ion-col>
                 <ion-col col-2><ion-label></ion-label><ion-icon name="md-trash" (click)="finishTaskPrompt()"></ion-icon></ion-col>
               </ng-container>
             </ion-row>

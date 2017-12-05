@@ -15,6 +15,8 @@ import { CalendarPage } from '../calendar/calendar';
 import { MessagesPage } from '../messages/messages';
 import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
+import {GlobalVars} from '../../app/globalVars'
+
 declare let cordova: any;
 
 @Component({
@@ -102,6 +104,7 @@ export class HomePage {
   login:string;
   currentDate:string;
   currentTime:string;
+  name:string;
   autoTasks:Array<any>;
   userProjectTasks:Array<any>;
   userProjects:Array<any>;
@@ -134,14 +137,13 @@ export class HomePage {
               public push:Push,
               private localNotifications: LocalNotifications,
               private platform: Platform,
-              private events: Events) {
-        console.log('home view');      
+              private events: Events,
+              public globalVar:GlobalVars) { 
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
-            console.log("ZALOGOWANO");
             this.storage.get('zalogowany').then((val) => {
               this.login = val;
-                  //this.getUserProjectsAndTasks();
+            //this.getUserProjectsAndTasks();
             this.getProjects();
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
@@ -207,10 +209,32 @@ export class HomePage {
     }
 
     getProjects(){
+      console.log('API URL: '+this.globalVar.getApiUrl());
+      let userIdFound = false;
       this.restapiService.getProjects().then(data => {
-        console.log(data);
+        this.projects = data;
+        for(let project of this.projects){
+          for(let user of project.users){
+            if(userIdFound == false){
+              this.storage.get('zalogowany').then(stored_login => {
+                if(user.login == stored_login){
+                  let user_id = user.id;
+                  this.storage.set('zalogowany_id',user_id);
+                  this.name = user.firstName;
+                  console.log('ajdi: '+user.id);
+                  userIdFound = true;
+                }
+              });
+            }
+            else break;
+          }
+        }
+        this.storage.get('zalogowany_id').then(value => {console.log("zalogowany id "+value)});
+        this.storage.get('zalogowany').then(value => {console.log("zalogowany "+value)});
+        console.log(this.projects);
       })
     }
+  //-----------------------------------------------------------------------------------------------------------------------  
   getUserProjectsAndTasks() {
     this.autoTasks = new Array<any>();
     this.storage.get('zalogowany_id').then((val) => {
@@ -346,13 +370,6 @@ export class HomePage {
   menu() {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
-        {
-          text: 'Wiadomosci',
-          icon:'md-chatboxes',
-          handler: () => {
-            this.pushMessagesPage();
-          }
-        },
         {
           text: 'Czynności skończone',
           icon:'md-calendar',
@@ -499,26 +516,33 @@ export class HomePage {
   }
 
   pauseTask(task_id:number){
-    this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          this.storage.get("current_task_id").then((id) => {
-            if(id == task.task_id){
-              this.userTask = task;
-              this.userTask.paused = true;
-              this.pausedTask.task_id = id;
-              this.pausedTask.user_id = user_id;
-              this.pausedTask.pause_date = this.today;
-              this.pausedTask.pause_hour = this.getHour();
-              this.restapiService.savePausedTask(this.pausedTask);
-              this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-              this.showalert("Wstrzymano czynność.");
-            }
-          });
-        }
-      });
+    let preferences:any;
+    this.restapiService.getUserPreferences().then((data) =>{
+      preferences = data;
+      for(let day of preferences){
+        console.log("preferences: "+day.day);
+      }
+      // this.restapiService.getUserTask()
+      // .then(data => {
+      //   this.userTasks = data;
+      //   this.storage.get('zalogowany_id').then((user_id) => {
+      //     for(let task of this.userTasks){
+      //       this.storage.get("current_task_id").then((id) => {
+      //         if(id == task.task_id){
+      //           this.userTask = task;
+      //           this.userTask.paused = true;
+      //           this.pausedTask.task_id = id;
+      //           this.pausedTask.user_id = user_id;
+      //           this.pausedTask.pause_date = this.today;
+      //           this.pausedTask.pause_hour = this.getHour();
+      //           this.restapiService.savePausedTask(this.pausedTask);
+      //           this.restapiService.updateUserTask(this.userTask.id,this.userTask);
+      //           this.showalert("Wstrzymano czynność.");
+      //         }
+      //       });
+      //     }
+      //   });
+      // });
     });
     this.getUserProjectsAndTasks();
   }

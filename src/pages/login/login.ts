@@ -5,6 +5,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 import { HomePage } from '../home/home';
 import { RegisterPage } from '../register/register';
 import { LocalNotifications} from '@ionic-native/local-notifications'
+import {GlobalVars} from '../../app/globalVars'
 
 @IonicPage()
 @Component({
@@ -25,14 +26,18 @@ export class LoginPage {
               public storage:Storage, 
               public localNotifications:LocalNotifications, 
               public platform:Platform, 
-              public toastCtrl:ToastController) {
-                console.log('login view');   
+              public toastCtrl:ToastController,
+              public globalVar:GlobalVars) {
     this.storage.get('apiUrl').then((val) => {
       this.credentials.apiUrl = val;
     });
-    this.storage.get('zalogowany').then((val) => {
-      if(val != null){
-        this.navCtrl.push(HomePage);
+    this.storage.get('isLoggedIn').then((val) => {
+      if(val == true){
+        this.storage.get('zalogowany').then(login => {
+          this.storage.get('haslo').then(password => {
+            this.login2(login,password);
+          });
+        });
       }
     });
   }
@@ -71,6 +76,7 @@ export class LoginPage {
       }
       if(this.correct == true){
         console.log('odpalam');
+        this.storage.set('isLoggedIn',true);
         this.navCtrl.push(HomePage);
       }
       else{
@@ -79,23 +85,29 @@ export class LoginPage {
     });
   }
 
-  login2() {
-    // console.log("credentials.apiUrl "+this.credentials.apiUrl);
-    // this.storage.set('apiUrl', this.credentials.apiUrl);
-    // this.storage.get('apiUrl').then((value) => {
-    //   console.log("storage apiurl "+value);
-    //  });
-    this.loginData.username = this.credentials.login;
-    this.loginData.password = this.credentials.password;
+  login2(login:string,password:string) {
+
+    this.storage.set('apiUrl', this.credentials.apiUrl);
+    this.globalVar.setApiUrl(this.credentials.apiUrl);
+
+    if(login != null && password != null){
+      this.loginData.username = login;
+      this.loginData.password = password;
+    }
+    else{
+      this.loginData.username = this.credentials.login;
+      this.loginData.password = this.credentials.password;
+    }
+
+    console.log(this.restapiService.login(this.loginData));
+    
     this.restapiService.login(this.loginData).subscribe((data) => {
       console.log(data);
       this.storage.set('isLoggedIn',true);
+      this.storage.set('zalogowany', this.loginData.username);
+      this.storage.set('haslo', this.loginData.password);
       this.navCtrl.push(HomePage);
-      //console.log(this.credentials.login+" "+this.credentials.password);
     });
-    // this.storage.set('isLoggedIn',true);
-    // this.navCtrl.push(HomePage);
-    //console.log(this.credentials.login+" "+this.credentials.password);
   }
 
   register(){

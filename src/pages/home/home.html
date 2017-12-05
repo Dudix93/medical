@@ -1,12 +1,12 @@
 <ion-header>
   <ion-navbar hideBackButton>
     <ion-title>
-      <ion-buttons end *ngFor="let u of user">
+      <ion-buttons end>
         <button (click)="pushMessagesPage()" style='background-color: Transparent;'>
           <ion-badge>{{amountNewMessages}}</ion-badge>
           <ion-icon name="md-chatboxes"></ion-icon>
         </button>
-        Witaj {{u.name}}  
+        Witaj {{name}}  
           <button (click)="menu()" style='background-color: Transparent;'><ion-icon name="menu"></ion-icon></button>
       </ion-buttons>
     </ion-title>
@@ -16,6 +16,7 @@
 <ion-content padding>
   <h2 *ngIf="projects != null">Twoje projekty:</h2>
   <h2 *ngIf="projects == null">Nie jesteś zapisany do żadnego projektu.</h2>
+  <!-- <ng-container *ngIf="projects != null">
       <ion-grid *ngFor="let project of userProjects,let i = index">
           <h2>{{project.title}}</h2>
           <ion-row>
@@ -65,8 +66,6 @@
             </ion-col>
           </ion-row>
       </ion-grid>
-      <!-- <div *ngFor="let project of userProjects,let i = index">
-        {{project.title}}
-      <div *ngFor="let task of project.tasks,let i = index">{{task.finish_date}}</div>
-      </div> -->
+    </ng-container> -->
+
 </ion-content>
