@@ -34,17 +34,18 @@ getMessages(){
   this.restapiService.getMessages(null,null).then(data =>{
     allMsgs = data;
     for(let msg of allMsgs){
+      console.log(msg);
       this.globalVars.pushMessage(new Message(
                                     msg.id,
                                     msg.title,
                                     msg.content,
                                     new Date(msg.sendDate).toLocaleDateString(),
-                                    new Date(msg.sendDate).getHours().toString().concat(':'.concat(new Date(msg.sendDate).getMinutes().toString()))));
-      this.storage.get('messages').then(msgs => {
-        if(msgs == undefined) this.storage.set('messages',{});
-        let messages = new Array<any>();
-        console.log(messages);
-      });
+                                    new Date(msg.sendDate).getHours().toString()
+                                    .concat(':'
+                                    .concat(new Date(msg.sendDate).getMinutes()<10?
+                                    '0'.concat(new Date(msg.sendDate).getMinutes().toString())
+                                    :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
+        this.globalVars.pushNewMessage(this.globalVars.getMessages()[this.globalVars.getMessages().length-1]);
     }
     this.allMessages = this.globalVars.getMessages();
     for(let msg of this.allMessages){
@@ -54,17 +55,13 @@ getMessages(){
     }
     this.dates.sort();
     this.dates.reverse();
+    this.newMessages = this.globalVars.getNewMessages();
     console.log(this.dates);
-    console.log(this.allMessages);
+    console.log("all "+this.allMessages);
+    console.log("nowe "+this.newMessages);
+    console.log("stare "+this.oldMessages);
   });
 
-  this.restapiService.getMessages(null,false).then(nju =>{
-    //console.log(nju);
-  });
-
-  this.restapiService.getMessages(null,true).then(old =>{
-    //console.log(old);
-  });
 }
 
 showMessage(id:number){

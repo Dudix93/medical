@@ -5,6 +5,8 @@ export class GlobalVars {
   token:any;
   apiUrl:any;
   messages = new Array<any>();
+  newMessages = new Array<any>();
+  oldMessages = new Array<any>();
 
   constructor() {
   }
@@ -37,4 +39,27 @@ export class GlobalVars {
     this.messages = new Array<any>();
   }
 
+  pushNewMessage(value){
+    this.newMessages.push(value);
+  }
+
+  getNewMessages(){
+    return this.newMessages;
+  }
+
+  cleanNewMessages(){
+    this.newMessages = new Array<any>();
+  }
+
+  pushOldMessage(value){
+    this.oldMessages.push(value);
+  }
+
+  getOldMessages(){
+    return this.oldMessages;
+  }
+
+  cleanOldMessages(){
+    this.oldMessages = new Array<any>();
+  }
 }
