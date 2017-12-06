@@ -28,14 +28,14 @@
             <ion-row>
                 <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
                 <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                <ion-col col-2><ion-label>Usuń</ion-label></ion-col>
+                <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
             </ion-row>
             
             <ion-row *ngFor="let msg of allMessages,let i = index">
               <ng-container *ngIf="msg.date == date">
                 <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                <ion-col col-7><ion-label>{{msg.title}}</ion-label></ion-col>
-                <ion-col col-2><ion-label></ion-label><ion-icon name="md-trash" (click)="finishTaskPrompt()"></ion-icon></ion-col>
+                <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
+                <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
               </ng-container>
             </ion-row>
 
@@ -50,14 +50,14 @@
               <ion-row>
                   <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
                   <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                  <ion-col col-2><ion-label>Usuń</ion-label></ion-col>
+                  <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
               </ion-row>
               
               <ion-row *ngFor="let msg of newMessages,let i = index">
                 <ng-container *ngIf="msg.date == date">
                   <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                  <ion-col col-7><ion-label>{{msg.title}}</ion-label></ion-col>
-                  <ion-col col-2><ion-label></ion-label><ion-icon name="md-trash" (click)="finishTaskPrompt()"></ion-icon></ion-col>
+                  <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
+                  <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
                 </ng-container>
               </ion-row>
   
@@ -73,14 +73,14 @@
                 <ion-row>
                     <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
                     <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                    <ion-col col-2><ion-label>Usuń</ion-label></ion-col>
+                    <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
                 </ion-row>
                 
                 <ion-row *ngFor="let msg of oldMessages,let i = index">
                   <ng-container *ngIf="msg.date == date">
                     <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                    <ion-col col-7><ion-label>{{msg.title}}</ion-label></ion-col>
-                    <ion-col col-2><ion-label></ion-label><ion-icon name="md-trash" (click)="finishTaskPrompt()"></ion-icon></ion-col>
+                    <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
+                    <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
                   </ng-container>
                 </ion-row>
     

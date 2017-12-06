@@ -64,13 +64,32 @@ getMessages(){
 
 }
 
-showMessage(id:number){
-  //showalert
-}
-
 showalert(info:string) {
   const alert = this.alertCtrl.create({
     title: info,
+    buttons: [
+      {
+        text: 'Ok',
+        handler: () => {
+          //this.startTask(data);
+        }
+      }
+    ]
+  });
+  alert.present();
+}
+
+showMessage(id:number,title:string,message:string) {
+  this.newMessages.forEach((msg,index) => {
+    if(msg.id == id){
+      this.globalVars.pushOldMessage(msg);
+      this.oldMessages = this.globalVars.getOldMessages();
+      this.newMessages.splice(index,1);
+    }
+  });
+  const alert = this.alertCtrl.create({
+    title: title,
+    message: message,
     buttons: [
       {
         text: 'Ok',

@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { Push, PushToken } from '@ionic/cloud-angular';
-import { ActionSheetController, AlertController, ToastController, NavController, Platform, Events } from 'ionic-angular';
+import { ActionSheetController, AlertController, NavController, Platform, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { UserProject } from '../../models/userProject';
 import { RadioButton } from '../../models/radioButton';
-import { UserTask } from '../../models/userTask';
 import { AutoTaskTime } from '../../models/autoTaskTime';
 import { LoginPage } from '../login/login';
 import { PreferencesPage } from '../preferences/preferences';
@@ -133,8 +131,6 @@ export class HomePage {
               private storage:Storage,
               private actionSheetCtrl:ActionSheetController,
               private alertCtrl:AlertController,
-              private toastCtrl:ToastController,
-              public push:Push,
               private localNotifications: LocalNotifications,
               private platform: Platform,
               private events: Events,
@@ -143,8 +139,8 @@ export class HomePage {
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
               this.login = val;
-            //this.getUserProjectsAndTasks();
-            this.getProjects();
+            this.getUserProjectsAndTasks();
+            //this.getProjects();
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
               this.getUserProjectsAndTasks();
@@ -182,7 +178,7 @@ export class HomePage {
               id: msg.id,
               title: 'Wiadomosc',
               text: msg.message,
-              icon:'ios-mail-outline'
+              icon:'ios-chatbubbles-outline'
             });
             this.message.message = msg.message;
             this.message.date = msg.date;
@@ -203,7 +199,7 @@ export class HomePage {
           text: 'Treść powiadomienia',
           //data: { mydata: 'My hidden message' },
           trigger: { every: 'minute', count: 2 },
-          icon:'md-alarm'
+          icon:'alert'
         });
       });
     }
@@ -238,6 +234,7 @@ export class HomePage {
   getUserProjectsAndTasks() {
     this.autoTasks = new Array<any>();
     this.storage.get('zalogowany_id').then((val) => {
+      console.log("login id "+val);
       this.restapiService.getUser(val)
       .then(data => {
         this.user = new Array<any>();
@@ -333,8 +330,10 @@ export class HomePage {
   }
 
   logout(){
+    this.storage.set('isLoggedIn',false);
     this.storage.set('zalogowany', null);
     this.storage.set('zalogowany_id', null);
+    this.storage.set('haslo', null);
     this.navCtrl.push(LoginPage);
   }
 
@@ -640,8 +639,6 @@ export class HomePage {
                 else if(d.getDay() == 6 && pref.sob == true){
                   time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.sobOd,pref.sobDo,startHour,task_id,pausedHour,pausedDate);
                 }
-                let h = Math.floor(time);
-                let m = Math.floor(60*((time) - Math.floor(time)));
                 this.firstDay = false;
                 DayTime = time - DayTime;
                 let hours = Math.floor(DayTime);
@@ -745,8 +742,6 @@ export class HomePage {
       }
       }
     time = time/3600000;
-    let h = Math.floor(time);
-    let m = Math.floor(60*(time - Math.floor(time)));
     console.log(" ");
     return time;
   }

@@ -69,12 +69,6 @@ export class RestapiServiceProvider {
     headers.append('Accept', 'application/json');
     headers.append('Content-Type', 'application/json');
     headers.append('Access-Control-Allow-Origin', '*');
-    // this.storage.get('token').then((value) => {
-    //   let tkn = value;
-    //   console.log('header token: '+tkn);
-    //   headers.append('Authorization', 'Bearer '+tkn);
-    // });
-    console.log('header token: '+this.globalVar.getToken());
     headers.append('Authorization', 'Bearer '+this.globalVar.getToken());
     headers.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     return new RequestOptions({headers:headers});
@@ -99,9 +93,9 @@ export class RestapiServiceProvider {
   }
 
   login(data) {
-    let url;
       let value = this.globalVar.getApiUrl();
-        return this.http.post(value+'/api/authenticate', data)
+        //return this.http.post(value+'/api/authenticate', data)
+        return this.http.post(value+'/users', data)
         .map((response:Response) => {
           console.log("token: "+response.json().id_token);
           this.globalVar.setToken(response.json().id_token);
@@ -188,7 +182,8 @@ export class RestapiServiceProvider {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        this.http.get(value+'/api/projects/user/',this.headers())
+        //this.http.get(value+'/api/projects/user/',this.headers())
+        this.http.get(value+'/projects/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -533,32 +528,13 @@ export class RestapiServiceProvider {
   getMessages(id:number,read:any) {
     return new Promise(resolve => {
       let value = this.globalVar.getApiUrl();
-        if(id != null && read == null){
-          this.http.get(value+'/api/statements?id='+id,this.headers())
+          this.http.get(value+'/statements',this.headers())
           .map(res => res.json())
           .subscribe(data => {
           this.data = data;
           resolve(this.data);
           });
-        }
-        else if(id == null && read != null){
-          this.http.get(value+'/api/statements?read='+read,this.headers())
-          .map(res => res.json())
-          .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-          });
-        }
-        else if(id == null && read == null){
-          this.http.get(value+'/api/statements',this.headers())
-          .map(res => res.json())
-          .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-          });
-        }
-       
-    });
+      });
   }
 
   updateMessages(id,data) {

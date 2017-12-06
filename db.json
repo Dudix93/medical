@@ -221,30 +221,12 @@
       "id": 8
     }
   ],
-"messages": [
-  {
-    "message": "info od Bartka",
-    "sent": true,
-    "date": "2.11.2017",
-    "time": "12:24",
-    "read": false,
-    "id": 1
-  },
-  {
-    "message": "wysłana wiadomość",
-    "sent": true,
-    "date": "3.11.2017",
-    "time": "12:24",
-    "read": true,
-    "id": 2
-  },
-  {
-    "message": "lorem ipsum bla bla bla bla",
-    "sent": true,
-    "date": "2.11.2017",
-    "time": "12:24",
-    "read": false,
-    "id": 3
-  }
-]
+  "statements": [
+    {
+      "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
+      "id": 1152,
+      "sendDate": "2017-12-04T11:59:00+01:00",
+      "title": "Przerwa techniczna"
+    }
+  ]
 }
