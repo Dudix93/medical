@@ -68,7 +68,9 @@ export class LoginPage {
         if(user.login == this.credentials.login){
           if(user.password == this.credentials.password && user.active == true){
             this.correct = true;
+            this.storage.set('isLoggedIn',true);
             this.storage.set('zalogowany', user.login);
+            this.storage.set('haslo', user.password);
             this.storage.set('zalogowany_id', user.id);
             break;
           }

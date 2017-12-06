@@ -13,10 +13,12 @@ import { GlobalVars } from '../../app/globalVars'
 export class MessagesPage {
 
 allMessages:Array<any>;
-dates:Array<any>;
-sort:string = 'all';
 newMessages:Array<any>;
 oldMessages:Array<any>;
+allDates:Array<any>;
+newDates:Array<any>;
+oldDates:Array<any>;
+sort:string = 'all';
 
 
   constructor(public navCtrl: NavController, 
@@ -30,38 +32,46 @@ oldMessages:Array<any>;
 
 getMessages(){
   let allMsgs;
-  this.dates = new Array<any>();
-  this.restapiService.getMessages(null,null).then(data =>{
-    allMsgs = data;
-    for(let msg of allMsgs){
-      console.log(msg);
-      this.globalVars.pushMessage(new Message(
-                                    msg.id,
-                                    msg.title,
-                                    msg.content,
-                                    new Date(msg.sendDate).toLocaleDateString(),
-                                    new Date(msg.sendDate).getHours().toString()
-                                    .concat(':'
-                                    .concat(new Date(msg.sendDate).getMinutes()<10?
-                                    '0'.concat(new Date(msg.sendDate).getMinutes().toString())
-                                    :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
-        this.globalVars.pushNewMessage(this.globalVars.getMessages()[this.globalVars.getMessages().length-1]);
-    }
-    this.allMessages = this.globalVars.getMessages();
+  this.allDates = new Array<any>();
+  this.newDates = new Array<any>();
+  this.oldDates = new Array<any>();
+
+  this.storage.get('unreadMessages').then(unreadMsgs =>{
+    console.log("unreadMsgs");
+    this.globalVars.setNewMessages(unreadMsgs);
+  });
+  this.storage.get('oldMessages').then(oldMsgs =>{this.globalVars.setOldMessages(oldMsgs)});
+
+    this.allMessages = this.globalVars.getNewMessages().concat(this.globalVars.getOldMessages());
+    this.newMessages = this.globalVars.getNewMessages();
+    this.oldMessages = this.globalVars.getOldMessages();
+
     for(let msg of this.allMessages){
-      if(this.dates.indexOf(msg.date) == -1){
-        this.dates.push(msg.date);
+      if(this.allDates.indexOf(msg.date) == -1){
+        this.allDates.push(msg.date);
       }
     }
-    this.dates.sort();
-    this.dates.reverse();
-    this.newMessages = this.globalVars.getNewMessages();
-    console.log(this.dates);
+    for(let msg of this.newMessages){
+      if(this.newDates.indexOf(msg.date) == -1){
+        this.newDates.push(msg.date);
+      }
+    }
+    for(let msg of this.oldMessages){
+      if(this.oldDates.indexOf(msg.date) == -1){
+        this.oldDates.push(msg.date);
+      }
+    }
+
+    this.allDates.sort();
+    this.allDates.reverse();
+    this.newDates.sort();
+    this.newDates.reverse();
+    this.oldDates.sort();
+    this.oldDates.reverse();
+    console.log(this.allDates);
     console.log("all "+this.allMessages);
     console.log("nowe "+this.newMessages);
     console.log("stare "+this.oldMessages);
-  });
-
 }
 
 showalert(info:string) {
@@ -85,6 +95,8 @@ showMessage(id:number,title:string,message:string) {
       this.globalVars.pushOldMessage(msg);
       this.oldMessages = this.globalVars.getOldMessages();
       this.newMessages.splice(index,1);
+      this.storage.set('unreadMessages',this.newMessages);
+      this.storage.set('oldMessages',this.oldMessages);
     }
   });
   const alert = this.alertCtrl.create({

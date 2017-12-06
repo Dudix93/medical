@@ -13,7 +13,8 @@ import { CalendarPage } from '../calendar/calendar';
 import { MessagesPage } from '../messages/messages';
 import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
-import {GlobalVars} from '../../app/globalVars'
+import { Message } from '../../models/message'
+import { GlobalVars } from '../../app/globalVars'
 
 declare let cordova: any;
 
@@ -99,6 +100,9 @@ export class HomePage {
   dayTasks: Array<number>;
   projects: any;
   project:any;
+  unreadMsgs:any;
+  oldMsgs:any;
+  newMsgs:any;
   login:string;
   currentDate:string;
   currentTime:string;
@@ -134,13 +138,13 @@ export class HomePage {
               private localNotifications: LocalNotifications,
               private platform: Platform,
               private events: Events,
-              public globalVar:GlobalVars) { 
+              public globalVars:GlobalVars) { 
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
               this.login = val;
-            this.getUserProjectsAndTasks();
-            //this.getProjects();
+            //this.getUserProjectsAndTasks();
+            this.getProjects();
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
               this.getUserProjectsAndTasks();
@@ -156,56 +160,116 @@ export class HomePage {
                 alert.present();
               })
             });
-            if(this.platform.is('cordova')){
-              this.scheduleNotification();
-              this.getMessages();
+            this.getMessages();
+            // if(this.platform.is('cordova')){
+              //this.scheduleNotification();
               setInterval(() => {
                 this.getMessages();
-              }, 30000);
+              }, 5000);
+            // }
+            });
+          }
+        });
+    }
+
+    getMessages(){
+      this.newMsgs = new Array<any>();
+      let allMsgs;
+      let currentMsg;
+      let nju = true;
+      this.restapiService.getMessages(null,null).then(data =>{
+        allMsgs = data;
+        this.storage.get('unreadMessages').then(unreadMsgs =>{
+          this.storage.get('oldMessages').then(oldMsgs => {
+            //console.log("unread "+unreadMsgs+" old "+oldMsgs);
+            this.unreadMsgs = unreadMsgs;
+            this.oldMsgs = oldMsgs;
+            if(this.unreadMsgs == undefined || this.unreadMsgs == null)this.storage.set('unreadMessages',new Array<any>());
+            if(this.oldMsgs == undefined || this.oldMsgs == null)this.storage.set('oldMessages',new Array<any>());
+            this.globalVars.cleanMessages();
+            for(let msg of allMsgs){
+              nju = true;
+              this.globalVars.pushMessage(new Message(
+                                            msg.id,
+                                            msg.title,
+                                            msg.content,
+                                            new Date(msg.sendDate).toLocaleDateString(),
+                                            new Date(msg.sendDate).getHours().toString()
+                                            .concat(':'
+                                            .concat(new Date(msg.sendDate).getMinutes()<10?
+                                            '0'.concat(new Date(msg.sendDate).getMinutes().toString())
+                                            :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
+              
+                currentMsg = this.globalVars.getMessages()[(this.globalVars.getMessages().length)-1];
+                console.log(this.unreadMsgs);
+                
+                for(let n of this.unreadMsgs){
+                  if(n.id == currentMsg.id){
+                    nju = false;
+                    break;
+                  }
+                }
+
+                if(nju == true){
+                  for(let o of this.oldMsgs){
+                    if(o.id == currentMsg.id){
+                      nju = false;
+                      break;
+                    }
+                  }
+                }
+
+                if(nju == true){
+                  this.unreadMsgs.push(currentMsg);
+                  this.newMsgs.push(currentMsg);
+                  console.log("dodane jako nowe: "+currentMsg.id);
+                }
+                //console.log("przeczytane: "+this.unreadMsgs);
             }
-            });
-          }
-        });
-    }
+            this.storage.set('unreadMessages',this.unreadMsgs);
 
-    getMessages() {
-      this.restapiService.getMessages(null,null).then(data => {
-        this.messages = data;
-        for(let msg of this.messages){
-          if(msg.read == false) this.amountNewMessages++;
-          if(msg.sent == false){
-            cordova.plugins.notification.local.schedule({
-              id: msg.id,
-              title: 'Wiadomosc',
-              text: msg.message,
-              icon:'ios-chatbubbles-outline'
-            });
-            this.message.message = msg.message;
-            this.message.date = msg.date;
-            this.message.time = msg.time;
-            this.message.read = msg.read;
-            this.restapiService.updateMessages(msg.id,this.message);
-          }
-        }
-        console.log("new messages: "+this.amountNewMessages);
-      });
-    }
-
-    scheduleNotification() {
-      this.storage.get('not_id').then((ajdi) => {
-        cordova.plugins.notification.local.schedule({
-          id: 1,
-          title: 'Powiadomienie',
-          text: 'Treść powiadomienia',
-          //data: { mydata: 'My hidden message' },
-          trigger: { every: 'minute', count: 2 },
-          icon:'alert'
+            if(this.newMsgs.length != 0){
+              if(this.newMsgs.length == 1){
+              //   cordova.plugins.notification.local.schedule({
+              //   id: this.newMsgs[0].id,
+              //   title: 'Raportowanie',
+              //   text: this.newMsgs[0].title,
+              //   icon:'ios-chatbubbles-outline'
+              // });
+              console.log("nowa wiadomosc: "+this.newMsgs[0].title);
+              }
+              else{
+                // cordova.plugins.notification.local.schedule({
+                //   id: this.newMsgs[0].id,
+                //   title: 'Raportowanie',
+                //   text: "Masz "+this.newMsgs.length+" nowych wiadomości.",
+                //   icon:'ios-chatbubbles-outline'
+                // }); 
+                console.log("Masz "+this.newMsgs.length+" nowych wiadomości.");   
+              }
+              this.newMsgs = new Array<any>();
+            }
+          });
         });
       });
+    
     }
+
+    // scheduleNotification() {
+    //   this.storage.get('not_id').then((ajdi) => {
+    //     cordova.plugins.notification.local.schedule({
+    //       id: 1,
+    //       title: 'Powiadomienie',
+    //       text: 'Treść powiadomienia',
+    //       //data: { mydata: 'My hidden message' },
+    //       trigger: { every: 'minute', count: 2 },
+    //       icon:'alert'
+    //     });
+    //   });
+    // }
 
     getProjects(){
-      console.log('API URL: '+this.globalVar.getApiUrl());
+      console.log('API URL: '+this.globalVars.getApiUrl());
       let userIdFound = false;
       this.restapiService.getProjects().then(data => {
         this.projects = data;

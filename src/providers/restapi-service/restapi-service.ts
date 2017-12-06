@@ -94,8 +94,8 @@ export class RestapiServiceProvider {
 
   login(data) {
       let value = this.globalVar.getApiUrl();
-        //return this.http.post(value+'/api/authenticate', data)
-        return this.http.post(value+'/users', data)
+        return this.http.post(value+'/api/authenticate', data)
+        //return this.http.post(value+'/users', data)
         .map((response:Response) => {
           console.log("token: "+response.json().id_token);
           this.globalVar.setToken(response.json().id_token);
@@ -182,8 +182,8 @@ export class RestapiServiceProvider {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        //this.http.get(value+'/api/projects/user/',this.headers())
-        this.http.get(value+'/projects/',this.headers())
+        this.http.get(value+'/api/projects/user/',this.headers())
+        //this.http.get(value+'/projects/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;

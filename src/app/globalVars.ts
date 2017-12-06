@@ -38,6 +38,10 @@ export class GlobalVars {
   cleanMessages(){
     this.messages = new Array<any>();
   }
+  
+  setNewMessages(value){
+    this.newMessages = value;
+  }
 
   pushNewMessage(value){
     this.newMessages.push(value);
@@ -49,6 +53,10 @@ export class GlobalVars {
 
   cleanNewMessages(){
     this.newMessages = new Array<any>();
+  }
+
+  setOldMessages(value){
+    this.oldMessages = value;
   }
 
   pushOldMessage(value){

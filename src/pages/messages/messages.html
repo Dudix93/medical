@@ -22,7 +22,7 @@
     <h2 *ngIf="allMessages == null">Nie masz żadnych wiadomości.</h2>
 
     <ng-container *ngIf="sort == 'all'">
-      <ng-container *ngFor="let date of dates,let i = index">
+      <ng-container *ngFor="let date of allDates,let i = index">
               <h1>Z dnia: {{date}}</h1>
         <ion-grid>
             <ion-row>
@@ -44,7 +44,7 @@
     </ng-container>
 
     <ng-container *ngIf="sort == 'new'">
-        <ng-container *ngFor="let date of dates,let i = index">
+        <ng-container *ngFor="let date of newDates,let i = index">
                 <h1>Z dnia: {{date}}</h1>
           <ion-grid>
               <ion-row>
@@ -77,7 +77,7 @@
                 </ion-row>
                 
                 <ion-row *ngFor="let msg of oldMessages,let i = index">
-                  <ng-container *ngIf="msg.date == date">
+                  <ng-container *ngIf="msg.date == oldDates">
                     <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
                     <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
                     <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
