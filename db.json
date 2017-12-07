@@ -91,7 +91,8 @@
       ],
       "tasks": [
         7,
-        8
+        8,
+        3
       ]
     }
   ],
@@ -119,16 +120,54 @@
       "update_date": "18.11.2017",
       "update_hour": "16:42",
       "update_time": 2,
-      "time_spent": 12,
+      "time_spent": "0:0",
       "start_date": "11.19.2017",
       "start_hour": "13:30",
       "description": null,
       "latest_dayTask": 6,
       "count_method": "automatic",
       "paused": false,
+      "finish_date": "5.12.2017",
+      "finish_hour": "23:11",
+      "id": 2
+    },
+    {
+      "user_id": 4,
+      "task_id": 3,
+      "task_title": "czynnosc3",
+      "update_date": "5.12.2017",
+      "update_hour": "23:12",
+      "update_time": 6,
+      "time_spent": 6,
+      "start_date": "12.5.2017",
+      "start_hour": "23:12",
+      "description": null,
+      "latest_dayTask": 7,
+      "latest_pausedTask": null,
+      "count_method": "manual",
+      "paused": false,
+      "finish_date": "6.12.2017",
+      "finish_hour": "8:36",
+      "id": 3
+    },
+    {
+      "user_id": 4,
+      "task_id": 1,
+      "task_title": "czynnosc1",
+      "update_date": null,
+      "update_hour": null,
+      "update_time": null,
+      "time_spent": null,
+      "start_date": "12.5.2017",
+      "start_hour": "08:00",
+      "description": null,
+      "latest_dayTask": 8,
+      "latest_pausedTask": null,
+      "count_method": "automatic",
+      "paused": false,
       "finish_date": null,
       "finish_hour": null,
-      "id": 2
+      "id": 4
     }
   ],
   "dayTask": [
@@ -163,70 +202,103 @@
       "date": "18.11.2017",
       "hour": "16:42",
       "time_spent": 12
+    },
+    {
+      "task_id": 3,
+      "user_id": 4,
+      "date": "12.5.2017",
+      "hour": "23:12",
+      "time_spent": "",
+      "id": 7
+    },
+    {
+      "task_id": 1,
+      "user_id": 4,
+      "date": "12.6.2017",
+      "hour": "8:37",
+      "time_spent": "",
+      "id": 8
     }
   ],
-  "dayTaskUpdate": [],
+  "dayTaskUpdate": [
+    {
+      "date": "12/8/2017",
+      "task_id": 8,
+      "user_id": 4,
+      "time": "15",
+      "id": 1
+    }
+  ],
   "pausedTask": [],
   "preferences": [
     {
-      "id": 7,
-      "user_id": "4",
-      "count_method": "",
-      "pon": true,
-      "ponOd": "08:00",
-      "ponDo": "16:00",
-      "wt": true,
-      "wtOd": "08:00",
-      "wtDo": "16:00",
-      "sr": true,
-      "srOd": "08:00",
-      "srDo": "16:00",
-      "czw": true,
-      "czwOd": "08:00",
-      "czwDo": "16:00",
-      "pt": true,
-      "ptOd": "08:00",
-      "ptDo": "16:00",
-      "sob": true,
-      "sobOd": "08:00",
-      "sobDo": "16:00",
-      "nd": true,
-      "ndOd": "08:00",
-      "ndDo": "16:00"
+      "id":0,
+      "day":0,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
     },
     {
-      "user_id": "8",
-      "count_method": "",
-      "pon": false,
-      "ponOd": "05:00",
-      "ponDo": "16:30",
-      "wt": true,
-      "wtOd": "08:40",
-      "wtDo": "12:40",
-      "sr": true,
-      "srOd": "08:40",
-      "srDo": "08:40",
-      "czw": true,
-      "czwOd": "08:40",
-      "czwDo": "08:40",
-      "pt": true,
-      "ptOd": "08:40",
-      "ptDo": "08:40",
-      "sob": false,
-      "sobOd": "08:40",
-      "sobDo": "08:40",
-      "nd": false,
-      "ndOd": "11:40",
-      "ndDo": "08:40",
-      "id": 8
+      "id":1,
+      "day":1,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
+    },
+    {
+      "id":2,
+      "day":2,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
+    },
+    {
+      "id":3,
+      "day":3,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
+    },
+    {
+      "id":4,
+      "day":4,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
+    },
+    {
+      "id":5,
+      "day":5,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
+    },
+    {
+      "id":6,
+      "day":6,
+      "start_hour":"08:00",
+      "finish_hour":"16:00",
+      "work_day":true
     }
   ],
   "statements": [
     {
       "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
-      "id": 1152,
+      "id": 1343,
       "sendDate": "2017-12-04T11:59:00+01:00",
       "title": "Przerwa techniczna"
+    },
+    {
+      "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
+      "id": 1108,
+      "sendDate": "2017-12-04T13:34:00+01:00",
+      "title": "Info od Bartka"
+    },
+    {
+      "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
+      "id": 11345,
+      "sendDate": "2017-12-04T13:34:00+01:00",
+      "title": "Info od Bartka"
     }
   ]
 }

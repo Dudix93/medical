@@ -177,13 +177,25 @@ export class RestapiServiceProvider {
     });
   }
 
+  getMessages(id:number,read:any) {
+    return new Promise(resolve => {
+      let value = this.globalVar.getApiUrl();
+          this.http.get(value+'/api/statements',this.headers())
+          .map(res => res.json())
+          .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+          });
+      });
+  }
+
   getProjects() {
     return new Promise(resolve => {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        this.http.get(value+'/api/projects/user/',this.headers())
-        //this.http.get(value+'/projects/',this.headers())
+        //this.http.get(value+'/api/projects/user/',this.headers())
+        this.http.get(value+'/projects/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -523,18 +535,6 @@ export class RestapiServiceProvider {
         });
       });
     });
-  }
-
-  getMessages(id:number,read:any) {
-    return new Promise(resolve => {
-      let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/api/statements',this.headers())
-          .map(res => res.json())
-          .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-          });
-      });
   }
 
   updateMessages(id,data) {

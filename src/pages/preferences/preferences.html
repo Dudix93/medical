@@ -6,15 +6,13 @@
 
 
 <ion-content padding>
-  <div *ngFor="let p of preferences">
-    <div *ngIf="p.user_id == loggedUser.id">
         <form (ngSubmit)="saveUserPreferences()">
-                <ion-item>
+                <!-- <ion-item>
                         <ion-label>Jedno zliczanie dla wszystkich</ion-label>
                         <ion-toggle [(ngModel)]="settings.method_for_all" name="method_for_all"></ion-toggle>
-                </ion-item>
+                </ion-item> -->
             <ion-grid>
-                <ion-row *ngIf='settings.method_for_all == false' radio-group [(ngModel)]="settings.count_method" name="count_method" disabled="true">   
+                <!-- <ion-row *ngIf='settings.method_for_all == false' radio-group [(ngModel)]="settings.count_method" name="count_method" disabled="true">   
                 <ion-col col-6>
                     <ion-item>
                     <ion-radio value="manual"></ion-radio>
@@ -27,7 +25,7 @@
                     <ion-label>Automatycznie</ion-label>
                     </ion-item>
                     </ion-col>
-                </ion-row>
+                </ion-row> -->
                 
                 <ion-row *ngIf='settings.method_for_all == true' radio-group [(ngModel)]="settings.count_method" name="count_method" disabled="false">   
                         <ion-col col-6>
@@ -104,6 +102,4 @@
             </ion-grid>
             <button ion-button type="submit">Zapisz ustawienia</button>
           </form>
-    </div>
-</div>
 </ion-content>

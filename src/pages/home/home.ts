@@ -143,8 +143,8 @@ export class HomePage {
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
               this.login = val;
-            //this.getUserProjectsAndTasks();
-            this.getProjects();
+            this.getUserProjectsAndTasks();
+            //this.getProjects();
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
               this.getUserProjectsAndTasks();
@@ -161,12 +161,12 @@ export class HomePage {
               })
             });
             this.getMessages();
-            // if(this.platform.is('cordova')){
+            if(this.platform.is('cordova')){
               //this.scheduleNotification();
               setInterval(() => {
                 this.getMessages();
               }, 5000);
-            // }
+            }
             });
           }
         });
@@ -585,27 +585,27 @@ export class HomePage {
       for(let day of preferences){
         console.log("preferences: "+day.day);
       }
-      // this.restapiService.getUserTask()
-      // .then(data => {
-      //   this.userTasks = data;
-      //   this.storage.get('zalogowany_id').then((user_id) => {
-      //     for(let task of this.userTasks){
-      //       this.storage.get("current_task_id").then((id) => {
-      //         if(id == task.task_id){
-      //           this.userTask = task;
-      //           this.userTask.paused = true;
-      //           this.pausedTask.task_id = id;
-      //           this.pausedTask.user_id = user_id;
-      //           this.pausedTask.pause_date = this.today;
-      //           this.pausedTask.pause_hour = this.getHour();
-      //           this.restapiService.savePausedTask(this.pausedTask);
-      //           this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-      //           this.showalert("Wstrzymano czynność.");
-      //         }
-      //       });
-      //     }
-      //   });
-      // });
+      this.restapiService.getUserTask()
+      .then(data => {
+        this.userTasks = data;
+        this.storage.get('zalogowany_id').then((user_id) => {
+          for(let task of this.userTasks){
+            this.storage.get("current_task_id").then((id) => {
+              if(id == task.task_id){
+                this.userTask = task;
+                this.userTask.paused = true;
+                this.pausedTask.task_id = id;
+                this.pausedTask.user_id = user_id;
+                this.pausedTask.pause_date = this.today;
+                this.pausedTask.pause_hour = this.getHour();
+                this.restapiService.savePausedTask(this.pausedTask);
+                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
+                this.showalert("Wstrzymano czynność.");
+              }
+            });
+          }
+        });
+      });
     });
     this.getUserProjectsAndTasks();
   }
@@ -653,8 +653,8 @@ export class HomePage {
     .then(data =>{
       this.userPreferences = data;
       this.storage.get('zalogowany_id').then(user_id =>{
-        for(let pref of this.userPreferences){
-          if(pref.user_id == user_id){
+
+
             this.restapiService.getLatestPausedTask(task_id,user_id)
             .then(data =>{
               this.pausedTaskObjects = data;
@@ -682,27 +682,19 @@ export class HomePage {
                 //     console.log(pause);
                 //   }
                 // });
-                if(d.getDay() == 0 && pref.nd == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.ndOd,pref.ndDo,startHour,task_id,pausedHour,pausedDate);
-                }
-                else if(d.getDay() == 1 && pref.pon == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.ponOd,pref.ponDo,startHour,task_id,pausedHour,pausedDate);
-                }
-                else if(d.getDay() == 2 && pref.wt == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.wtOd,pref.wtDo,startHour,task_id,pausedHour,pausedDate);
-                }
-                else if(d.getDay() == 3 && pref.sr == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.srOd,pref.srDo,startHour,task_id,pausedHour,pausedDate);
-                }
-                else if(d.getDay() == 4 && pref.czw == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.czwOd,pref.czwDo,startHour,task_id,pausedHour,pausedDate);
-                } 
-                else if(d.getDay() == 5 && pref.pt == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.ptOd,pref.ptDo,startHour,task_id,pausedHour,pausedDate);
-                }
-                else if(d.getDay() == 6 && pref.sob == true){
-                  time += this.timeForDay(pref,this.firstDay,d,taskStartHour,pref.sobOd,pref.sobDo,startHour,task_id,pausedHour,pausedDate);
-                }
+                console.log("kolejny dzien: "+new Date(d).getDay());
+                time += this.timeForDay(
+                  this.userPreferences[d.getDay()],
+                  this.firstDay,
+                  d,
+                  taskStartHour,
+                  this.userPreferences[new Date(d).getDay()].start_hour,
+                  this.userPreferences[new Date(d).getDay()].finish_hour,
+                  startHour,
+                  task_id,
+                  pausedHour,
+                  pausedDate);
+                
                 this.firstDay = false;
                 DayTime = time - DayTime;
                 let hours = Math.floor(DayTime);
@@ -723,8 +715,6 @@ export class HomePage {
                console.log(hours+":"+minutes);
               this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
             });
-          }
-        }
       });
     });
   }

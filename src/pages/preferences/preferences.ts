@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { CommonModule } from '@angular/common';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
+import { SingleDay } from '../../models/singleDay'
 
 @IonicPage()
 @Component({
@@ -17,19 +18,26 @@ export class PreferencesPage {
               user_id:'',
               method_for_all:false,
               count_method: '',
-              pon: '', ponOd: '', ponDo: '', 
-              wt:'', wtOd: '', wtDo: '',  
-              sr:'', srOd: '', srDo: '',  
-              czw:'', czwOd: '', czwDo: '',  
-              pt:'', ptOd: '', ptDo: '',  
-              sob:'', sobOd: '', sobDo: '',  
-              nd:'', ndOd: '', ndDo: '', }
+              pon:true, ponOd: '', ponDo: '', 
+              wt:true, wtOd: '', wtDo: '',  
+              sr:true, srOd: '', srDo: '',  
+              czw:true, czwOd: '', czwDo: '',  
+              pt:true, ptOd: '', ptDo: '',  
+              sob:true, sobOd: '', sobDo: '',  
+              nd:true, ndOd: '', ndDo: '', }
+
+    singleDay = {
+      id:0,
+      day:0,
+      start_hour:'',
+      finish_hour:'',
+      work_day:true
+    }
   constructor(public navCtrl: NavController, 
               public restapiService: RestapiServiceProvider, 
               public navParams: NavParams, 
               public storage:Storage,
               public alertCtrl:AlertController) {
-    this.getLoggedUser();
     this.getUserPreferences();
     //console.log(this.settings);
   }
@@ -39,60 +47,58 @@ export class PreferencesPage {
     .then(data => {
       this.preferences = data;
       for (let entry of this.preferences) {
-          this.storage.get('zalogowany_id').then((val) => {
-            console.log(entry.user_id+" "+val);
-            if(entry.user_id == val){
               this.settings.id = entry.id;
               this.settings.method_for_all = entry.method_for_all;
               this.settings.count_method = entry.count_method;
               this.settings.user_id = entry.user_id;
-              this.settings.pon = entry.pon;
-              this.settings.wt = entry.wt;
-              this.settings.sr = entry.sr;
-              this.settings.czw = entry.czw;
-              this.settings.pt = entry.pt;
-              this.settings.sob = entry.sob;
-              this.settings.nd = entry.nd;
               
-              this.settings.ponOd = entry.ponOd;
-              this.settings.wtOd = entry.wtOd;
-              this.settings.srOd = entry.srOd;
-              this.settings.czwOd = entry.czwOd;
-              this.settings.ptOd = entry.ptOd;
-              this.settings.sobOd = entry.sobOd;
-              this.settings.ndOd = entry.ndOd;
+              if(entry.day == 1)this.settings.pon = entry.work_day;
+              if(entry.day == 2)this.settings.wt = entry.work_day;
+              if(entry.day == 3)this.settings.sr = entry.work_day;
+              if(entry.day == 4)this.settings.czw = entry.work_day;
+              if(entry.day == 5)this.settings.pt = entry.work_day;
+              if(entry.day == 6)this.settings.sob = entry.work_day;
+              if(entry.day == 0)this.settings.nd = entry.work_day;
+              
+              if(entry.day == 1)this.settings.ponOd = entry.start_hour;
+              if(entry.day == 2)this.settings.wtOd = entry.start_hour;
+              if(entry.day == 3)this.settings.srOd = entry.start_hour;
+              if(entry.day == 4)this.settings.czwOd = entry.start_hour;
+              if(entry.day == 5)this.settings.ptOd = entry.start_hour;
+              if(entry.day == 6)this.settings.sobOd = entry.start_hour;
+              if(entry.day == 0)this.settings.ndOd = entry.start_hour;
 
-              this.settings.ponDo = entry.ponDo;
-              this.settings.wtDo = entry.wtDo;
-              this.settings.srDo = entry.srDo;
-              this.settings.czwDo = entry.czwDo;
-              this.settings.ptDo = entry.ptDo;
-              this.settings.sobDo = entry.sobDo;
-              this.settings.ndDo = entry.ndDo;
-              // console.log("pon settings: "+this.settings.sobDo);
+              if(entry.day == 1)this.settings.ponDo = entry.finish_hour;
+              if(entry.day == 2)this.settings.wtDo = entry.finish_hour;
+              if(entry.day == 3)this.settings.srDo = entry.finish_hour;
+              if(entry.day == 4)this.settings.czwDo = entry.finish_hour;
+              if(entry.day == 5)this.settings.ptDo = entry.finish_hour;
+              if(entry.day == 6)this.settings.sobDo = entry.finish_hour;
+              if(entry.day == 0)this.settings.ndDo = entry.finish_hour;
+              // console.log("pon settings: "+if(entry.day == 6)this.settings.sobDo);
               // console.log("pon entry: "+entry.sobDo);
               //console.log("Do usunięcia: "+this.deleteID);
             }
-          });
-        }
-    });
-  }
-
-  getLoggedUser(){
-    this.storage.get('zalogowany_id').then((val) => {
-      this.loggedUser.id = val;
-    });
-    this.storage.get('zalogowany').then((val) => {
-      this.loggedUser.login = val;
-    });
-    console.log(this.loggedUser);
-    return this.loggedUser;
+            
+        });
   }
 
   saveUserPreferences() {
-    console.log(this.settings);
-    this.restapiService.updateUserPreferences(this.settings.id,this.settings);
-    this.showalert("Zapisano preferencje.");
+
+    this.restapiService.updateUserPreferences(1,new SingleDay(1,1,this.settings.ponOd,this.settings.ponDo,this.settings.pon));
+
+    this.restapiService.updateUserPreferences(2,new SingleDay(2,2,this.settings.wtOd,this.settings.wtDo,this.settings.wt));
+
+    this.restapiService.updateUserPreferences(3,new SingleDay(3,3,this.settings.srOd,this.settings.srDo,this.settings.sr));
+
+    this.restapiService.updateUserPreferences(4,new SingleDay(4,4,this.settings.czwOd,this.settings.czwDo,this.settings.czw));
+
+    this.restapiService.updateUserPreferences(5,new SingleDay(5,5,this.settings.ptOd,this.settings.ptDo,this.settings.pt));
+
+    this.restapiService.updateUserPreferences(6,new SingleDay(6,6,this.settings.sobOd,this.settings.sobDo,this.settings.sob));
+
+    this.restapiService.updateUserPreferences(0,new SingleDay(0,0,this.settings.ndOd,this.settings.ndDo,this.settings.nd));
+
   }
 
   showalert(info:string) {
