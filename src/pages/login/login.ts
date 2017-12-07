@@ -55,6 +55,7 @@ export class LoginPage {
   login() {
     console.log("credentials.apiUrl "+this.credentials.apiUrl);
     this.storage.set('apiUrl', this.credentials.apiUrl);
+    this.globalVar.setApiUrl(this.credentials.apiUrl);
     this.storage.get('apiUrl').then((value) => {
       console.log("storage apiurl "+value);
      });

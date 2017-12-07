@@ -37,41 +37,43 @@ getMessages(){
   this.oldDates = new Array<any>();
 
   this.storage.get('unreadMessages').then(unreadMsgs =>{
-    console.log("unreadMsgs");
     this.globalVars.setNewMessages(unreadMsgs);
+    this.storage.get('oldMessages').then(oldMsgs =>{
+      this.globalVars.setOldMessages(oldMsgs)
+      
+      this.allMessages = this.globalVars.getNewMessages().concat(this.globalVars.getOldMessages());
+      this.newMessages = this.globalVars.getNewMessages();
+      this.oldMessages = this.globalVars.getOldMessages();
+  
+  
+      for(let msg of this.allMessages){
+        if(this.allDates.indexOf(msg.date) == -1){
+          this.allDates.push(msg.date);
+        }
+      }
+      for(let msg of this.newMessages){
+        if(this.newDates.indexOf(msg.date) == -1){
+          this.newDates.push(msg.date);
+        }
+      }
+      for(let msg of this.oldMessages){
+        if(this.oldDates.indexOf(msg.date) == -1){
+          this.oldDates.push(msg.date);
+        }
+      }
+  
+      this.allDates.sort();
+      this.allDates.reverse();
+      this.newDates.sort();
+      this.newDates.reverse();
+      this.oldDates.sort();
+      this.oldDates.reverse();
+      console.log(this.oldDates);
+      console.log("all "+this.allMessages);
+      console.log("nowe "+this.newMessages);
+      console.log("stare "+this.oldMessages);
+    });
   });
-  this.storage.get('oldMessages').then(oldMsgs =>{this.globalVars.setOldMessages(oldMsgs)});
-
-    this.allMessages = this.globalVars.getNewMessages().concat(this.globalVars.getOldMessages());
-    this.newMessages = this.globalVars.getNewMessages();
-    this.oldMessages = this.globalVars.getOldMessages();
-
-    for(let msg of this.allMessages){
-      if(this.allDates.indexOf(msg.date) == -1){
-        this.allDates.push(msg.date);
-      }
-    }
-    for(let msg of this.newMessages){
-      if(this.newDates.indexOf(msg.date) == -1){
-        this.newDates.push(msg.date);
-      }
-    }
-    for(let msg of this.oldMessages){
-      if(this.oldDates.indexOf(msg.date) == -1){
-        this.oldDates.push(msg.date);
-      }
-    }
-
-    this.allDates.sort();
-    this.allDates.reverse();
-    this.newDates.sort();
-    this.newDates.reverse();
-    this.oldDates.sort();
-    this.oldDates.reverse();
-    console.log(this.allDates);
-    console.log("all "+this.allMessages);
-    console.log("nowe "+this.newMessages);
-    console.log("stare "+this.oldMessages);
 }
 
 showalert(info:string) {

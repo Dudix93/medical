@@ -528,7 +528,7 @@ export class RestapiServiceProvider {
   getMessages(id:number,read:any) {
     return new Promise(resolve => {
       let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/statements',this.headers())
+          this.http.get(value+'/api/statements',this.headers())
           .map(res => res.json())
           .subscribe(data => {
           this.data = data;

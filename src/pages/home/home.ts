@@ -181,7 +181,7 @@ export class HomePage {
         allMsgs = data;
         this.storage.get('unreadMessages').then(unreadMsgs =>{
           this.storage.get('oldMessages').then(oldMsgs => {
-            //console.log("unread "+unreadMsgs+" old "+oldMsgs);
+            this.amountNewMessages = unreadMsgs.length;
             this.unreadMsgs = unreadMsgs;
             this.oldMsgs = oldMsgs;
             if(this.unreadMsgs == undefined || this.unreadMsgs == null)this.storage.set('unreadMessages',new Array<any>());
