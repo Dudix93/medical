@@ -7,6 +7,22 @@ export class GlobalVars {
   messages = new Array<any>();
   newMessages = new Array<any>();
   oldMessages = new Array<any>();
+  user ={
+    "activated": true,
+    "authorities": [],
+    "createdBy":'',
+    "createdDate": "",
+    "email": "",
+    "firstName": "",
+    "id": 0,
+    "imageUrl": "",
+    "langKey": "",
+    "lastModifiedBy": "",
+    "lastModifiedDate": "",
+    "lastName": "",
+    "login": "",
+    "password": ""
+  }
 
   constructor() {
   }
@@ -70,4 +86,17 @@ export class GlobalVars {
   cleanOldMessages(){
     this.oldMessages = new Array<any>();
   }
+
+  setUser(value){this.user = value;}
+
+  getUser(){return this.user;}
+
+  setUserFirstName(value){this.user.firstName = value;}
+
+  setUserEmail(value){this.user.email = value;}
+
+  setUserLastname(value){this.user.lastName = value;}
+
+  setUserPassword(value){this.user.password = value;}
+
 }

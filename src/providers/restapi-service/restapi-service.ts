@@ -120,32 +120,18 @@ export class RestapiServiceProvider {
     });
   }
 
-  getUser(id:number) {
+  getUser() {
     //this.get(this.getApiUrl,"users",id,this.headers);
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
-        this.http.get(value+'/users/'+id)
+        this.http.get(value+'/api/users/me/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });
       });
-    });
-  }
-
-  getUserPreferences() {
-    return new Promise(resolve => {
-      this.storage.get('apiUrl').then((value) => {
-        //console.log(options);
-        this.http.get(value+'/preferences',this.headers())
-        .map(res => res.json())
-        .subscribe(data => {
-         this.data = data;
-         resolve(this.data);
-        });
-       });
     });
   }
 
@@ -180,7 +166,7 @@ export class RestapiServiceProvider {
   getMessages(id:number,read:any) {
     return new Promise(resolve => {
       let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/statements',this.headers())
+          this.http.get(value+'/api/statements',this.headers())
           .map(res => res.json())
           .subscribe(data => {
           this.data = data;
@@ -195,13 +181,45 @@ export class RestapiServiceProvider {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
         //this.http.get(value+'/api/projects/user/',this.headers())
-        this.http.get(value+'/projects/',this.headers())
+        this.http.get(value+'/api/projects/user',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });
       // });
+    });
+  }
+
+  getProjectTasks(id:number) {
+    return new Promise(resolve => {
+      // this.storage.get('apiUrl').then((value) => {
+        let value = this.globalVar.getApiUrl();
+        //console.log(this.headers());
+        //this.http.get(value+'/api/projects/user/',this.headers())
+        this.http.get(value+'/api/project-actions/project/'+id,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      // });
+    });
+  }
+
+  getRaports() {
+    return new Promise(resolve => {
+        let value = this.globalVar.getApiUrl();
+        this.http.get(value+'/api/raports/user',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+          
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
+        });
     });
   }
 
@@ -369,17 +387,17 @@ export class RestapiServiceProvider {
     });
   }
 
-  saveUserPreferences(data) {
-    console.log(JSON.stringify(data));
-    return new Promise((resolve, reject) => {
+  getUserPreferences() {
+    return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/preferences', data)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });  
-      });
+        //console.log(options);
+        this.http.get(value+'/api/preferences',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
     });
   }
 
@@ -387,7 +405,7 @@ export class RestapiServiceProvider {
     //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/preferences/'+id, data, this.headers())
+        this.http.put(value+'/api/preferences/'+id, data, this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
