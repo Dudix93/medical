@@ -16,53 +16,53 @@ export class RestapiServiceProvider {
               public globalVar:GlobalVars){
   }
 
-  get(apiUrl,resource,id,headers):Promise<any>{
-    console.log(apiUrl);
-    if(id == null){
-      console.log("nie ma id");
-      return new Promise(resolve => {
-        this.http.get(apiUrl+'/'+resource)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-    });
-    }
-    else{
-      console.log("jest id");
-      return new Promise(resolve => {
-        this.http.get(apiUrl+'/'+resource+'/'+id)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-    });
-    }
-  }
+  // get(apiUrl,resource,id,headers):Promise<any>{
+  //   console.log(apiUrl);
+  //   if(id == null){
+  //     console.log("nie ma id");
+  //     return new Promise(resolve => {
+  //       this.http.get(apiUrl+'/'+resource)
+  //       .map(res => res.json())
+  //       .subscribe(data => {
+  //         this.data = data;
+  //         resolve(this.data);
+  //       });
+  //   });
+  //   }
+  //   else{
+  //     console.log("jest id");
+  //     return new Promise(resolve => {
+  //       this.http.get(apiUrl+'/'+resource+'/'+id)
+  //       .map(res => res.json())
+  //       .subscribe(data => {
+  //         this.data = data;
+  //         resolve(this.data);
+  //       });
+  //   });
+  //   }
+  // }
 
-  post(apiUrl,resource,data,headers):Promise<any>{
-    return new Promise((resolve, reject) => {
-        this.http.post(apiUrl+'/'+resource+'/',data,headers)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-    });
-  }
+  // post(apiUrl,resource,data,headers):Promise<any>{
+  //   return new Promise((resolve, reject) => {
+  //       this.http.post(apiUrl+'/'+resource+'/',data,headers)
+  //       .subscribe(res => {
+  //         resolve(res);
+  //       }, (err) => {
+  //         reject(err);
+  //       });
+  //   });
+  // }
 
-  delete(apiUrl,resource,id):Promise<any>{
-    return new Promise((resolve, reject) => {
-        this.http.delete(apiUrl+'/'+resource+'/',id)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-    });
-  }
+  // delete(apiUrl,resource,id):Promise<any>{
+  //   return new Promise((resolve, reject) => {
+  //       this.http.delete(apiUrl+'/'+resource+'/',id)
+  //       .subscribe(res => {
+  //         resolve(res);
+  //       }, (err) => {
+  //         reject(err);
+  //       });
+  //   });
+  // }
 
   headers():RequestOptions{
     let headers = new Headers();
@@ -180,7 +180,7 @@ export class RestapiServiceProvider {
   getMessages(id:number,read:any) {
     return new Promise(resolve => {
       let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/api/statements',this.headers())
+          this.http.get(value+'/statements',this.headers())
           .map(res => res.json())
           .subscribe(data => {
           this.data = data;

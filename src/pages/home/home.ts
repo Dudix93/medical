@@ -121,13 +121,6 @@ export class HomePage {
   }
   today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
   messages:any;
-  message = {
-    "message":'',
-    "sent":true,
-    "date":'',
-    "time":'',
-    "read":'',
-  }
   amountNewMessages:number = 0;
 
   constructor(public navCtrl: NavController, 
