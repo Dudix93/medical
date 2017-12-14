@@ -1,37 +1,38 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Edytuj {{params.task_title}}</ion-title>
+    <ion-title>Edytuj {{task_name}}</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding *ngIf="taskToEdit.time == -1">
+<ion-content>
   <ion-item> 
-    Data rozpoczęcia: {{task.start_date}}
+    Data rozpoczęcia: {{startDate}}
   </ion-item>
-  <ion-item *ngIf="task.count_method=='manual'"> 
-      Spędzony czas: {{task.time_spent}} godzin.
+  <ion-item *ngIf="countMethod=='manual'"> 
+      Spędzony czas: {{timeOfHours}} godzin {{timeOfMinutes}} minut.
   </ion-item>
-  <ion-item *ngIf="task.count_method=='automatic'"> 
-      Spędzony czas: {{params.hours}} godzin {{params.minutes}} minut.
-  </ion-item>
-  <ion-item *ngIf="task.count_method=='manual'">  
+  <!-- <ion-item *ngIf="countMethod=='automatic'"> 
+      Spędzony czas: {{params.hours}} godzin {{timeOf}} minut.
+  </ion-item> -->
+  <ion-item *ngIf="countMethod=='manual'">  
       Ostatnia aktualizacja:<br> 
-      {{task.update_hour}} {{task.update_date}} o {{task.update_time}} godzin.
+      {{updateDate}} o {{lastUpdateTime}} godzin.
   </ion-item>
   <form (ngSubmit)="updateTask()">
-      <ion-item *ngIf="task.count_method=='manual'"> 
+      <ion-item *ngIf="countMethod=='manual'"> 
           <ion-label floating>Aktualizuj czas</ion-label>
           <ion-input type="text" [(ngModel)]="updateTime" name="updateTime"></ion-input>        
       </ion-item>    
       <ion-item>
           <ion-label floating>Opis</ion-label>
-          <ion-input type="text" [(ngModel)]="task.description" name="description" clearInput></ion-input>        
+          <ion-input type="text" [(ngModel)]="comment" name="comment" clearInput></ion-input>        
       </ion-item> 
-    <button ion-button type="submit">Aktualizuj</button>
+    <button ion-button type="submit" disabled *ngIf="currentComment == comment && updateTime == undefined">Aktualizuj</button>
+    <button ion-button type="submit" *ngIf="currentComment != comment || updateTime != undefined">Aktualizuj</button>
   </form>
 </ion-content>
 
-<ion-content padding *ngIf="taskToEdit.time != -1">
+<!-- <ion-content padding *ngIf="taskToEdit.time != -1">
   <form (ngSubmit)="updatePastTask()">
     <ion-item> 
           <ion-label floating>Aktualizuj czas</ion-label>
@@ -43,4 +44,4 @@
       </ion-item> 
     <button ion-button type="submit">Aktualizuj</button>
   </form>
-</ion-content>
+</ion-content> -->

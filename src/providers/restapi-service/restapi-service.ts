@@ -180,8 +180,8 @@ export class RestapiServiceProvider {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        this.http.get(value+'/api/projects/user/',this.headers())
-        //this.http.get(value+'/projects/',this.headers())
+        //this.http.get(value+'/api/projects/user/',this.headers())
+        this.http.get(value+'/projects/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -210,8 +210,8 @@ export class RestapiServiceProvider {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        //this.http.get(value+'/api/projects/user/',this.headers())
-        this.http.get(value+'/api/project-actions/project/'+id,this.headers())
+        //this.http.get(value+'/api/project-actions/project/'+id,this.headers())
+        this.http.get(value+'/project-actions/'+id,this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -221,11 +221,12 @@ export class RestapiServiceProvider {
     });
   }
 
-  getRaports() {
-    return new Promise(resolve => {
+  getRaports(id:number) {
+    if(id == null){
+      return new Promise(resolve => {
         let value = this.globalVar.getApiUrl();
-        this.http.get(value+'/api/raports/user',this.headers())
-        //this.http.get(value+'/raports',this.headers())
+        //this.http.get(value+'/api/raports/user',this.headers())
+        this.http.get(value+'/raports',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -235,6 +236,38 @@ export class RestapiServiceProvider {
           this.err = err;
           resolve(this.err);
         });
+    });
+    }
+    else{
+      return new Promise(resolve => {
+        let value = this.globalVar.getApiUrl();
+        //this.http.get(value+'/api/raports/user/'+id,this.headers())
+        this.http.get(value+'/raports/'+id,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          console.log(data);
+          resolve(this.data);
+          
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
+        });
+    });
+    }
+  }
+  
+  updateRaport(id,data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        //this.http.put(value+'/api/raports/user/'+id,data,this.headers())
+        this.http.put(value+'/raports/'+id,data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
     });
   }
 

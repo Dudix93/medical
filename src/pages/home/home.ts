@@ -139,13 +139,11 @@ export class HomePage {
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
               this.login = val;
-            this.getUserData();
-            //this.getUserProjectsAndTasks();
+            //this.getUserData();
             this.getProjects();
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
-              //this.getUserProjectsAndTasks();
-              //this.getProjects();
+              this.getProjects();
             });
 
             // this.platform.ready().then((readySource) => {
@@ -160,15 +158,15 @@ export class HomePage {
             //   })
             // });
 
-            if (platform.is('cordova')){
-              this.push.register().then((t: PushToken) => {
-                return this.push.saveToken(t);
-              }).then((t: PushToken) => {
-                console.log('Token saved:', t.token);
-              });
+            // if (platform.is('cordova')){
+            //   this.push.register().then((t: PushToken) => {
+            //     return this.push.saveToken(t);
+            //   }).then((t: PushToken) => {
+            //     console.log('Token saved:', t.token);
+            //   });
           
-              this.push.rx.notification();
-            }
+            //   this.push.rx.notification();
+            // }
 
             this.getMessages();
             if(this.platform.is('cordova')){
@@ -293,18 +291,20 @@ export class HomePage {
       this.userProjects = new Array<any>();
       this.restapiService.getProjects().then(data => {
         this.projects = data;
-        this.restapiService.getRaports().then(data => {
+        console.log("getProjects: "+data);
+        this.restapiService.getRaports(null).then(data => {
           this.userTasks = data;
+          console.log("getRaports: "+data);
           this.storage.get('zalogowany').then(stored_login => {
 
           for(let project of this.projects){
-            console.log("projekt: "+project.id);
+            console.log("projekt: "+project.name);
             this.restapiService.getProjectTasks(project.id).then(data => {
               this.projectTasks = data;
               this.projectTasks = new Array<any>();
               this.userProjectTasks = new Array<any>();
               for(let raport of this.userTasks){
-                //console.log("raport: "+JSON.stringify(raport));
+                console.log("raport: "+raport);
                 if(project.id == raport.projectId){
                   this.projectTasks.push(raport);
                 }
@@ -312,8 +312,7 @@ export class HomePage {
               for(let task of this.projectTasks){
                 //let currentTask = new UserTask(task.id,task.timeOf,task.startDate,task.endDate,task.comment,task.action.name,task.countMethod,task.paused,task.projectId);
                 if(task.paused == false && task.countMethod == 'manual'){
-                  console.log(new UserTask(task.id,task));
-                  this.userProjectTasks.push(new UserTask(task.id,task));
+                  this.userProjectTasks.push(task);
                 }
                 else if(task.countMethod == 'automatic'){
 
@@ -322,7 +321,6 @@ export class HomePage {
               this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
             });
           }
-          for(let proj of this.userProjects)console.log("userProjects: "+proj.tasks);
         });
       });
     });
@@ -452,16 +450,9 @@ export class HomePage {
     this.navCtrl.push(MessagesPage);
   }
 
-  editTask(task_id:number, task_title:string, hours:number, minutes:number){
-    this.storage.get('current_task_id').then((id) => {
-      this.storage.get('current_task_title').then((title) => {
-        this.params.task_id = id;
-        this.params.task_title = title;
-        this.params.hours = hours;
-        this.params.minutes = minutes;
+  editTask(task_id:number){
+        this.params.task_id = task_id;
         this.navCtrl.push(EditTaskPage, this.params);
-      });
-    });
   }
 
   menu() {
@@ -501,26 +492,41 @@ export class HomePage {
   }
 
   prepareTasksRadioButtons(project_id:number){
+    let buttons:any;
     this.radioButtons = [];
-    //console.log(this.userProjectTasks);
-    for(let project of this.userProjects){
-      if(project.id == project_id){
-        for(let task of project.tasks){
-          // if(project_id == task.project_id){
-   
+    this.restapiService.getProjectTasks(project_id).then(data => {
+      this.projectTasks = data;
+      for(let task of this.projectTasks.tasks){
+        console.log(task.id);
+        for(let project of this.userProjects){
+          if(project.id == project_id && project.tasks.length != 0){
+            for(let tasks of project.tasks){
+              console.log("rozpoczety: "+tasks.action.id);
+              if(tasks.id != task.id){
                 if(this.radioButtons.length == 0){
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
                 }
                 else{
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
                 }
-                continue;
-            
-          // }
+              }
+            }
+            continue;
+          }
+          else if(project.id == project_id && project.tasks.length == 0){
+            if(this.radioButtons.length == 0){
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
+            }
+            else{
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
+            }
+            continue;
+          }
         }
       }
-    }
-    return this.radioButtons;
+      this.globalVars.setButtons(this.radioButtons);
+    });
+    return this.globalVars.getButtons();
   }
 
   prepareCountMethodRadioButtons(){
@@ -868,20 +874,20 @@ export class HomePage {
   }
 
   selectTaskToStart(project:string, project_id:number) {
-    this.restapiService.getRaports()
+    this.restapiService.getRaports(null)
     .then(userTasks => {
       this.inProgress = false;
       this.userTasks = userTasks;
-        for(let task of this.userTasks){
-          if(task.finish_date == null){
-            //console.log(task);
-            this.storage.get('current_task_title').then((title) => {
-              this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: "+title);
-            });
-            this.inProgress = true;
-            break;
-          }
-        }
+        // for(let task of this.userTasks){
+        //   if(task.finish_date == null){
+        //     //console.log(task);
+        //     this.storage.get('current_task_title').then((title) => {
+        //       this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: "+title);
+        //     });
+        //     this.inProgress = true;
+        //     break;
+        //   }
+        // }
         if(this.inProgress == false){
           const tasksAlert = this.alertCtrl.create({
             title: "Czynnosci w "+project,

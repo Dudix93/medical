@@ -4,9 +4,12 @@ import {Injectable} from '@angular/core';
 export class GlobalVars {
   token:any;
   apiUrl:any;
+
   messages = new Array<any>();
   newMessages = new Array<any>();
   oldMessages = new Array<any>();
+  buttons = new Array<any>();
+
   user ={
     "activated": true,
     "authorities": [],
@@ -24,17 +27,57 @@ export class GlobalVars {
     "password": ""
   }
 
+  raport = {
+    "id":0,
+    "timeOf":0,
+    "startDate":null,
+    "endDate":null,
+    "comment":" ",
+    "action":{"id":0,"name":""},
+    "countMethod":"",
+    "pausedDate":"",
+    "paused":false,
+    "userId":0,
+    "projectId":0,
+    "lastUpdateDate":"",
+    "lastUpdateTimeOf":0
+  }
+
   constructor() {
+  }
+
+  getRaport() {
+    return this.raport;
+  }
+
+  setRaport(value) {
+    this.raport = value;
+  }
+
+  setTimeOf(value) {this.raport.timeOf = value;}
+  
+  setComment(value) {this.raport.comment = value;}
+
+  setLastUpdateTimeOf(value) {this.raport.lastUpdateTimeOf = value;}
+
+  setLastUpdateDate(value) {this.raport.lastUpdateDate = value;}
+//-----------------------------------------------------------
+  getButtons() {
+    return this.buttons;
+  }
+
+  setButtons(value) {
+    this.buttons = value;
+  }
+//-----------------------------------------------------------
+  getToken() {
+    return this.token;
   }
 
   setToken(value) {
     this.token = value;
   }
-
-  getToken() {
-    return this.token;
-  }
-
+//-----------------------------------------------------------
   setApiUrl(value) {
     this.apiUrl = value;
   }
@@ -42,7 +85,7 @@ export class GlobalVars {
   getApiUrl() {
     return this.apiUrl;
   }
-
+//-----------------------------------------------------------
   pushMessage(value){
     this.messages.push(value);
   }
@@ -54,7 +97,7 @@ export class GlobalVars {
   cleanMessages(){
     this.messages = new Array<any>();
   }
-  
+//-----------------------------------------------------------  
   setNewMessages(value){
     this.newMessages = value;
   }
@@ -70,7 +113,7 @@ export class GlobalVars {
   cleanNewMessages(){
     this.newMessages = new Array<any>();
   }
-
+//-----------------------------------------------------------
   setOldMessages(value){
     this.oldMessages = value;
   }
@@ -86,7 +129,7 @@ export class GlobalVars {
   cleanOldMessages(){
     this.oldMessages = new Array<any>();
   }
-
+//--------------------------------------------------------
   setUser(value){this.user = value;}
 
   getUser(){return this.user;}
