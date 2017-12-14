@@ -8,8 +8,8 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 })
 export class RegisterPage {
 
-  newUser = {login: '', password:'', name: '', email: '', active:false, projects:null, tasks:null}
-  checkpassword:string;
+  newUser = {login: '', password:'', firstName: '', lastName: '', langKey:'en', email:''}
+  repeatPassword:string;
 
   constructor(public navCtrl: NavController, 
     private restapiService: RestapiServiceProvider, 
@@ -19,12 +19,12 @@ export class RegisterPage {
   }
 
   register(){
-    if(this.newUser.password != this.checkpassword){
+    if(this.newUser.password != this.repeatPassword){
       this.showalert("Podane hasła się nie zgadzają.");
     }
     else{
       this.restapiService.saveUser(this.newUser);
-      this.showalert("Witaj "+this.newUser.name+".<br>Poczekaj na aktywację konta.");
+      this.showalert("Witaj "+this.newUser.firstName+".<br>Poczekaj na aktywację konta.");
     }
   }
 

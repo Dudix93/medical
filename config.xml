@@ -84,6 +84,7 @@
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
     <plugin name="phonegap-plugin-push" spec="^2.1.0">
         <variable name="SENDER_ID" value="160370676742" />
+        <variable name="FCM_VERSION" value="11.0.1" />
     </plugin>
     <plugin name="de.appplant.cordova.plugin.local-notification" spec="https://github.com/katzer/cordova-plugin-local-notifications\#ios10" />
     <plugin name="cordova-plugin-local-notification" spec="git+https://github.com/katzer/cordova-plugin-local-notifications.git" />

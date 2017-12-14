@@ -38,82 +38,9 @@ export class CalendarPage {
               public storage: Storage,
               public restapiService: RestapiServiceProvider,
               public alertCtrl:AlertController,) {
-                this.getUserProjectsAndTasks();
+                //this.getUserProjectsAndTasks();
   }
 
-  getUserProjectsAndTasks() {
-    this.storage.get('zalogowany_id').then((val) => {
-      this.restapiService.getUser(val)
-      .then(data => {
-        this.user = new Array<any>();
-        this.user.push(data);
-          this.restapiService.getProjects()
-          .then(data => {
-            this.projects = data;
-            this.restapiService.getTasks()
-            .then(data => {
-              this.tasks = data;
-              this.restapiService.getUserTask()
-              .then(data => {
-                this.userTasks = data;
-                this.restapiService.getDayTask()
-                .then(data => {
-                  this.allDayTasks = data;
-                  this.restapiService.getAllDayTaskUpdate()
-                  .then(data => {
-                    this.allEditedTask = data;
-                    this.userProjects = new Array<any>();
-                    if(this.user[0].projects != null){
-                      for(let userProject of this.user[0].projects){
-                        this.userProjectTasks = new Array<any>();
-                        for(let project of this.projects){
-                          if(project.id == userProject){
-                            this.project = project;
-
-                              for(let userTask of this.userTasks){
-                                for(let projectTasks of project.tasks){
-                                  if(userTask.finish_date == null){
-                                    this.storage.set('current_task_id', userTask.task_id);
-                                    this.storage.set('current_task_title', userTask.task_title);
-                                  }
-                                  if(userTask.task_id == projectTasks){
-                                    this.dayTasks = new Array<any>();
-                                    for(let dayTask of this.allDayTasks){
-                                      if(dayTask.user_id == userTask.user_id && dayTask.task_id == userTask.task_id){
-                                        this.alreadyEdited = false;
-                                        for(let et of this.allEditedTask){
-                                          if(dayTask.user_id == et.user_id && dayTask.task_id == et.task_id && dayTask.date == et.date){
-                                            this.dayTasks.push(new UpdateDayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,et.time,et.description));
-                                            this.alreadyEdited = true;
-                                            continue;
-                                          }
-                                        }
-                                        if(this.alreadyEdited == false){
-                                          this.dayTasks.push(new UpdateDayTask(dayTask.task_id,dayTask.user_id,dayTask.date,dayTask.time_spent,null,null));
-                                        }
-                                      }
-                                    }
-                                    this.userProjectTasks.push(new UserTask(userTask.user_id,userTask.task_id,userTask.task_title,this.dayTasks));
-                                    continue;
-                                  }
-                                }
-                            }
-                          
-                          this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
-                        //console.log(this.userProjects);
-                        }
-                      }
-                    }
-                  }
-                  else this.projects = null;
-                  });
-                });
-              });
-            });
-          });
-      });
-    });
-  }
 
   addDayTaskToUpdate(date:string,task_id:number,user_id:number,time:number,description:string){
     this.taskToEdit.date = date;

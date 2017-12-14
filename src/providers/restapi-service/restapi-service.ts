@@ -166,7 +166,7 @@ export class RestapiServiceProvider {
   getMessages(id:number,read:any) {
     return new Promise(resolve => {
       let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/api/statements',this.headers())
+          this.http.get(value+'/statements',this.headers())
           .map(res => res.json())
           .subscribe(data => {
           this.data = data;
@@ -180,14 +180,28 @@ export class RestapiServiceProvider {
       // this.storage.get('apiUrl').then((value) => {
         let value = this.globalVar.getApiUrl();
         //console.log(this.headers());
-        //this.http.get(value+'/api/projects/user/',this.headers())
-        this.http.get(value+'/api/projects/user',this.headers())
+        this.http.get(value+'/api/projects/user/',this.headers())
+        //this.http.get(value+'/projects/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });
       // });
+    });
+  }
+
+  register(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/api/users', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+      });
     });
   }
 
@@ -211,6 +225,7 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
         let value = this.globalVar.getApiUrl();
         this.http.get(value+'/api/raports/user',this.headers())
+        //this.http.get(value+'/raports',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;

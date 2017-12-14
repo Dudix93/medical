@@ -15,6 +15,8 @@ import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
 import { Message } from '../../models/message'
 import { GlobalVars } from '../../app/globalVars'
+import { UserTask } from '../../models/userTask'
+import { Push, PushToken } from '@ionic/cloud-angular';
 
 declare let cordova: any;
 
@@ -131,7 +133,8 @@ export class HomePage {
               private localNotifications: LocalNotifications,
               private platform: Platform,
               private events: Events,
-              public globalVars:GlobalVars) { 
+              public globalVars:GlobalVars,
+              public push:Push) { 
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
@@ -157,9 +160,22 @@ export class HomePage {
             //   })
             // });
 
+            if (platform.is('cordova')){
+              this.push.register().then((t: PushToken) => {
+                return this.push.saveToken(t);
+              }).then((t: PushToken) => {
+                console.log('Token saved:', t.token);
+              });
+          
+              this.push.rx.notification();
+            }
+
             this.getMessages();
             if(this.platform.is('cordova')){
-              //this.scheduleNotification();
+              setInterval(() => {
+                this.powiadomienieCykliczne();
+              }, 120000);
+              
               setInterval(() => {
                 this.getMessages();
               }, 5000);
@@ -172,6 +188,7 @@ export class HomePage {
     getUserData(){
       this.restapiService.getUser().then(user => {
         this.globalVars.setUser(user);
+        this.name = this.globalVars.getUser().firstName;
       });
     }
 
@@ -233,22 +250,20 @@ export class HomePage {
 
             if(this.newMsgs.length != 0){
               if(this.newMsgs.length == 1){
-              //   cordova.plugins.notification.local.schedule({
-              //   id: this.newMsgs[0].id,
-              //   title: 'Raportowanie',
-              //   text: this.newMsgs[0].title,
-              //   icon:'ios-chatbubbles-outline'
-              // });
-              console.log("nowa wiadomosc: "+this.newMsgs[0].title);
+                cordova.plugins.notification.local.schedule({
+                id: this.newMsgs[0].id,
+                title: 'Raportowanie',
+                text: this.newMsgs[0].title,
+                icon:'ios-chatbubbles-outline'
+              });
+              //console.log("nowa wiadomosc: "+this.newMsgs[0].title);
               }
               else{
-                // cordova.plugins.notification.local.schedule({
-                //   id: this.newMsgs[0].id,
-                //   title: 'Raportowanie',
-                //   text: "Masz "+this.newMsgs.length+" nowych wiadomości.",
-                //   icon:'ios-chatbubbles-outline'
-                // }); 
-                console.log("Masz "+this.newMsgs.length+" nowych wiadomości.");   
+                cordova.plugins.notification.local.schedule({
+                  id: this.newMsgs[0].id,
+                  title: 'Raportowanie',
+                  text: "Masz "+this.newMsgs.length+" nowych wiadomości.",
+                }); 
               }
               this.newMsgs = new Array<any>();
             }
@@ -258,18 +273,20 @@ export class HomePage {
     
     }
 
-    // scheduleNotification() {
-    //   this.storage.get('not_id').then((ajdi) => {
-    //     cordova.plugins.notification.local.schedule({
-    //       id: 1,
-    //       title: 'Powiadomienie',
-    //       text: 'Treść powiadomienia',
-    //       //data: { mydata: 'My hidden message' },
-    //       trigger: { every: 'minute', count: 2 },
-    //       icon:'alert'
-    //     });
-    //   });
-    // }
+    powiadomienieCykliczne() {
+      let id = new Date().getUTCDate().toString().
+      concat(new Date().getMonth().toString().
+      concat(new Date().getFullYear().toString().
+      concat(new Date().getHours().toString().
+      concat(new Date().getMinutes().toString()))));
+      console.log("Powiadomienie o nr id: "+id+" otrzymane o godzinie "+this.getHour());
+      cordova.plugins.notification.local.schedule({
+          id: Number(id),
+          title: 'Powiadomienie',
+          text: 'Otrzymano o godzinie: '+this.getHour(),
+          //trigger: { every: 'minute', count: 3 }
+        });
+    }
 
     getProjects(){
       let userIdFound = false;
@@ -278,17 +295,34 @@ export class HomePage {
         this.projects = data;
         this.restapiService.getRaports().then(data => {
           this.userTasks = data;
-          console.log("raporty: "+this.userTasks);
           this.storage.get('zalogowany').then(stored_login => {
 
           for(let project of this.projects){
+            console.log("projekt: "+project.id);
             this.restapiService.getProjectTasks(project.id).then(data => {
               this.projectTasks = data;
+              this.projectTasks = new Array<any>();
               this.userProjectTasks = new Array<any>();
-              this.userProjects.push(new UserProject(project.id,project.name,this.projectTasks));
+              for(let raport of this.userTasks){
+                //console.log("raport: "+JSON.stringify(raport));
+                if(project.id == raport.projectId){
+                  this.projectTasks.push(raport);
+                }
+              }
+              for(let task of this.projectTasks){
+                //let currentTask = new UserTask(task.id,task.timeOf,task.startDate,task.endDate,task.comment,task.action.name,task.countMethod,task.paused,task.projectId);
+                if(task.paused == false && task.countMethod == 'manual'){
+                  console.log(new UserTask(task.id,task));
+                  this.userProjectTasks.push(new UserTask(task.id,task));
+                }
+                else if(task.countMethod == 'automatic'){
+
+                }
+              }
+              this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
             });
           }
-          console.log(this.userProjects);
+          for(let proj of this.userProjects)console.log("userProjects: "+proj.tasks);
         });
       });
     });
@@ -541,7 +575,7 @@ export class HomePage {
         this.storage.set('current_task_title', task.title);
       });
     }
-    this.getUserProjectsAndTasks();
+    this.getProjects();
   }
 
   finishTask(hours:any,minutes:any){
@@ -573,7 +607,7 @@ export class HomePage {
     this.restapiService.updateUserTask(this.userTask.id, this.userTask);
     this.storage.set('current_task_id', null);
     this.storage.set('current_task_title', null);
-    this.getUserProjectsAndTasks();
+    this.getProjects();
   }
 
   pauseTask(task_id:number){
@@ -605,7 +639,7 @@ export class HomePage {
         });
       });
     });
-    this.getUserProjectsAndTasks();
+    this.getProjects();
   }
 
   restartTask(task_id:number){
@@ -635,7 +669,7 @@ export class HomePage {
         }
       });
     });
-    this.getUserProjectsAndTasks();
+    this.getProjects();
   }
 
   countTime(task_id:number,start_date:string,date:Date){

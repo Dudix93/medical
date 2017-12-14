@@ -20,16 +20,20 @@
       </ion-item>
       <ion-item>
         <ion-label>Powtórz hasło</ion-label>
-        <ion-input type="password" [(ngModel)]="checkpassword" name="password"></ion-input>    
-    </ion-item>
+        <ion-input type="password" [(ngModel)]="repeatPassword" name="password"></ion-input>    
+      </ion-item>
       <ion-item>
         <ion-label>E-mail</ion-label>
         <ion-input type="text" [(ngModel)]="newUser.email" name="email"></ion-input>        
-    </ion-item>  
+      </ion-item>  
       <ion-item>
         <ion-label>Imię</ion-label>
-        <ion-input type="text" [(ngModel)]="newUser.name" name="name"></ion-input>        
-    </ion-item>  
+        <ion-input type="text" [(ngModel)]="newUser.firstName" name="firstName"></ion-input>        
+      </ion-item>
+      <ion-item>
+        <ion-label>Nazwisko</ion-label>
+        <ion-input type="text" [(ngModel)]="newUser.lastName" name="lastName"></ion-input>        
+      </ion-item>    
       <button ion-button type="submit">Zarejestruj</button>
     </form>
     <!-- <p *ngIf="correct == false">Złe dane logowania</p> -->
