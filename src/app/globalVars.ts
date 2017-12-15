@@ -4,6 +4,7 @@ import {Injectable} from '@angular/core';
 export class GlobalVars {
   token:any;
   apiUrl:any;
+  projectTasks:any;
 
   messages = new Array<any>();
   newMessages = new Array<any>();
@@ -44,6 +45,14 @@ export class GlobalVars {
   }
 
   constructor() {
+  }
+
+  getProjectTasks() {
+    return this.projectTasks;
+  }
+
+  setProjectTasks(value) {
+    this.projectTasks = value;
   }
 
   getRaport() {

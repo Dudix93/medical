@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { Response, Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 import {GlobalVars} from '../../app/globalVars'
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class RestapiServiceProvider {
@@ -205,21 +206,18 @@ export class RestapiServiceProvider {
     });
   }
 
-  getProjectTasks(id:number) {
-    return new Promise(resolve => {
-      // this.storage.get('apiUrl').then((value) => {
+  getProjectTasks(id:number): Observable<any> {
+     
+
         let value = this.globalVar.getApiUrl();
-        //console.log(this.headers());
         //this.http.get(value+'/api/project-actions/project/'+id,this.headers())
-        this.http.get(value+'/project-actions/'+id,this.headers())
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
+        return this.http.get(value+'/project-actions/'+id,this.headers()).map((res: Response) => {
+          const data = res.json();
+          return data;
         });
-      // });
-    });
-  }
+
+
+        }
 
   getRaports(id:number) {
     if(id == null){
@@ -246,7 +244,6 @@ export class RestapiServiceProvider {
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
-          console.log(data);
           resolve(this.data);
           
         }, (err) => {

@@ -17,6 +17,7 @@ import { Message } from '../../models/message'
 import { GlobalVars } from '../../app/globalVars'
 import { UserTask } from '../../models/userTask'
 import { Push, PushToken } from '@ionic/cloud-angular';
+//import { finalize} from 'rxjs/operators';
 
 declare let cordova: any;
 
@@ -299,7 +300,7 @@ export class HomePage {
 
           for(let project of this.projects){
             console.log("projekt: "+project.name);
-            this.restapiService.getProjectTasks(project.id).then(data => {
+            this.restapiService.getProjectTasks(project.id).subscribe((data:any) => {
               this.projectTasks = data;
               this.projectTasks = new Array<any>();
               this.userProjectTasks = new Array<any>();
@@ -328,62 +329,6 @@ export class HomePage {
         this.storage.get('zalogowany').then(value => {console.log("zalogowany "+value)});
     }
   //-----------------------------------------------------------------------------------------------------------------------  
-  // getUserProjectsAndTasks() {
-  //   this.autoTasks = new Array<any>();
-  //   this.storage.get('zalogowany_id').then((val) => {
-  //     console.log("login id "+val);
-  //     this.restapiService.getUser(val)
-  //     .then(data => {
-  //       this.user = new Array<any>();
-  //       this.user.push(data);
-  //         this.restapiService.getProjects()
-  //         .then(data => {
-  //           this.projects = data;
-  //           this.restapiService.getTasks()
-  //           .then(data => {
-  //             this.tasks = data;
-  //             this.restapiService.getUserTask()
-  //             .then(data => {
-  //               this.userTasks = data;
-  //               this.userProjects = new Array<any>();
-  //               if(this.user[0].projects != null){
-  //                 for(let userProject of this.user[0].projects){
-  //                   this.userProjectTasks = new Array<any>();
-  //                   for(let project of this.projects){
-  //                     if(project.id == userProject){
-  //                       //console.log(project);
-  //                       this.project = project;
-
-  //                         for(let userTask of this.userTasks){
-  //                           for(let projectTasks of project.tasks){
-  //                             if(userTask.finish_date == null){
-  //                               this.storage.set('current_task_id', userTask.task_id);
-  //                               this.storage.set('current_task_title', userTask.task_title);
-  //                             }
-  //                             if(userTask.task_id == projectTasks){
-  //                                   this.userProjectTasks.push(userTask);
-  //                                   if(userTask.count_method == 'automatic' && userTask.finish_date == null){
-  //                                     //console.log(new Date(userTask.start_date.concat("/".concat(userTask.start_hour))));
-  //                                     this.countTime(userTask.task_id,userTask.start_date,new Date(userTask.start_date.concat("/".concat(userTask.start_hour))));
-  //                                   }
-  //                                   continue;
-  //                             }
-  //                           }
-  //                       }
-                      
-  //                     this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
-  //                     console.log(this.userProjectTasks);
-  //                   }
-  //                 }
-  //               }
-  //             }
-  //             else this.projects = null; 
-  //           });
-  //           });
-  //         });
-  //     });
-  //   });
-  // }
 
   getTasks() {
       this.restapiService.getTasks()
@@ -491,18 +436,25 @@ export class HomePage {
     actionSheet.present();
   }
 
-  prepareTasksRadioButtons(project_id:number){
+  prepareTasksRadioButtons(pt:any,project_id:number){
     let buttons:any;
-    this.radioButtons = [];
-    this.restapiService.getProjectTasks(project_id).then(data => {
-      this.projectTasks = data;
+    let startedTasks:any;
+    this.radioButtons = new Array<any>();
+    this.globalVars.setButtons([]);
+    this.restapiService.getProjectTasks(project_id).
+    subscribe((data:any) => {
+      console.log(data);
+    });
+      startedTasks = new Array<any>();
+      this.projectTasks = pt;
+      console.log("--------------------------------");
       for(let task of this.projectTasks.tasks){
-        console.log(task.id);
+        console.log("taski: "+task.id+" "+task.name);
         for(let project of this.userProjects){
           if(project.id == project_id && project.tasks.length != 0){
-            for(let tasks of project.tasks){
-              console.log("rozpoczety: "+tasks.action.id);
-              if(tasks.id != task.id){
+            for(let task of project.tasks)startedTasks.push(task.action.id);
+              if(startedTasks.indexOf(task.id) == -1){
+                console.log("button: "+task.id+" "+task.name);
                 if(this.radioButtons.length == 0){
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
                 }
@@ -510,23 +462,22 @@ export class HomePage {
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
                 }
               }
-            }
-            continue;
           }
           else if(project.id == project_id && project.tasks.length == 0){
+            console.log("button: "+task.id+" "+task.name);
             if(this.radioButtons.length == 0){
               this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
             }
             else{
               this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
             }
-            continue;
           }
         }
       }
       this.globalVars.setButtons(this.radioButtons);
-    });
-    return this.globalVars.getButtons();
+      console.log("buttony: "+this.globalVars.getButtons());
+      return this.globalVars.getButtons();
+
   }
 
   prepareCountMethodRadioButtons(){
@@ -876,6 +827,7 @@ export class HomePage {
   selectTaskToStart(project:string, project_id:number) {
     this.restapiService.getRaports(null)
     .then(userTasks => {
+      let inputs:any[];
       this.inProgress = false;
       this.userTasks = userTasks;
         // for(let task of this.userTasks){
@@ -889,25 +841,27 @@ export class HomePage {
         //   }
         // }
         if(this.inProgress == false){
-          const tasksAlert = this.alertCtrl.create({
-            title: "Czynnosci w "+project,
-            inputs: this.prepareTasksRadioButtons(project_id),        
-            buttons: [
-              {
-                text: 'Anuluj',
-                role: 'cancel',
-                handler: () => {
+          this.restapiService.getProjectTasks(project_id).subscribe(ProjectTasks => {
+            const tasksAlert = this.alertCtrl.create({
+              title: "Czynnosci w "+project,
+              inputs: this.prepareTasksRadioButtons(ProjectTasks,project_id),        
+              buttons: [
+                {
+                  text: 'Anuluj',
+                  role: 'cancel',
+                  handler: () => {
+                  }
+                },
+                {
+                  text: 'Rozpocznij',
+                  handler: data => {
+                    this.selectCountMethod(data);
+                  }
                 }
-              },
-              {
-                text: 'Rozpocznij',
-                handler: data => {
-                  this.selectCountMethod(data);
-                }
-              }
-            ]
+              ]
+            });
+            tasksAlert.present();
           });
-          tasksAlert.present();
         }
     });
   }

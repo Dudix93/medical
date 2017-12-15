@@ -30,6 +30,10 @@ export class EditTaskPage {
               private events: Events,
               private globalVars: GlobalVars) 
   {
+    this.getEditTaskData();
+  }
+
+  getEditTaskData(){
     this.task_id = this.navParams.get('task_id');
     if(this.navParams.get('date') == undefined){
       this.restapiService.getRaports(this.task_id).then(data => {
@@ -82,17 +86,22 @@ updateTask(){
     this.showalert("Wpisz pełną godzine!");
   }
   else{
-    if(this.updateTime != undefined && this.updateTime != ''){
+    console.log(this.globalVars.getRaport());
+    if((this.updateTime != undefined && this.updateTime != '') || this.globalVars.getRaport().comment != this.comment){
       if(this.globalVars.getRaport().comment != this.comment) this.globalVars.setComment(this.comment);
-      if(this.globalVars.getRaport().timeOf != this.updateTime){
-        this.globalVars.setTimeOf(Number(this.updateTime) + Number(this.globalVars.getRaport().timeOf));
+      if(this.globalVars.getRaport().timeOf != this.updateTime && this.updateTime != undefined){
+        console.log(this.globalVars.getRaport().timeOf+" "+this.updateTime);
+        this.globalVars.setTimeOf((Number(this.updateTime)*60) + Number(this.globalVars.getRaport().timeOf));
         this.globalVars.setLastUpdateTimeOf(this.updateTime);
         this.globalVars.setLastUpdateDate(new Date());
       }
+      console.log(this.globalVars.getRaport());
       this.restapiService.updateRaport(this.globalVars.getRaport().id,this.globalVars.getRaport());
+      this.showalert("Zaktualizowano czynność.");
     }
   }
-  this.events.publish('updateViewAfterEdit');
+  this.getEditTaskData();
+  //this.events.publish('updateViewAfterEdit');
 }
 
 // updatePastTask(){
@@ -132,9 +141,6 @@ showalert(info:string) {
     buttons: [
       {
         text: 'Ok',
-        handler: () => {
-          //this.startTask(data);
-        }
       }
     ]
   });
