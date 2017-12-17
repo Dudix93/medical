@@ -451,7 +451,7 @@ export class RestapiServiceProvider {
     //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/api/preferences/'+id, data, this.headers())
+        this.http.put(value+'/preferences/'+id, data, this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
