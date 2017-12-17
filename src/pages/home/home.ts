@@ -139,6 +139,9 @@ export class HomePage {
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
+              this.storage.get('apiUrl').then(url =>{
+                this.globalVars.setApiUrl(url);
+
               this.login = val;
             //this.getUserData();
             this.getProjects();
@@ -179,7 +182,11 @@ export class HomePage {
                 this.getMessages();
               }, 5000);
             }
+          });
             });
+          }
+          else{
+            this.navCtrl.push(LoginPage);
           }
         });
     }
@@ -289,44 +296,65 @@ export class HomePage {
 
     getProjects(){
       let userIdFound = false;
+      let autoTasks = [];
+      let currentAutoTask;
+      let index;
+      let time;
       this.userProjects = new Array<any>();
       this.restapiService.getProjects().then(data => {
         this.projects = data;
-        console.log("getProjects: "+data);
         this.restapiService.getRaports(null).then(data => {
           this.userTasks = data;
-          console.log("getRaports: "+data);
-          this.storage.get('zalogowany').then(stored_login => {
-
-          for(let project of this.projects){
-            console.log("projekt: "+project.name);
-            this.restapiService.getProjectTasks(project.id).subscribe((data:any) => {
+           for(let project of this.projects){
+            this.restapiService.getProjectTasks(project.id).subscribe(data => {
               this.projectTasks = data;
+              this.restapiService.getUserPreferences().then(data =>{
+                this.userPreferences = data;
               this.projectTasks = new Array<any>();
-              this.userProjectTasks = new Array<any>();
+              autoTasks = new Array<any>(); 
+              this.userProjectTasks = new Array<[any,any]>();
               for(let raport of this.userTasks){
-                console.log("raport: "+raport);
                 if(project.id == raport.projectId){
                   this.projectTasks.push(raport);
                 }
               }
               for(let task of this.projectTasks){
-                //let currentTask = new UserTask(task.id,task.timeOf,task.startDate,task.endDate,task.comment,task.action.name,task.countMethod,task.paused,task.projectId);
-                if(task.paused == false && task.countMethod == 'manual'){
-                  this.userProjectTasks.push(task);
+                if(task.countMethod == 'manual' || (task.endDate != null && task.countMethod == 'automatic')){
+                  console.log("manual: "+project.name+" "+task.action.name);
+                  this.userProjectTasks.push([task,task.timeOf]);
                 }
-                else if(task.countMethod == 'automatic'){
-
+                else if(task.endDate == null && task.countMethod == 'automatic'){
+                  autoTasks.push(task);
                 }
               }
-              this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
+
+              index = 1;
+              time = 0;
+              for(let task of autoTasks){
+                console.log("raport: "+task.id);
+                if(currentAutoTask == undefined) currentAutoTask = task.action.id;
+                if(currentAutoTask != task.action.id){
+                  currentAutoTask = task.action.id;
+                  time = 0;
+                }
+                if(index == autoTasks.length){
+                  if(task.pausedDate != null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                  else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                  let hours = Math.floor(time);
+                  let minutes = Math.floor(60*(time - Math.floor(time)));
+                  console.log("sumarycznie dnia taska: "+hours+":"+minutes);
+                  continue;
+                }
+                if(task.pausedDate != null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                index++;
+              }
+              //this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
+            });
             });
           }
-        });
       });
     });
-        this.storage.get('zalogowany_id').then(value => {console.log("zalogowany id "+value)});
-        this.storage.get('zalogowany').then(value => {console.log("zalogowany "+value)});
     }
   //-----------------------------------------------------------------------------------------------------------------------  
 
@@ -376,6 +404,7 @@ export class HomePage {
     this.storage.set('zalogowany', null);
     this.storage.set('zalogowany_id', null);
     this.storage.set('haslo', null);
+    this.storage.set('isLoggedIn',false);
     this.navCtrl.push(LoginPage);
   }
 
@@ -452,9 +481,9 @@ export class HomePage {
         console.log("taski: "+task.id+" "+task.name);
         for(let project of this.userProjects){
           if(project.id == project_id && project.tasks.length != 0){
-            for(let task of project.tasks)startedTasks.push(task.action.id);
+            for(let task of project.tasks)startedTasks.push(task[0].action.id);
               if(startedTasks.indexOf(task.id) == -1){
-                console.log("button: "+task.id+" "+task.name);
+     
                 if(this.radioButtons.length == 0){
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
                 }
@@ -464,7 +493,7 @@ export class HomePage {
               }
           }
           else if(project.id == project_id && project.tasks.length == 0){
-            console.log("button: "+task.id+" "+task.name);
+
             if(this.radioButtons.length == 0){
               this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
             }
@@ -475,7 +504,6 @@ export class HomePage {
         }
       }
       this.globalVars.setButtons(this.radioButtons);
-      console.log("buttony: "+this.globalVars.getButtons());
       return this.globalVars.getButtons();
 
   }
@@ -629,165 +657,137 @@ export class HomePage {
     this.getProjects();
   }
 
-  countTime(task_id:number,start_date:string,date:Date){
+  countTime(task_id:number,pref:any,startDate:Date,endDate:Date){
+    console.log(' ');
+    console.log("startDate "+startDate.toLocaleDateString()+" "+startDate.getHours()+":"+startDate.getMinutes());
+    console.log("endDate "+endDate.toLocaleDateString()+" "+endDate.getHours()+":"+endDate.getMinutes());
     let time = 0;
-    let DayTime = 0;
-    let pausedTime = 0;
-    let pausedHour = null;
-    let pausedDate = null;
-    let taskStartHour = '';
-    let startHour = date.getHours().toString().concat(":".concat(date.getMinutes().toString()));
+    let startHour;
+    let endHour;
     this.firstDay = true;
-    this.restapiService.getUserPreferences()
-    .then(data =>{
-      this.userPreferences = data;
-      this.storage.get('zalogowany_id').then(user_id =>{
+    this.userPreferences = pref;
 
+              for(let d = startDate;d.getUTCDate()<=new Date(endDate).getUTCDate() && d.getMonth()<=new Date(endDate).getMonth();d.setDate(d.getDate()+1)){
+                startHour = startDate.getHours().toString().concat(":".concat(startDate.getMinutes().toString()));
+                endHour = endDate.getHours().toString().concat(":".concat(endDate.getMinutes().toString()));
+                let tmp;
+                if(this.firstDay == true && startDate.toLocaleDateString() != endDate.toLocaleDateString()){
+                  time += this.timeBetween(this.userPreferences[d.getDay()].finish_hour,startHour);
+                  tmp = this.timeBetween(this.userPreferences[d.getDay()].finish_hour,startHour);
+                  console.log("godz: "+startHour+"-"+this.userPreferences[d.getDay()].finish_hour);
+                  let hours = Math.floor(tmp/3600000);
+                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
+                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
+                }
 
-            this.restapiService.getLatestPausedTask(task_id,user_id)
-            .then(data =>{
-              this.pausedTaskObjects = data;
-              if(this.pausedTaskObjects != ''){
-                if(this.pausedTaskObjects[0].restart_hour == null){
-                  pausedHour = this.pausedTaskObjects[0].pause_hour;
-                  pausedDate = this.pausedTaskObjects[0].pause_date;
+                else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
+                  time += this.timeBetween(endHour,startHour);
+                  tmp = this.timeBetween(endHour,startHour);;
+                  console.log("godz: "+startHour+"-"+endHour);
+                  let hours = Math.floor(tmp/3600000);
+                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
+                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
                 }
-              }
-              for(let pause of this.pausedTaskObjects){
-                if(pause.restart_hour != null){
-                  pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
+
+                else{
+                  time += this.timeBetween(this.userPreferences[d.getDay()].finish_hour,this.userPreferences[d.getDay()].start_hour);
+                  tmp = this.timeBetween(this.userPreferences[d.getDay()].finish_hour,this.userPreferences[d.getDay()].start_hour);
+                  console.log("godz: "+this.userPreferences[d.getDay()].start_hour+"-"+this.userPreferences[d.getDay()].finish_hour);
+                  let hours = Math.floor(tmp/3600000);
+                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
+                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
                 }
-              }
-              console.log("paused hour: "+pausedHour);
-              console.log("paused date: "+pausedDate);
-              console.log(date.getUTCDate()+":"+date.getMonth()+" ? "+new Date().getUTCDate()+":"+new Date().getMonth());
-              for(let d = date;d.getUTCDate()<=new Date().getUTCDate() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
-                taskStartHour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
-                // this.restapiService.getLatestPausedTask(task_id,pref.user_id)
-                // .then(data =>{
-                //   this.pausedTaskObjects = data;
-                //   this.pausedTaskObjects.reverse();
-                //   for(let pause of this.pausedTaskObjects){
-                //     console.log(pause);
-                //   }
-                // });
-                console.log("kolejny dzien: "+new Date(d).getDay());
-                time += this.timeForDay(
-                  this.userPreferences[d.getDay()],
-                  this.firstDay,
-                  d,
-                  taskStartHour,
-                  this.userPreferences[new Date(d).getDay()].start_hour,
-                  this.userPreferences[new Date(d).getDay()].finish_hour,
-                  startHour,
-                  task_id,
-                  pausedHour,
-                  pausedDate);
                 
                 this.firstDay = false;
-                DayTime = time - DayTime;
-                let hours = Math.floor(DayTime);
-                let minutes = Math.floor(60*(DayTime - Math.floor(DayTime)));
-                console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
-                this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
-                DayTime = time;
+                //this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
               }
-              pausedTime = pausedTime/3600000;
-              let hours = Math.floor(time);
-              let minutes = Math.floor(60*(time - Math.floor(time)));
-              let hp = Math.floor(pausedTime);
-              let mp = Math.floor(60*(pausedTime - Math.floor(pausedTime)));
-              console.log(hours+":"+minutes+" - "+hp+":"+mp);
-              time = time - (pausedTime);
-               hours = Math.floor(time);
-               minutes = Math.floor(60*(time - Math.floor(time)));
-               console.log(hours+":"+minutes);
-              this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
-            });
-      });
-    });
+              time = time/3600000;
+               let hours = Math.floor(time);
+               let minutes = Math.floor(60*(time - Math.floor(time)));
+               console.log("sumarycznie dnia obiektu: "+hours+":"+minutes);
+               return time;
   }
 
   timeBetween(from:string,then:string){
     return (new Date("01.01.2000/".concat(from)).getTime()-new Date("01.01.2000/".concat(then)).getTime())
   }
 
-  timeForDay(pref:any,firstDay:any,d:any,taskStartHour:string,dayOd:any,dayDo:any,startHour:any,task_id:any,pausedHour:any,pausedDate:any){
-    let time = 0;
-    let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
-    this.pausedTaskObjects = new Array<any>();
-    //------------------------------------------------------------------------------------------------------------------------
-      if(firstDay == true){
-        //jesli to nie jest dzisiaj
-        if(d.toLocaleDateString() != new Date().toLocaleDateString()){
-          if((pausedHour == null) || (pausedHour != null && d.toLocaleDateString() != new Date(pausedDate).toLocaleDateString())){
-            time += this.timeBetween(dayDo,taskStartHour);
-          } 
-          else if(pausedHour != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,taskStartHour);
-          } 
-        }
-        //jesli to jest dzisiaj
-        else
-        {
-          //jeśli jest spauzowany
-            if(pausedHour != null && pausedDate != null){
-              if(d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-                //console.log(d.toLocaleDateString()+" "+pausedDate);
-                time += this.timeBetween(pausedHour,startHour);
-              }
-            }
-            else{
-              //jesli rozpocząłem czynność pozniej niz zacząłem pracę
-              if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
-              //jesli już skończyłem dzisiaj pracować
-              if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
-                time += this.timeBetween(dayDo,dayOd);
-              }
-              //jeśli jeszcze jestem w pracy
-              else{
-                time += this.timeBetween(nowHour,dayOd);
-              }
-            }
+  // timeForDay(firstDay:any,dayOd:any,dayDo:any,startHour:any,endHour:any){
+  //   let time = 0;
+  //   let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
+  //   this.pausedTaskObjects = new Array<any>();
+  //   //------------------------------------------------------------------------------------------------------------------------
+  //     if(firstDay == true){
+  //       //jesli to nie jest dzisiaj
+  //       if(d.toLocaleDateString() != new Date().toLocaleDateString()){
+  //         if((pausedHour == null) || (pausedHour != null && d.toLocaleDateString() != new Date(pausedDate).toLocaleDateString())){
+  //           time += this.timeBetween(dayDo,taskStartHour);
+  //         } 
+  //         else if(pausedHour != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
+  //           time += this.timeBetween(pausedHour,taskStartHour);
+  //         } 
+  //       }
+  //       //jesli to jest dzisiaj
+  //       else
+  //       {
+  //         //jeśli jest spauzowany
+  //           if(pausedHour != null && pausedDate != null){
+  //             if(d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
+  //               //console.log(d.toLocaleDateString()+" "+pausedDate);
+  //               time += this.timeBetween(pausedHour,startHour);
+  //             }
+  //           }
+  //           else{
+  //             //jesli rozpocząłem czynność pozniej niz zacząłem pracę
+  //             if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
+  //             //jesli już skończyłem dzisiaj pracować
+  //             if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
+  //               time += this.timeBetween(dayDo,dayOd);
+  //             }
+  //             //jeśli jeszcze jestem w pracy
+  //             else{
+  //               time += this.timeBetween(nowHour,dayOd);
+  //             }
+  //           }
           
-        }
-        }
-        //------------------------------------------------------------------------------------------------------------------------
-      else if(d.getUTCDate() == new Date().getUTCDate() && d.getMonth() == new Date().getMonth()){
-        if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
-        if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,startHour);
-        }
-        else{
-          //jesli rozpocząłem czynność pozniej niz zacząłem pracę
-          if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
-          //jesli już skończyłem dzisiaj pracować
-          if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
-            time += this.timeBetween(dayDo,dayOd);
-          }
-          //jeśli jeszcze jestem w pracy
-          else{
-            time += this.timeBetween(nowHour,dayOd);
-          }
-        }// SPRAWDŹ CZY NOW NIE JEST ZANIM ZACZYNASZ PRACĘ, BO BĘDZIE NA MINUSIE
-      }
-        }
-        //------------------------------------------------------------------------------------------------------------------------
-        //każdy dzień pomiędzy dzisiaj a dniem rozpoczęcia czynności
-      else{
-        if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
-        if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,dayOd);
-          }
-        else{
-          time += this.timeBetween(dayDo,dayOd);
-        }
-      }
-      }
-    time = time/3600000;
-    console.log(" ");
-    return time;
-  }
+  //       }
+  //       }
+  //       //------------------------------------------------------------------------------------------------------------------------
+  //     else if(d.getUTCDate() == new Date().getUTCDate() && d.getMonth() == new Date().getMonth()){
+  //       if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
+  //       if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
+  //           time += this.timeBetween(pausedHour,startHour);
+  //       }
+  //       else{
+  //         //jesli rozpocząłem czynność pozniej niz zacząłem pracę
+  //         if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
+  //         //jesli już skończyłem dzisiaj pracować
+  //         if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
+  //           time += this.timeBetween(dayDo,dayOd);
+  //         }
+  //         //jeśli jeszcze jestem w pracy
+  //         else{
+  //           time += this.timeBetween(nowHour,dayOd);
+  //         }
+  //       }// SPRAWDŹ CZY NOW NIE JEST ZANIM ZACZYNASZ PRACĘ, BO BĘDZIE NA MINUSIE
+  //     }
+  //       }
+  //       //------------------------------------------------------------------------------------------------------------------------
+  //       //każdy dzień pomiędzy dzisiaj a dniem rozpoczęcia czynności
+  //     else{
+  //       if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
+  //       if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
+  //           time += this.timeBetween(pausedHour,dayOd);
+  //         }
+  //       else{
+  //         time += this.timeBetween(dayDo,dayOd);
+  //       }
+  //     }
+  //     }
+  //   time = time/3600000;
+  //   console.log(" ");
+  //   return time;
+  // }
 
 
   finishTaskPrompt(task_id:number, task_title:string, hours:any, minutes:any) {

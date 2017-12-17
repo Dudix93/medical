@@ -224,7 +224,7 @@ export class RestapiServiceProvider {
       return new Promise(resolve => {
         let value = this.globalVar.getApiUrl();
         //this.http.get(value+'/api/raports/user',this.headers())
-        this.http.get(value+'/raports',this.headers())
+        this.http.get(value+'/raports?_sort=action.id,startDate&_order=asc',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -436,7 +436,8 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(options);
-        this.http.get(value+'/api/preferences',this.headers())
+        //this.http.get(value+'/api/preferences',this.headers())
+        this.http.get(value+'/preferences',this.headers())
         .map(res => res.json())
         .subscribe(data => {
          this.data = data;

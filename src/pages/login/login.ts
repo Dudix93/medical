@@ -53,7 +53,6 @@ export class LoginPage {
   }
 
   login() {
-    console.log("credentials.apiUrl "+this.credentials.apiUrl);
     this.storage.set('apiUrl', this.credentials.apiUrl);
     this.globalVar.setApiUrl(this.credentials.apiUrl);
     this.storage.get('apiUrl').then((value) => {
@@ -63,8 +62,6 @@ export class LoginPage {
     .then(data => {
       this.correct=false;
       this.users = data;
-      console.log("dejta: "+data);
-      console.log(this.users);
       for (var user of this.users) {
         if(user.login == this.credentials.login){
           if(user.password == this.credentials.password && user.active == true){
@@ -72,13 +69,12 @@ export class LoginPage {
             this.storage.set('isLoggedIn',true);
             this.storage.set('zalogowany', user.login);
             this.storage.set('haslo', user.password);
-            this.storage.set('zalogowany_id', user.id);
+            this.storage.set('apiUrl',this.credentials.apiUrl);
             break;
           }
         }
       }
       if(this.correct == true){
-        console.log('odpalam');
         this.storage.set('isLoggedIn',true);
         this.navCtrl.push(HomePage);
       }
@@ -101,11 +97,8 @@ export class LoginPage {
       this.loginData.username = this.credentials.login;
       this.loginData.password = this.credentials.password;
     }
-
-    console.log(this.restapiService.login(this.loginData));
     
     this.restapiService.login(this.loginData).subscribe((data) => {
-      console.log(data);
       this.storage.set('isLoggedIn',true);
       this.storage.set('zalogowany', this.loginData.username);
       this.storage.set('haslo', this.loginData.password);
