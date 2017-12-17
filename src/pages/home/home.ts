@@ -320,7 +320,7 @@ export class HomePage {
               }
               for(let task of this.projectTasks){
                 if(task.countMethod == 'manual' || (task.endDate != null && task.countMethod == 'automatic')){
-                  console.log("manual: "+project.name+" "+task.action.name);
+                  console.log("manual: "+project.name+" "+task.action.name);//skonczony autotask tez bo po zakonczniu naspisuje enddate dla kazdego obiektu 
                   this.userProjectTasks.push([task,task.timeOf]);
                 }
                 else if(task.endDate == null && task.countMethod == 'automatic'){
@@ -331,9 +331,11 @@ export class HomePage {
               index = 1;
               time = 0;
               for(let task of autoTasks){
-                console.log("raport: "+task.id);
                 if(currentAutoTask == undefined) currentAutoTask = task.action.id;
                 if(currentAutoTask != task.action.id){
+                  let hours = Math.floor(time);
+                  let minutes = Math.floor(60*(time - Math.floor(time)));
+                  console.log("sumarycznie dla "+currentAutoTask+": "+hours+":"+minutes);
                   currentAutoTask = task.action.id;
                   time = 0;
                 }
@@ -342,7 +344,7 @@ export class HomePage {
                   else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
                   let hours = Math.floor(time);
                   let minutes = Math.floor(60*(time - Math.floor(time)));
-                  console.log("sumarycznie dnia taska: "+hours+":"+minutes);
+                  console.log("sumarycznie dla "+currentAutoTask+": "+hours+":"+minutes);
                   continue;
                 }
                 if(task.pausedDate != null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
@@ -657,47 +659,79 @@ export class HomePage {
     this.getProjects();
   }
 
+  podgląd(d:any,start:any,end:any){
+    let tmp = this.timeBetween(end,start);
+    let hours = Math.floor(tmp/3600000);
+    let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
+    console.log(d.toLocaleDateString()+" "+"godz: "+start+"-"+end+" "+hours+"h "+minutes+"m");
+  }
   countTime(task_id:number,pref:any,startDate:Date,endDate:Date){
     console.log(' ');
-    console.log("startDate "+startDate.toLocaleDateString()+" "+startDate.getHours()+":"+startDate.getMinutes());
-    console.log("endDate "+endDate.toLocaleDateString()+" "+endDate.getHours()+":"+endDate.getMinutes());
+    console.log("raport id: "+task_id);
     let time = 0;
-    let startHour;
-    let endHour;
+    let reportStartHour;
+    let reportEndHour;
+    let workStartHour;
+    let workEndHour;
+    let workDay;
     this.firstDay = true;
     this.userPreferences = pref;
+    let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
 
-              for(let d = startDate;d.getUTCDate()<=new Date(endDate).getUTCDate() && d.getMonth()<=new Date(endDate).getMonth();d.setDate(d.getDate()+1)){
-                startHour = startDate.getHours().toString().concat(":".concat(startDate.getMinutes().toString()));
-                endHour = endDate.getHours().toString().concat(":".concat(endDate.getMinutes().toString()));
-                let tmp;
-                if(this.firstDay == true && startDate.toLocaleDateString() != endDate.toLocaleDateString()){
-                  time += this.timeBetween(this.userPreferences[d.getDay()].finish_hour,startHour);
-                  tmp = this.timeBetween(this.userPreferences[d.getDay()].finish_hour,startHour);
-                  console.log("godz: "+startHour+"-"+this.userPreferences[d.getDay()].finish_hour);
-                  let hours = Math.floor(tmp/3600000);
-                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
-                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
+              for(let d = startDate;d.toLocaleDateString()<=new Date(endDate).toLocaleDateString();d.setDate(d.getDate()+1)){
+                for(let p of this.userPreferences){
+                  if(p.day == d.getDay()){
+                    workStartHour = p.start_hour;
+                    workEndHour = p.finish_hour;
+                    workDay = p.work_day;
+                    break;
+                  }
                 }
-
-                else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
-                  time += this.timeBetween(endHour,startHour);
-                  tmp = this.timeBetween(endHour,startHour);;
-                  console.log("godz: "+startHour+"-"+endHour);
-                  let hours = Math.floor(tmp/3600000);
-                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
-                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
+                if(workDay == true){
+                  reportStartHour = startDate.getHours().toString().concat(":".concat(startDate.getMinutes().toString()));
+                  reportEndHour = endDate.getHours().toString().concat(":".concat(endDate.getMinutes().toString()));
+                  let tmp;
+                  
+                  if(this.firstDay == true && startDate.toLocaleDateString() != endDate.toLocaleDateString()){
+                    time += this.timeBetween(workEndHour,reportStartHour);
+                    this.podgląd(d,reportStartHour,workEndHour);
+                  }//pierwszy dzień, liczymy od startTask do endDay
+  
+                  else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
+                    if(endDate.toLocaleDateString() == new Date().toLocaleDateString()){
+                      if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        time += this.timeBetween(nowHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,nowHour);
+                      }
+                      else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        time += this.timeBetween(workEndHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,workEndHour);
+                      } 
+                    }
+                    else{
+                      time += this.timeBetween(reportEndHour,reportStartHour);
+                      this.podgląd(d,reportStartHour,reportEndHour);
+                    }
+                  }//pierwszy i ostatni dzień
+  
+                  else if(this.firstDay == false && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
+                    if(endDate.toLocaleDateString() == new Date().toLocaleDateString()){
+                      if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        time += this.timeBetween(nowHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,nowHour);
+                      }
+                      else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        time += this.timeBetween(workEndHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,workEndHour);
+                      } 
+                    }
+                  }//nie pierwszy ale ostatni, bo dzisiaj
+  
+                  else{
+                    time += this.timeBetween(workEndHour,workStartHour);
+                    this.podgląd(d,workStartHour,workEndHour);
+                  }//każdy dzień pomiędzy, liczymy od startDay do endDay
                 }
-
-                else{
-                  time += this.timeBetween(this.userPreferences[d.getDay()].finish_hour,this.userPreferences[d.getDay()].start_hour);
-                  tmp = this.timeBetween(this.userPreferences[d.getDay()].finish_hour,this.userPreferences[d.getDay()].start_hour);
-                  console.log("godz: "+this.userPreferences[d.getDay()].start_hour+"-"+this.userPreferences[d.getDay()].finish_hour);
-                  let hours = Math.floor(tmp/3600000);
-                  let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
-                  console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
-                }
-                
                 this.firstDay = false;
                 //this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
               }
