@@ -435,8 +435,6 @@ export class RestapiServiceProvider {
   getUserPreferences() {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        //console.log(options);
-        //this.http.get(value+'/api/preferences',this.headers())
         this.http.get(value+'/preferences',this.headers())
         .map(res => res.json())
         .subscribe(data => {
@@ -448,7 +446,6 @@ export class RestapiServiceProvider {
   }
 
   updateUserPreferences(id,data) {
-    //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.put(value+'/preferences/'+id, data, this.headers())

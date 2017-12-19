@@ -294,6 +294,11 @@ export class HomePage {
         });
     }
 
+    minutesToHM(time:number){
+      let hours = Math.floor(time);
+      let minutes = Math.floor(60*(time - Math.floor(time)));
+      return hours.toString().concat(':'.concat(minutes.toString()));
+    }
     getProjects(){
       let userIdFound = false;
       let autoTasks = [];
@@ -320,8 +325,9 @@ export class HomePage {
               }
               for(let task of this.projectTasks){
                 if(task.countMethod == 'manual' || (task.endDate != null && task.countMethod == 'automatic')){
-                  console.log("manual: "+project.name+" "+task.action.name);//skonczony autotask tez bo po zakonczniu naspisuje enddate dla kazdego obiektu 
-                  this.userProjectTasks.push([task,task.timeOf]);
+                  console.log("manual: "+project.name+" "+task.action.name);//skonczony autotask tez bo po zakonczniu naspisuje enddate dla kazdego raportu 
+                  this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
+                  console.log('czas: '+task.timeOf);
                 }
                 else if(task.endDate == null && task.countMethod == 'automatic'){
                   autoTasks.push(task);
@@ -331,12 +337,14 @@ export class HomePage {
               index = 1;
               time = 0;
               for(let task of autoTasks){
-                if(currentAutoTask == undefined) currentAutoTask = task.action.id;
-                if(currentAutoTask != task.action.id){
-                  let hours = Math.floor(time);
-                  let minutes = Math.floor(60*(time - Math.floor(time)));
-                  console.log("sumarycznie dla "+currentAutoTask+": "+hours+":"+minutes);
-                  currentAutoTask = task.action.id;
+                if(currentAutoTask == undefined){
+                  currentAutoTask = task;
+                }
+                if(currentAutoTask.action.id != task.action.id){
+                  console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                  console.log('');
+                  this.userProjectTasks.push([currentAutoTask,this.minutesToHM(time)]);
+                  currentAutoTask = task;
                   time = 0;
                 }
                 if(index == autoTasks.length){
@@ -344,14 +352,23 @@ export class HomePage {
                   else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
                   let hours = Math.floor(time);
                   let minutes = Math.floor(60*(time - Math.floor(time)));
-                  console.log("sumarycznie dla "+currentAutoTask+": "+hours+":"+minutes);
+                  console.log('');
+                  console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                  this.userProjectTasks.push([task,this.minutesToHM(time)]);
                   continue;
                 }
-                if(task.pausedDate != null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
-                else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                if(task.pausedDate != null){
+                  time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                  currentAutoTask = task;
+                }
+                else if(task.pausedDate == null){
+                  time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                  currentAutoTask = task;
+                }
                 index++;
+                console.log('');
               }
-              //this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
+              this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
             });
             });
           }
@@ -665,9 +682,8 @@ export class HomePage {
     let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
     console.log(d.toLocaleDateString()+" "+"godz: "+start+"-"+end+" "+hours+"h "+minutes+"m");
   }
+
   countTime(task_id:number,pref:any,startDate:Date,endDate:Date){
-    console.log(' ');
-    console.log("raport id: "+task_id);
     let time = 0;
     let reportStartHour;
     let reportEndHour;
@@ -680,10 +696,10 @@ export class HomePage {
 
               for(let d = startDate;d.toLocaleDateString()<=new Date(endDate).toLocaleDateString();d.setDate(d.getDate()+1)){
                 for(let p of this.userPreferences){
-                  if(p.day == d.getDay()){
-                    workStartHour = p.start_hour;
-                    workEndHour = p.finish_hour;
-                    workDay = p.work_day;
+                  if(p.dayOfWeek == d.getDay()){
+                    workStartHour = p.hourFrom;
+                    workEndHour = p.hourTo;
+                    workDay = p.workDay;
                     break;
                   }
                 }
@@ -738,7 +754,7 @@ export class HomePage {
               time = time/3600000;
                let hours = Math.floor(time);
                let minutes = Math.floor(60*(time - Math.floor(time)));
-               console.log("sumarycznie dnia obiektu: "+hours+":"+minutes);
+               console.log("sumarycznie dla raportu: "+hours+":"+minutes);
                return time;
   }
 
