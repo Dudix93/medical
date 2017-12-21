@@ -16,7 +16,7 @@
   </ion-item> -->
   <ion-item *ngIf="countMethod=='manual'">  
       Ostatnia aktualizacja:<br> 
-      {{updateDate}} o {{lastUpdateTime}} godzin.
+      {{updateDate}} o {{lastUpdateTimeOf}} godzin.
   </ion-item>
   <form (ngSubmit)="updateTask()">
       <ion-item *ngIf="countMethod=='manual'"> 
@@ -24,7 +24,7 @@
           <ion-input type="text" [(ngModel)]="updateTime" name="updateTime"></ion-input>        
       </ion-item>    
       <ion-item>
-          <ion-label floating>Opis</ion-label>
+          <ion-label floating>Komentarz</ion-label>
           <ion-input type="text" [(ngModel)]="comment" name="comment" clearInput></ion-input>        
       </ion-item> 
     <button ion-button type="submit" disabled *ngIf="currentComment == comment && updateTime == undefined">Aktualizuj</button>

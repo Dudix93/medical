@@ -119,7 +119,8 @@ export class HomePage {
     task_title: '', 
     task_id:0,
     hours:0,
-    minutes:0 
+    minutes:0,
+    raport:'' 
   }
   today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
   messages:any;
@@ -145,6 +146,8 @@ export class HomePage {
               this.login = val;
             //this.getUserData();
             this.getProjects();
+            this.storage.set('unreadMsgs',null);
+            this.storage.set('oldMessages',null);
             this.inProgress = false;
             this.events.subscribe('updateViewAfterEdit',()=>{
               this.getProjects();
@@ -171,17 +174,16 @@ export class HomePage {
           
             //   this.push.rx.notification();
             // }
-
-            this.getMessages();
-            if(this.platform.is('cordova')){
-              setInterval(() => {
-                this.powiadomienieCykliczne();
-              }, 120000);
+            // this.getMessages();
+            // if(this.platform.is('cordova')){
+            //   setInterval(() => {
+            //     this.powiadomienieCykliczne();
+            //   }, 120000);
               
-              setInterval(() => {
-                this.getMessages();
-              }, 5000);
-            }
+            //   setInterval(() => {
+            //     this.getMessages();
+            //   }, 5000);
+            // }
           });
             });
           }
@@ -302,10 +304,12 @@ export class HomePage {
     getProjects(){
       let userIdFound = false;
       let autoTasks = [];
+      let autoTasksIds = [];
       let currentAutoTask;
       let index;
       let time;
       this.userProjects = new Array<any>();
+      this.userProjectTasks = new Array<any>();
       this.restapiService.getProjects().then(data => {
         this.projects = data;
         this.restapiService.getRaports(null).then(data => {
@@ -317,6 +321,7 @@ export class HomePage {
                 this.userPreferences = data;
               this.projectTasks = new Array<any>();
               autoTasks = new Array<any>(); 
+              autoTasksIds = new Array<any>(); 
               this.userProjectTasks = new Array<[any,any]>();
               for(let raport of this.userTasks){
                 if(project.id == raport.projectId){
@@ -325,12 +330,17 @@ export class HomePage {
               }
               for(let task of this.projectTasks){
                 if(task.countMethod == 'manual' || (task.endDate != null && task.countMethod == 'automatic')){
-                  console.log("manual: "+project.name+" "+task.action.name);//skonczony autotask tez bo po zakonczniu naspisuje enddate dla kazdego raportu 
+                  //console.log("manual: "+project.name+" "+task.action.name);//skonczony autotask tez bo po zakonczniu naspisuje enddate dla kazdego raportu 
                   this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
-                  console.log('czas: '+task.timeOf);
+                  //console.log('czas: '+task.timeOf);
                 }
                 else if(task.endDate == null && task.countMethod == 'automatic'){
+                  console.log("push "+task.action.name);
                   autoTasks.push(task);
+                }
+                else if(task.endDate != null && task.countMethod == 'automatic' && autoTasksIds.indexOf(task.action.id) == -1){
+                  console.log("ended: "+task.action.name);
+                  autoTasksIds.push(task.action.id);
                 }
               }
 
@@ -344,6 +354,7 @@ export class HomePage {
                   console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
                   console.log('');
                   this.userProjectTasks.push([currentAutoTask,this.minutesToHM(time)]);
+                  this.updateRaportsTime(currentAutoTask.action.id,currentAutoTask.projectId,time*60);
                   currentAutoTask = task;
                   time = 0;
                 }
@@ -355,6 +366,7 @@ export class HomePage {
                   console.log('');
                   console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
                   this.userProjectTasks.push([task,this.minutesToHM(time)]);
+                  this.updateRaportsTime(task.action.id,task.projectId,time*60);
                   continue;
                 }
                 if(task.pausedDate != null){
@@ -377,46 +389,46 @@ export class HomePage {
     }
   //-----------------------------------------------------------------------------------------------------------------------  
 
-  getTasks() {
-      this.restapiService.getTasks()
-      .then(data => {
-        this.tasks = data;
-      });
-  }
+//   getTasks() {
+//       this.restapiService.getTasks()
+//       .then(data => {
+//         this.tasks = data;
+//       });
+//   }
 
-  getUserTask(task_id:number) {
-    this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          if(user_id == task.user_id && task_id == task.task_id){
-            this.userTask = task;
-            console.log(this.userTask);
-            break;
-          }
-        }
-      });
-    });
-}
+//   getUserTask(task_id:number) {
+//     this.restapiService.getUserTask()
+//     .then(data => {
+//       this.userTasks = data;
+//       this.storage.get('zalogowany_id').then((user_id) => {
+//         for(let task of this.userTasks){
+//           if(user_id == task.user_id && task_id == task.task_id){
+//             this.userTask = task;
+//             console.log(this.userTask);
+//             break;
+//           }
+//         }
+//       });
+//     });
+// }
 
-  saveTask() {
-    this.restapiService.saveTask(this.task).then((result) => {
-      console.log(this.task);
-      this.getTasks();
-    }, (err) => {
-      console.log(err);
-    });
-  }
+//   saveTask() {
+//     this.restapiService.saveTask(this.task).then((result) => {
+//       console.log(this.task);
+//       this.getTasks();
+//     }, (err) => {
+//       console.log(err);
+//     });
+//   }
 
-  deleteTask(id:String) {
-    this.restapiService.deleteTask(id).then((result) => {
-      console.log(result);
-      this.getTasks();
-    }, (err) => {
-      console.log(err);
-    });
-  }
+//   deleteTask(id:String) {
+//     this.restapiService.deleteTask(id).then((result) => {
+//       console.log(result);
+//       this.getTasks();
+//     }, (err) => {
+//       console.log(err);
+//     });
+//   }
 
   logout(){
     this.storage.set('isLoggedIn',false);
@@ -443,8 +455,8 @@ export class HomePage {
     this.navCtrl.push(MessagesPage);
   }
 
-  editTask(task_id:number){
-        this.params.task_id = task_id;
+  editTask(raport:any){
+        this.params.raport = raport;
         this.navCtrl.push(EditTaskPage, this.params);
   }
 
@@ -582,67 +594,47 @@ export class HomePage {
     this.getProjects();
   }
 
-  finishTask(hours:any,minutes:any){
-    let k = new Array<any>();
-    this.userTask.finish_date = new Date().toLocaleDateString();
-    this.userTask.finish_hour = this.getHour();
-    if(this.userTask.count_method == 'automatic'){
-      this.storage.forEach((value,key)=>{
-        k = key.split(' ');
-        if(k[0] == this.userTask.task_id && value != '0:0')
-        {
-          console.log(key+" "+value);
-          this.restapiService.saveDayTask(new DayTask(
-            Number(this.userTask.task_id),
-            Number(this.userTask.user_id),
-            k[1].replace(/\//g,'.'),//date
-            value,//time spent
-          ));
-          this.storage.remove(key);
-        }
-      });
-      console.log('------------NAPRAW USUWANIE ZE STORAGE--------------------------');
-      this.storage.forEach((value,key)=>{console.log(key+" "+value)});
+  updateRaportsTime(task_id:number,project_id:number,time:number){
+    for(let raport of this.userTasks){
+      if(raport.action.id == task_id && raport.projectId == project_id){
+        raport.timeOf = time;
+        this.restapiService.updateRaport(raport.id,raport);
+      }
     }
-    if(hours != null && minutes != null){
-      this.userTask.time_spent = hours.toString().concat(":".concat(minutes));
+  }
+
+  updateRaportsComment(task_id:number,project_id:number,comment:string){
+    for(let raport of this.userTasks){
+      if(raport.action.id == task_id && raport.projectId == project_id){
+        raport.comment = comment;
+        this.restapiService.updateRaport(raport.id,raport);
+      }
     }
-    //console.log(this.userTask);
-    this.restapiService.updateUserTask(this.userTask.id, this.userTask);
+  }
+
+  finishTask(task_id:number,project_id:number){
+    for(let raport of this.userTasks){
+      if(raport.action.id == task_id && raport.projectId == project_id){
+        raport.endDate = new Date();
+        this.restapiService.updateRaport(raport.id,raport);
+      }
+    }
     this.storage.set('current_task_id', null);
     this.storage.set('current_task_title', null);
     this.getProjects();
   }
 
-  pauseTask(task_id:number){
-    let preferences:any;
-    this.restapiService.getUserPreferences().then((data) =>{
-      preferences = data;
-      for(let day of preferences){
-        console.log("preferences: "+day.day);
+  pauseTask(raport_id:number){
+    for(let raport of this.userTasks){
+      if(raport.id == raport_id){
+        raport.pausedDate = new Date();
+        raport.paused = true;
+        this.restapiService.updateRaport(raport.id,raport);
+        break;
       }
-      this.restapiService.getUserTask()
-      .then(data => {
-        this.userTasks = data;
-        this.storage.get('zalogowany_id').then((user_id) => {
-          for(let task of this.userTasks){
-            this.storage.get("current_task_id").then((id) => {
-              if(id == task.task_id){
-                this.userTask = task;
-                this.userTask.paused = true;
-                this.pausedTask.task_id = id;
-                this.pausedTask.user_id = user_id;
-                this.pausedTask.pause_date = this.today;
-                this.pausedTask.pause_hour = this.getHour();
-                this.restapiService.savePausedTask(this.pausedTask);
-                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-                this.showalert("Wstrzymano czynność.");
-              }
-            });
-          }
-        });
-      });
-    });
+    }
+    this.storage.set('current_task_id', null);
+    this.storage.set('current_task_title', null);
     this.getProjects();
   }
 
@@ -840,22 +832,10 @@ export class HomePage {
   // }
 
 
-  finishTaskPrompt(task_id:number, task_title:string, hours:any, minutes:any) {
+  finishTaskPrompt(task_id:number, project_id:number, project_name:string) {
     this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          this.storage.get("current_task_id").then((id) => {
-            if(id == task.task_id){
-              this.userTask = task;
-            }
-          });
-        }
-      });
-    });
     const alert = this.alertCtrl.create({
-      title: 'Zkończyć '+task_title+'?',
+      title: 'Zkończyć '+project_name+'?',
       buttons: [
         {
           text: 'Anuluj',
@@ -866,7 +846,7 @@ export class HomePage {
         {
           text: 'Zakończ',
           handler: () => {
-            this.finishTask(hours,minutes);
+            this.finishTask(task_id,project_id);
           }
         }
       ]
