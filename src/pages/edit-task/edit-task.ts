@@ -10,6 +10,7 @@ import { GlobalVars } from '../../app/globalVars';
 })
 export class EditTaskPage {
 
+  raportId:any;
   raports:any;
   raport:any;
   updateDate:any;
@@ -34,41 +35,6 @@ export class EditTaskPage {
     this.getRaportData();
   }
 
-  // getEditTaskData(){
-  //   this.task_id = this.navParams.get('task_id');
-  //   if(this.navParams.get('date') == undefined){
-  //     this.restapiService.getRaports(this.task_id).then(data => {
-  //       this.globalVars.setRaport(data);
-  //       this.task_name = this.globalVars.getRaport().action.name;
-  //       this.comment = this.currentComment = this.globalVars.getRaport().comment;
-  //       this.countMethod = this.globalVars.getRaport().countMethod;
-  //       this.lastUpdateTime = this.globalVars.getRaport().lastUpdateTimeOf;
-  //       if(this.globalVars.getRaport().timeOf > 60){
-  //         this.timeOfHours = (this.globalVars.getRaport().timeOf/60).toString().split(".")[0];
-  //         this.timeOfMinutes = (this.globalVars.getRaport().timeOf)-(this.timeOfHours*60);
-  //       }
-  //       else{
-  //         this.timeOfHours = 0;
-  //         this.timeOfMinutes = this.globalVars.getRaport().timeOf;
-  //       }
-  //       this.updateDate = new Date(this.globalVars.getRaport().lastUpdateDate).toLocaleDateString().concat(" ".
-  //                         concat(new Date(this.globalVars.getRaport().lastUpdateDate).getHours().toString().concat(":".
-  //                         concat(new Date(this.globalVars.getRaport().lastUpdateDate).getMinutes().toString()))));
-  //       this.startDate = new Date(this.globalVars.getRaport().startDate).toLocaleDateString().concat(" ".
-  //                         concat(new Date(this.globalVars.getRaport().startDate).getHours().toString().concat(":".
-  //                         concat(new Date(this.globalVars.getRaport().startDate).getMinutes().toString()))));
-                          
-  //     });
-  //   }
-  //   else{
-  //     // this.restapiService.getRaports(this.task_id).then(data => {
-  //     //   this.globalVars.setRaport(data);
-  //     //   this.task_name = this.globalVars.getRaport().action.name;
-  //     //   console.log("globalVars.getRaport(): "+this.globalVars.getRaport());
-  //     // });
-  //   }
-  // }
-
   getHour(){
     var minutes = new Date().getMinutes();
     if(minutes < 10){
@@ -79,34 +45,13 @@ export class EditTaskPage {
     }
   }
 
-// updateTask(){
-//   if(this.updateTime != undefined && this.updateTime != '' && isNaN(Number(this.updateTime)) == true){
-//     this.showalert("Wpisz liczbę!");
-//   }
-//   else if(this.updateTime != undefined && this.updateTime != '' && Number(this.updateTime) !== parseInt(this.updateTime, 10)){
-//     this.showalert("Wpisz pełną godzine!");
-//   }
-//   else{
-//     console.log(this.globalVars.getRaport());
-//     if((this.updateTime != undefined && this.updateTime != '') || this.globalVars.getRaport().comment != this.comment){
-//       if(this.globalVars.getRaport().comment != this.comment) this.globalVars.setComment(this.comment);
-//       if(this.globalVars.getRaport().timeOf != this.updateTime && this.updateTime != undefined){
-//         console.log(this.globalVars.getRaport().timeOf+" "+this.updateTime);
-//         this.globalVars.setTimeOf((Number(this.updateTime)*60) + Number(this.globalVars.getRaport().timeOf));
-//         this.globalVars.setLastUpdateTimeOf(this.updateTime);
-//         this.globalVars.setLastUpdateDate(new Date());
-//       }
-//       console.log(this.globalVars.getRaport());
-//       this.restapiService.updateRaport(this.globalVars.getRaport().id,this.globalVars.getRaport());
-//       this.showalert("Zaktualizowano czynność.");
-//     }
-//   }
-//   this.getEditTaskData();
-//   //this.events.publish('updateViewAfterEdit');
-// }
-
 getRaportData(){
-  this.raport = this.navParams.get('raport');
+  this.raportId = this.navParams.get('raportId');
+  this.restapiService.getRaports(null).then(rap => {
+    this.raports = rap;
+    for(let raport of this.raports){
+      if(this.raportId == raport.id){
+        this.raport = raport;
         this.countMethod = this.raport.countMethod;
         this.task_name = this.raport.action.name;
         this.comment = this.raport.comment;
@@ -124,11 +69,17 @@ getRaportData(){
                           concat(new Date(this.raport.lastUpdateDate).getMinutes().toString()))));
         this.startDate = new Date(this.raport.startDate).toLocaleDateString().concat(" ".
                           concat(new Date(this.raport.startDate).getHours().toString().concat(":".
-                          concat(new Date(this.raport.startDate).getMinutes().toString()))));    
+                          concat(new Date(this.raport.startDate).getMinutes().toString()))));   
+              break;
+      }
+    }
+    console.log(this.lastUpdateTimeOf);
+    console.log(this.updateDate);
+    console.log(this.timeOfHours+":"+this.timeOfMinutes);
+  }); 
 }
 
   updateTask(){
-    this.raport = this.navParams.get('raport');
     if(this.raport.countMethod == 'manual'){
       this.restapiService.getRaports(null).then(rap => {
         this.raports = rap;
@@ -139,26 +90,29 @@ getRaportData(){
               raport.lastUpdateTimeOf = this.updateTime;
               raport.timeOf = raport.timeOf + this.updateTime*60;
             }
-            console.log(raport.comment+" "+this.comment);
+            console.log(raport.comment);
+            console.log(this.comment);
             if(raport.comment != this.comment) raport.comment = this.comment;
             this.restapiService.updateRaport(raport.id,raport);
           }
         }
-        this.getRaportData();
         this.events.publish('updateViewAfterEdit');
+        this.showalert('Zaktualizowano czynność.');
+        this.navCtrl.pop();
       });
     }
-    if(this.raport.countMethod == 'automatic'){
+    else if(this.raport.countMethod == 'automatic'){
       this.restapiService.getRaports(null).then(rap => {
         this.raports = rap;
         for(let raport of this.raports){
           if(this.raport.action.id == raport.action.id && this.raport.projectId == raport.projectId){
-            raport.comment = this.comment;
+            if(raport.comment != this.comment) raport.comment = this.comment;
             this.restapiService.updateRaport(raport.id,raport);
           }
         }
-        this.getRaportData();
         this.events.publish('updateViewAfterEdit');
+        this.showalert('Zaktualizowano czynność.');
+        this.navCtrl.pop();
       });
     }
   }

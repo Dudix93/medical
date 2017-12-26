@@ -44,7 +44,37 @@ export class GlobalVars {
     "lastUpdateTimeOf":0
   }
 
+  currentTask = {
+    "id":null,
+    "name":null,
+    "raport_id":null,
+  }
+
   constructor() {
+  }
+
+  getCurrentTask() {
+    return this.currentTask;
+  }
+
+  getCurrentTaskRaportId() {
+    return this.currentTask.raport_id;
+  }
+
+  setCurrentTaskRaportId(value) {
+    this.currentTask.raport_id = value;
+  }
+
+  getCurrentTaskId() {
+    return this.currentTask.id;
+  }
+
+  setCurrentTaskId(value) {
+    this.currentTask.id = value;
+  }
+  
+  setCurrentTaskName(value) {
+    this.currentTask.name = value;
   }
 
   getProjectTasks() {
