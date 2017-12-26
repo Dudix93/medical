@@ -298,7 +298,7 @@ export class RestapiServiceProvider {
   getDayTask() {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.get(value+'/dayTask',this.headers())
+        this.http.get(value+'/dayTasks',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -311,7 +311,7 @@ export class RestapiServiceProvider {
   saveDayTask(data) {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/dayTask', data,this.headers())
+        this.http.post(value+'/dayTasks', data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -324,7 +324,7 @@ export class RestapiServiceProvider {
   deleteDayTask(id) {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/dayTask/'+id,this.headers())
+        this.http.delete(value+'/dayTasks/'+id,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -337,7 +337,7 @@ export class RestapiServiceProvider {
   updateDayTask(id,data) {
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/dayTask/'+id, data, this.headers())
+        this.http.put(value+'/dayTasks/'+id, data, this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {

@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { GlobalVars } from '../../app/globalVars';
+import { DayTask } from '../../models/dayTask';
 
 @Component({
   selector: 'page-edit-task',
@@ -80,6 +81,8 @@ getRaportData(){
 }
 
   updateTask(){
+    let dayTasks;
+    let updated = false;
     if(this.raport.countMethod == 'manual'){
       this.restapiService.getRaports(null).then(rap => {
         this.raports = rap;
@@ -89,6 +92,20 @@ getRaportData(){
             if(this.updateTime != '' && this.updateTime != undefined && this.updateTime != null){
               raport.lastUpdateTimeOf = this.updateTime;
               raport.timeOf = raport.timeOf + this.updateTime*60;
+              this.restapiService.getDayTask().then(data =>{
+                dayTasks = data;
+                for(let dayTask of dayTasks){
+                  if(new Date().toLocaleDateString() == dayTask.date && raport.action.id == dayTask.taskId){
+                    dayTask.time = Number(dayTask.time) + Number(this.updateTime);
+                    this.restapiService.updateDayTask(dayTask.id,dayTask);
+                    updated = true;
+                    break;
+                  }
+                }
+                if(updated == false){
+                  this.restapiService.saveDayTask(new DayTask(this.raport.action.id,this.raport.projectId,this.raport.userId,new Date().toLocaleDateString(),this.updateTime));
+                }
+              });
             }
             console.log(raport.comment);
             console.log(this.comment);
