@@ -5,6 +5,8 @@ export class GlobalVars {
   token:any;
   apiUrl:any;
   projectTasks:any;
+  selectedTask:any;
+  selectedProject:any;
 
   messages = new Array<any>();
   newMessages = new Array<any>();
@@ -51,6 +53,22 @@ export class GlobalVars {
   }
 
   constructor() {
+  }
+
+  setSelectedTask(value) {
+    this.selectedTask = value;
+  }
+
+  getSelectedTask() {
+    return this.selectedTask;
+  }
+
+  setSelectedProject(value) {
+    this.selectedProject = value;
+  }
+
+  getSelectedProject() {
+    return this.selectedProject;
   }
 
   getCurrentTask() {

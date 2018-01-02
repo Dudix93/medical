@@ -71,6 +71,7 @@ export class HomePage {
   } 
   pushPage = EditTaskPage;
   inProgress:boolean;
+  saveDayTask = false;
   dayTasksObjects:any;
   pausedTaskObjects:any;
   userTasks: any;
@@ -79,7 +80,7 @@ export class HomePage {
   time:number;
   firstDay:boolean;
   user: Array<any>;
-  dayTasks: Array<number>;
+  dayTasks: any;
   projects: any;
   project:any;
   unreadMsgs:any;
@@ -118,12 +119,12 @@ export class HomePage {
               this.storage.get('apiUrl').then(url =>{
                 this.globalVars.setApiUrl(url);
                 //this.getUserData();
-                this.getProjects();
+                this.getProjects(null,null);
                 // this.storage.set('unreadMsgs',null);
                 // this.storage.set('oldMessages',null);
                 this.inProgress = false;
                 this.events.subscribe('updateViewAfterEdit',()=>{
-                  this.getProjects();
+                  this.getProjects(null,null);
                 });
                 setInterval(() => {
                   this.updateCurrentTask(this.globalVars.getCurrentTaskId());
@@ -186,7 +187,6 @@ export class HomePage {
       let nju = true;
       this.restapiService.getMessages(null,null).then(data =>{
         allMsgs = data;
-        console.log('wszystkie '+allMsgs);
       }).then(() =>{
         this.storage.get('unreadMessages').then(data =>{
           unreadMsgs = data;
@@ -200,7 +200,6 @@ export class HomePage {
             if(this.oldMsgs == undefined || this.oldMsgs == null)this.storage.set('oldMessages',new Array<any>());
             this.globalVars.cleanMessages();
             for(let msg of allMsgs){
-              console.log(msg);
               nju = true;
               this.globalVars.pushMessage(new Message(
                                             msg.id,
@@ -330,7 +329,57 @@ export class HomePage {
       }
     }
 
-    getProjects(){
+    mergeDayTasks(){
+      let dayTasks;
+      let time;
+      let currentDayTaskId;
+      let currentDayTask = {
+        "taskId": null,
+        "projectId": null,
+        "date": null,
+        "time":null,
+        "userId":null,
+        "comment":null,
+      };
+      console.log(this.dayTasks);
+        for(let dt of this.dayTasks){
+          console.log('dt: '+JSON.stringify(dt));
+          if(currentDayTask.taskId == null){
+            currentDayTask.taskId = dt.taskId;
+            currentDayTask.projectId = dt.projectId;
+            currentDayTask.date = dt.date;
+            currentDayTask.time = dt.time;
+            currentDayTask.userId = dt.userId;
+            currentDayTask.comment = dt.comment;
+          }
+          else if(currentDayTask.taskId != dt.taskId || currentDayTask.projectId != dt.projectId || currentDayTask.date != dt.date){
+            console.log('nowy: '+JSON.stringify(currentDayTask));
+            this.restapiService.saveDayTask(currentDayTask).then(()=>{
+              currentDayTask.taskId = dt.taskId;
+              currentDayTask.projectId = dt.projectId;
+              currentDayTask.date = dt.date;
+              currentDayTask.time = dt.time;
+              currentDayTask.userId = dt.userId;
+              currentDayTask.comment = dt.comment;
+              if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
+                console.log('koniec: '+JSON.stringify(currentDayTask));
+                this.restapiService.saveDayTask(currentDayTask);
+              }
+            });
+          }
+          else if(currentDayTask.taskId == dt.taskId && currentDayTask.projectId == dt.projectId && currentDayTask.date == dt.date){
+            //this.restapiService.deleteDayTask(currentDayTaskId);
+            //console.log('usuwamy: '+currentDayTaskId+" "+JSON.stringify(currentDayTask));
+            currentDayTask.time = Number(currentDayTask.time) + Number(dt.time);
+            if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
+              this.restapiService.saveDayTask(currentDayTask);
+              console.log('koniec: '+JSON.stringify(currentDayTask));
+            }
+          }
+        }
+    }
+
+    getProjects(project_id:number,task_id:number){
       let userIdFound = false;
       let autoTasks = [];
       let autoTasksIds = [];
@@ -387,6 +436,10 @@ export class HomePage {
                 for(let task of autoTasks){
                   if(currentAutoTask == null){
                     currentAutoTask = task;
+                    if(project_id == task.projectId && task_id == task.action.id){
+                      this.saveDayTask = true;
+                      console.log('savedaytask true');
+                    }
                   }
                   if(currentAutoTask.action.id != task.action.id){
                     console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
@@ -397,28 +450,34 @@ export class HomePage {
                     time = 0;
                   }
                   if(index == autoTasks.length){
-                    if(task.pausedDate != null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
-                    else if(task.pausedDate == null)time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                    if(project_id == task.projectId && task_id == task.action.id)this.saveDayTask = true;
+                    if(task.pausedDate != null)time+=this.countTime(currentAutoTask.projectId,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                    else if(task.pausedDate == null)time+=this.countTime(currentAutoTask.projectId,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
                     let hours = Math.floor(time);
                     let minutes = Math.floor(60*(time - Math.floor(time)));
                     console.log('');
                     console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
                     this.userProjectTasks.push([task,this.minutesToHM(time)]);
                     this.updateRaportsTime(task.action.id,task.projectId,time*60);
+                    if(project_id != null) this.mergeDayTasks();
                     continue;
                   }
                   if(task.pausedDate != null){
-                    time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                    if(project_id == task.projectId && task_id == task.action.id)this.saveDayTask = true;
+                    time+=this.countTime(currentAutoTask.projectId,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
                     currentAutoTask = task;
                   }
                   else if(task.pausedDate == null){
-                    time+=this.countTime(task.id,this.userPreferences,new Date(task.startDate),new Date());
+                    if(project_id == task.projectId && task_id == task.action.id)this.saveDayTask = true;
+                    time+=this.countTime(currentAutoTask.projectId,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
                     currentAutoTask = task;
                   }
                   index++;
                   console.log('');
+                  this.saveDayTask = false;
                 }
                 this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
+
               });
               });
           }
@@ -626,7 +685,7 @@ export class HomePage {
           if(raport.action.id == task.id && raport.endDate == null && raport.projectId == projectId){
             this.globalVars.setCurrentTaskRaportId(raport.id);
             console.log(this.globalVars.getCurrentTask());
-            this.getProjects();
+            this.getProjects(null,null);
             break;
           }
         }
@@ -635,18 +694,28 @@ export class HomePage {
   }
 
   finishTask(task_id:number,project_id:number){
-    for(let raport of this.userTasks){
-      if(raport.action.id == task_id && raport.projectId == project_id){
-        raport.endDate = new Date();
-        this.restapiService.updateRaport(raport.id,raport);
+    let automatic = false;
+    let raports;
+    this.restapiService.getRaports(null).then(data =>{
+      raports = data;
+      for(let raport of raports){
+        if(raport.action.id == task_id && raport.projectId == project_id){
+          raport.endDate = new Date();
+          this.restapiService.updateRaport(raport.id,raport);
+          if(raport.countMethod == 'automatic')automatic = true;
+        }
       }
-    }
-    this.globalVars.setCurrentTaskId(null);
-    this.globalVars.setCurrentTaskName(null);
-    this.globalVars.setCurrentTaskRaportId(null);
-    this.getProjects();
-    this.showalert("Zakończono czynność.");
-    console.log('currentTask: '+this.globalVars.getCurrentTask());
+      this.globalVars.setCurrentTaskId(null);
+      this.globalVars.setCurrentTaskName(null);
+      this.globalVars.setCurrentTaskRaportId(null);
+      if(automatic == true){
+        this.dayTasks = new Array<any>();
+        this.getProjects(project_id,task_id);
+        //this.mergeDayTasks();
+      }
+      else this.getProjects(null,null);
+      this.showalert("Zakończono czynność.");
+    });
   }
 
   pauseTask(raport_id:number){
@@ -658,7 +727,7 @@ export class HomePage {
           this.globalVars.setCurrentTaskId(null);
           this.globalVars.setCurrentTaskName(null);
           this.globalVars.setCurrentTaskRaportId(null);
-          this.getProjects();
+          this.getProjects(null,null);
           this.showalert("Wstrzymano czynność.");
         });
         break;
@@ -685,7 +754,7 @@ export class HomePage {
 
           this.globalVars.setCurrentTaskId(this.raport.action.id);
           this.globalVars.setCurrentTaskName(this.raport.action.name);
-          this.restapiService.saveRaport(this.raport).then(() =>{this.getProjects();});
+          this.restapiService.saveRaport(this.raport).then(() =>{this.getProjects(null,null);});
           break;
           }
         }
@@ -708,13 +777,16 @@ export class HomePage {
     console.log(d.toLocaleDateString()+" "+"godz: "+start+"-"+end+" "+hours+"h "+minutes+"m");
   }
 
-  countTime(task_id:number,pref:any,startDate:Date,endDate:Date){
+  countTime(project_id:number,task_id:number,pref:any,startDate:Date,endDate:Date){
     let time = 0;
     let reportStartHour;
     let reportEndHour;
     let workStartHour;
     let workEndHour;
     let workDay;
+    let hours;
+    let minutes;
+    let dayTime;
     this.firstDay = true;
     this.userPreferences = pref;
     let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
@@ -734,6 +806,7 @@ export class HomePage {
                   let tmp;
                   
                   if(this.firstDay == true && startDate.toLocaleDateString() != endDate.toLocaleDateString()){
+                    dayTime = this.timeBetween(workEndHour,reportStartHour);
                     time += this.timeBetween(workEndHour,reportStartHour);
                     this.podgląd(d,reportStartHour,workEndHour);
                   }//pierwszy dzień, liczymy od startTask do endDay
@@ -741,15 +814,18 @@ export class HomePage {
                   else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
                     if(endDate == new Date()){//spełnione gdy nie jest spauzowane
                       if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(nowHour,reportStartHour);
                         time += this.timeBetween(nowHour,reportStartHour);
                         this.podgląd(d,reportStartHour,nowHour);
                       }
                       else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(workEndHour,reportStartHour);
                         time += this.timeBetween(workEndHour,reportStartHour);
                         this.podgląd(d,reportStartHour,workEndHour);
                       } 
                     }
                     else{
+                      dayTime = this.timeBetween(reportEndHour,reportStartHour);
                       time += this.timeBetween(reportEndHour,reportStartHour);
                       this.podgląd(d,reportStartHour,reportEndHour);
                     }
@@ -758,33 +834,42 @@ export class HomePage {
                   else if(this.firstDay == false && d.toLocaleDateString() == endDate.toLocaleDateString()){
                     if(endDate == new Date()){
                       if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(nowHour,workStartHour);
                         time += this.timeBetween(nowHour,workStartHour);
                         this.podgląd(d,workStartHour,nowHour);
                       }
                       else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(workEndHour,workStartHour);
                         time += this.timeBetween(workEndHour,workStartHour);
                         this.podgląd(d,workStartHour,workEndHour);
                       } 
                     }
                     else{
+                      dayTime = 
                       time += this.timeBetween(reportEndHour,workStartHour);
                       this.podgląd(d,workStartHour,reportEndHour);
                     }
                   }//nie pierwszy ale ostatni, bo dzisiaj
   
                   else{
+                    dayTime = 
                     time += this.timeBetween(workEndHour,workStartHour);
                     this.podgląd(d,workStartHour,workEndHour);
                   }//każdy dzień pomiędzy, liczymy od startDay do endDay
                 }
                 this.firstDay = false;
-                //this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
+                
+                hours = Math.floor(dayTime/3600000);
+                minutes = Math.floor(60*(dayTime/3600000 - Math.floor(dayTime/3600000)));
+                if(this.saveDayTask == true){
+                  this.dayTasks.push(new DayTask(task_id,project_id,this.globalVars.getUser().id,d.toLocaleDateString(),((hours*60)+minutes),null));
+                }
               }
               time = time/3600000;
-               let hours = Math.floor(time);
-               let minutes = Math.floor(60*(time - Math.floor(time)));
-               console.log("sumarycznie dla raportu: "+hours+":"+minutes);
-               return time;
+              hours = Math.floor(time);
+              minutes = Math.floor(60*(time - Math.floor(time)));
+              console.log("sumarycznie dla raportu: "+hours+":"+minutes);
+              return time;
   }
 
   timeBetween(from:string,then:string){

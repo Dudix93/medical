@@ -61,6 +61,7 @@ export class LoginPage {
     this.restapiService.getUsers()
     .then(data => {
       this.correct=false;
+      console.log(data);
       this.users = data;
       for (var user of this.users) {
         if(user.login == this.credentials.login){
@@ -77,6 +78,9 @@ export class LoginPage {
       if(this.correct == true){
         this.storage.set('isLoggedIn',true);
         this.navCtrl.push(HomePage);
+      }
+      else if(this.users.status == 0){
+        this.showToast("Nie można się połączyć z serwerem.");
       }
       else{
         this.showToast("Podałeś zły login lub hasło.");

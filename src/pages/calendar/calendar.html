@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Kalendarz</ion-title>
+    <ion-title>Zakończone czynności</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -9,42 +9,32 @@
     <ion-item>
         <ion-label>Projekt</ion-label>
         <ion-select [(ngModel)]="selectedProject">
-          <ion-option *ngFor="let project of userProjects" value="{{project.title}}">{{project.title}}</ion-option>
+          <ion-option *ngFor="let project of userProjects" value="{{project.id}}">{{project.name}}</ion-option>
         </ion-select>
     </ion-item>
     
     <ion-item *ngIf="selectedProject != null">
         <ion-label>Czynność</ion-label>
         <ion-select [(ngModel)]="selectedTask">
-          <ng-container *ngFor="let project of userProjects">
-            <ng-container *ngIf="project.title == selectedProject">
-              <ion-option *ngFor="let task of project.tasks" value="{{task.task_title}}">{{task.task_title}}</ion-option>
-            </ng-container>
+          <ng-container *ngFor="let task of userTasks">
+                <ion-option *ngIf="task.projectId == selectedProject" value="{{task.taskId}}">{{task.name}}</ion-option>
           </ng-container>
         </ion-select>
     </ion-item>
   
 
-    <ion-list *ngFor="let project of userProjects,let i = index">
-      <ng-container *ngIf="project.title == selectedProject">
-        <ion-list *ngFor="let task of project.tasks,let i = index">
-          <ng-container *ngIf="task.task_title == selectedTask">
-            <ion-grid>
+            <ion-grid *ngIf="selectedProject != null && selectedTask != null"> 
               <ion-row>
                   <ion-col col-4>Data</ion-col>
-                  <ion-col col-4>Czas(godz.)</ion-col>
+                  <ion-col col-4>Czas(H:M)</ion-col>
                   <ion-col col-4>Edytuj</ion-col>
               </ion-row>
-              <ion-row *ngFor="let dayTask of task.day_tasks">
-                  <ion-col col-4>{{dayTask.date}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask.time_update > dayTask.time_spent">{{dayTask.time_spent}} + {{dayTask.time_update - dayTask.time_spent}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask.time_update < dayTask.time_spent && dayTask.time_update != null">{{dayTask.time_spent}} - {{dayTask.time_spent - dayTask.time_update}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask.time_update == null">{{dayTask.time_spent}}</ion-col>
-                  <ion-col col-4><ion-icon name="ios-create-outline" (click)="addDayTaskToUpdate(dayTask.date,task.task_id,task.user_id,dayTask.time_spent,dayTask.description)"></ion-icon></ion-col>
+              <ion-row *ngFor="let dayTask of dayTasks">  
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask">{{dayTask['task'].date}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] == null">{{dayTask['task'].time}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['task'].time}} + {{dayTask['update'].time-dayTask['task'].time}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['task'].time}} - {{dayTask['task'].time - dayTask['update'].time}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask"><ion-icon name="ios-create-outline" (click)="addDayTaskToUpdate(dayTask['task'].date,dayTask['task'].taskId,dayTask['task'].userId,dayTask['task'].projectId,dayTask['task'].time)"></ion-icon></ion-col>
               </ion-row>
             </ion-grid>
-          </ng-container>
-        </ion-list>
-      </ng-container>
-  </ion-list>
 </ion-content>

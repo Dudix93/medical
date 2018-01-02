@@ -96,7 +96,6 @@ export class RestapiServiceProvider {
   login(data) {
       let value = this.globalVar.getApiUrl();
         return this.http.post(value+'/api/authenticate', data)
-        //return this.http.post(value+'/users', data)
         .map((response:Response) => {
           console.log("token: "+response.json().id_token);
           this.globalVar.setToken(response.json().id_token);
@@ -147,6 +146,104 @@ export class RestapiServiceProvider {
          resolve(this.data);
         });
        });
+    });
+  }
+
+  deleteUserTask(data){
+    //console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/userTask/'+data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  saveUserTask(data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/userTask', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  updateUserTask(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/userTask/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  getRaportUpdate() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.get(value+'/raportUpdate',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
+    });
+  }
+
+  deleteRaportUpdate(data){
+    //console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/raportUpdate/'+data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+  
+  saveRaportUpdate(data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/raportUpdate', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  updateRaportUpdate(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/raportUpdate/'+id, data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
     });
   }
 
@@ -298,11 +395,37 @@ export class RestapiServiceProvider {
   getDayTask() {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.get(value+'/dayTasks',this.headers())
+        this.http.get(value+'/dayTasks?_sort=date,taskId&_order=asc',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
+        });
+      });
+    });
+  }
+
+  getAutoDayTask() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/autoDayTasks?_sort=date,taskId&_order=asc',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
+
+  saveAutoDayTask(data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/autoDayTasks', data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
         });
       });
     });
@@ -321,10 +444,11 @@ export class RestapiServiceProvider {
     });
   }
 
-  deleteDayTask(id) {
+  deleteDayTask(data){
+    //console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/dayTasks/'+id,this.headers())
+        this.http.delete(value+'/dayTasks/'+data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -347,33 +471,6 @@ export class RestapiServiceProvider {
     });
   }
 
-  saveUserTask(data) {
-    //console.log(JSON.stringify(data));
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/userTask', data)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
-
-  updateUserTask(id,data) {
-    //console.log(JSON.stringify(data));
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/userTask/'+id, data, this.headers())
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
 
   deleteTask(data){
     console.log(data);
@@ -389,19 +486,6 @@ export class RestapiServiceProvider {
     });
   }
 
-  deleteUserTask(data){
-    //console.log(data);
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/userTask/'+data,this.headers())
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
 
   saveUser(data) {
     console.log(JSON.stringify(data));

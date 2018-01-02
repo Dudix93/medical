@@ -1,6 +1,7 @@
 export class UserTask {
     constructor(
-        id:any,
-        raport:any
+        public taskId:number,
+        public name:string,
+        public projectId:number,
     ){}
   }
