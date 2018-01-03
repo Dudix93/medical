@@ -7,6 +7,8 @@ export class GlobalVars {
   projectTasks:any;
   selectedTask:any;
   selectedProject:any;
+  startWorkHour:any;
+  stopWorkHour:any;
 
   messages = new Array<any>();
   newMessages = new Array<any>();
@@ -53,6 +55,22 @@ export class GlobalVars {
   }
 
   constructor() {
+  }
+
+  setStartWorkHour(value) {
+    this.startWorkHour = value;
+  }
+
+  getStartWorkHour() {
+    return this.startWorkHour;
+  }
+
+  setStopWorkHour(value) {
+    this.stopWorkHour = value;
+  }
+
+  getStopWorkHour() {
+    return this.stopWorkHour;
   }
 
   setSelectedTask(value) {

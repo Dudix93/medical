@@ -59,6 +59,12 @@ export class HomePage {
     restart_date:null,
     restart_hour:null,
   }    
+
+  currentDay = {
+    workDay:null,
+    hourFrom:null,
+    hourTo:null,
+  }   
   
   newPausedTask = {
     id:0,
@@ -127,7 +133,11 @@ export class HomePage {
                   this.getProjects(null,null);
                 });
                 setInterval(() => {
-                  this.updateCurrentTask(this.globalVars.getCurrentTaskId());
+                  this.setWorkHours();
+                  console.log(JSON.stringify(this.currentDay));
+                  if(this.currentDay.workDay == true && new Date() > new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourFrom))) && new Date() < new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourTo)))){
+                    this.updateCurrentTask(this.globalVars.getCurrentTaskId());
+                  }
                 }, 60000);
 
             // this.platform.ready().then((readySource) => {
@@ -153,9 +163,9 @@ export class HomePage {
             // }
             this.getMessages();
             if(this.platform.is('cordova')){
-              setInterval(() => {
-                this.powiadomienieCykliczne();
-              }, 120000);
+              // setInterval(() => {
+              //   this.powiadomienieCykliczne();
+              // }, 120000);
               
               setInterval(() => {
                 this.getMessages();
@@ -329,6 +339,20 @@ export class HomePage {
       }
     }
 
+    setWorkHours(){
+      this.restapiService.getUserPreferences().then(data =>{
+        this.userPreferences = data;
+        for(let p of this.userPreferences){
+          if(p.dayOfWeek == new Date().getDay()){
+            this.currentDay.workDay = p.workDay;
+            this.currentDay.hourFrom = p.hourFrom;
+            this.currentDay.hourTo = p.hourTo;
+            break;
+          }
+        }
+      });
+    }
+
     mergeDayTasks(){
       let dayTasks;
       let time;
@@ -341,7 +365,6 @@ export class HomePage {
         "userId":null,
         "comment":null,
       };
-      console.log(this.dayTasks);
         for(let dt of this.dayTasks){
           console.log('dt: '+JSON.stringify(dt));
           if(currentDayTask.taskId == null){
@@ -361,6 +384,7 @@ export class HomePage {
               currentDayTask.time = dt.time;
               currentDayTask.userId = dt.userId;
               currentDayTask.comment = dt.comment;
+              console.log('nadpisanie: '+JSON.stringify(currentDayTask));
               if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
                 console.log('koniec: '+JSON.stringify(currentDayTask));
                 this.restapiService.saveDayTask(currentDayTask);
@@ -376,6 +400,8 @@ export class HomePage {
               console.log('koniec: '+JSON.stringify(currentDayTask));
             }
           }
+          console.log('currentTask: '+JSON.stringify(currentDayTask));
+          console.log('');
         }
     }
 
@@ -711,7 +737,6 @@ export class HomePage {
       if(automatic == true){
         this.dayTasks = new Array<any>();
         this.getProjects(project_id,task_id);
-        //this.mergeDayTasks();
       }
       else this.getProjects(null,null);
       this.showalert("Zakończono czynność.");
