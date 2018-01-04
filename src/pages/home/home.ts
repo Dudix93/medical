@@ -133,14 +133,17 @@ export class HomePage {
                   this.getProjects(null,null);
                 });
                 setInterval(() => {
-                  this.setWorkHours();
-                  console.log(JSON.stringify(this.currentDay));
-                  if(this.currentDay.workDay == true && new Date() > new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourFrom))) && new Date() < new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourTo)))){
-                    this.updateCurrentTask(this.globalVars.getCurrentTaskId());
+                  if(this.globalVars.getCurrentTaskId() != null){
+                    this.setWorkHours();
+                    //console.log(JSON.stringify(this.currentDay));
+                    if(this.currentDay.workDay == true && new Date() > new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourFrom))) && new Date() < new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourTo)))){
+                      this.updateCurrentTask(this.globalVars.getCurrentTaskId());
+                      console.log('czas++');
+                    }
                   }
                 }, 60000);
 
-            // this.platform.ready().then((readySource) => {
+            // this.platform.ready().then((readySource) => {`
             //   this.localNotifications.on('click', (notification, state) => {
             //     let json = JSON.parse(notification.data);
            
@@ -365,8 +368,9 @@ export class HomePage {
         "userId":null,
         "comment":null,
       };
+      let currentDayTaskObjects = new Array<any>();
         for(let dt of this.dayTasks){
-          console.log('dt: '+JSON.stringify(dt));
+          console.log('dt: '+currentDayTask.date+" "+currentDayTask.time);
           if(currentDayTask.taskId == null){
             currentDayTask.taskId = dt.taskId;
             currentDayTask.projectId = dt.projectId;
@@ -376,32 +380,33 @@ export class HomePage {
             currentDayTask.comment = dt.comment;
           }
           else if(currentDayTask.taskId != dt.taskId || currentDayTask.projectId != dt.projectId || currentDayTask.date != dt.date){
-            console.log('nowy: '+JSON.stringify(currentDayTask));
-            this.restapiService.saveDayTask(currentDayTask).then(()=>{
-              currentDayTask.taskId = dt.taskId;
-              currentDayTask.projectId = dt.projectId;
-              currentDayTask.date = dt.date;
-              currentDayTask.time = dt.time;
-              currentDayTask.userId = dt.userId;
-              currentDayTask.comment = dt.comment;
-              console.log('nadpisanie: '+JSON.stringify(currentDayTask));
-              if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
-                console.log('koniec: '+JSON.stringify(currentDayTask));
-                this.restapiService.saveDayTask(currentDayTask);
-              }
-            });
+            console.log('nowy: '+currentDayTask.date+" "+currentDayTask.time);
+            currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+                currentDayTask.taskId = dt.taskId;
+                currentDayTask.projectId = dt.projectId;
+                currentDayTask.date = dt.date;
+                currentDayTask.time = dt.time;
+                currentDayTask.userId = dt.userId;
+                currentDayTask.comment = dt.comment;
+                console.log('nadpisanie: '+currentDayTask.date+" "+currentDayTask.time);
+                if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
+                  console.log('koniec: '+currentDayTask.date+" "+currentDayTask.time);
+                  currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+                }
           }
           else if(currentDayTask.taskId == dt.taskId && currentDayTask.projectId == dt.projectId && currentDayTask.date == dt.date){
-            //this.restapiService.deleteDayTask(currentDayTaskId);
-            //console.log('usuwamy: '+currentDayTaskId+" "+JSON.stringify(currentDayTask));
             currentDayTask.time = Number(currentDayTask.time) + Number(dt.time);
             if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
-              this.restapiService.saveDayTask(currentDayTask);
-              console.log('koniec: '+JSON.stringify(currentDayTask));
+              currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+              console.log('koniec: '+currentDayTask.date+" "+currentDayTask.time);
             }
           }
-          console.log('currentTask: '+JSON.stringify(currentDayTask));
+          console.log('currentTask: '+currentDayTask.date+" "+currentDayTask.time);
           console.log('');
+        }
+        for(let dt of currentDayTaskObjects){
+          console.log(dt);
+          this.restapiService.saveDayTask(dt);
         }
     }
 
