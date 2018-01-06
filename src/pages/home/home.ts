@@ -293,8 +293,14 @@ export class HomePage {
     }
 
     minutesToHM(time:number){
+      let Minutes;
       let hours = Math.floor(time);
       let minutes = Math.floor(60*(time - Math.floor(time)));
+      if(minutes < 10){
+        Minutes = '0'.concat(minutes.toString());
+        return hours.toString().concat(':'.concat(Minutes.toString()));
+      }
+      else
       return hours.toString().concat(':'.concat(minutes.toString()));
     }
 
