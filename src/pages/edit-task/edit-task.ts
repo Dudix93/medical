@@ -78,6 +78,13 @@ export class EditTaskPage {
     });
   }
 
+  fullMinutes(m:number){
+    if(m<10){
+      return '0'.concat(m.toString());
+    }
+    else return m.toString();
+  }
+
 getRaportData(){
   this.raportId = this.navParams.get('raportId');
   this.restapiService.getRaports(null).then(rap => {
@@ -99,10 +106,10 @@ getRaportData(){
         }
         this.updateDate = new Date(this.raport.lastUpdateDate).toLocaleDateString().concat(" ".
                           concat(new Date(this.raport.lastUpdateDate).getHours().toString().concat(":".
-                          concat(new Date(this.raport.lastUpdateDate).getMinutes().toString()))));
+                          concat(this.fullMinutes(new Date(this.raport.lastUpdateDate).getMinutes())))));
         this.startDate = new Date(this.raport.startDate).toLocaleDateString().concat(" ".
                           concat(new Date(this.raport.startDate).getHours().toString().concat(":".
-                          concat(new Date(this.raport.startDate).getMinutes().toString()))));   
+                          concat(this.fullMinutes(new Date(this.raport.startDate).getMinutes())))));   
               break;
       }
     }
