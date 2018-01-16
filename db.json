@@ -1,70 +1,6 @@
 {
   "raports": [
     {
-      "id": 6251,
-      "timeOf": 164,
-      "startDate": "2017-12-07T09:00:07+01:00",
-      "endDate": "2017-12-21T11:24:27.237Z",
-      "comment": "komentarz dotyczący testowania ",
-      "action": {
-        "id": 1051,
-        "name": "Testowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-07T09:31:07+01:00",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1452
-    },
-    {
-      "id": 6661,
-      "timeOf": 1740,
-      "startDate": "2017-12-15T10:00:07+01:00",
-      "endDate": "2017-12-20T16:43:00.548Z",
-      "comment": "komentarz dotyczący implementacji",
-      "action": {
-        "id": 23,
-        "name": "Implementacja"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-15T11:00:07+01:00",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1452
-    },
-    {
-      "id": 666,
-      "timeOf": 1740,
-      "startDate": "2017-12-15T13:00:07+01:00",
-      "endDate": "2017-12-20T16:43:00.548Z",
-      "comment": "komentarz dotyczący implementacji",
-      "action": {
-        "id": 23,
-        "name": "Implementacja"
-      },
-      "countMethod": "automatic",
-      "pausedDate": null,
-      "paused": false,
-      "userId": 4,
-      "projectId": 1452
-    },
-    {
-      "id": 6252,
-      "timeOf": 164,
-      "startDate": "2017-12-15T10:00:07+01:00",
-      "endDate": "2017-12-21T11:24:27.237Z",
-      "comment": "komentarz dotyczący testowania ",
-      "action": {
-        "id": 1051,
-        "name": "Testowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-15T11:00:07+01:00",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1452
-    },
-    {
       "id": 6253,
       "timeOf": 62,
       "startDate": "2017-12-09T09:31:07+01:00",
@@ -79,22 +15,6 @@
       "paused": false,
       "userId": 4,
       "projectId": 1452
-    },
-    {
-      "timeOf": 164,
-      "startDate": "2017-12-21T08:38:35.558Z",
-      "endDate": "2017-12-21T11:24:27.237Z",
-      "comment": "komentarz dotyczący testowania ",
-      "action": {
-        "id": 1051,
-        "name": "Testowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": null,
-      "paused": false,
-      "userId": 4,
-      "projectId": 1452,
-      "id": 6662
     },
     {
       "timeOf": 840,
@@ -115,122 +35,58 @@
       "lastUpdateTimeOf": "3"
     },
     {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Fri, 22 Dec 2017 20:16:02 GMT",
+      "timeOf": 2806,
+      "startDate": "Fri, 22 Dec 2017 13:16:02 GMT",
       "endDate": null,
-      "comment": "komemtarz do projektowania",
+      "comment": "",
       "action": {
         "id": 1053,
         "name": "projektowanie"
       },
       "countMethod": "automatic",
-      "pausedDate": "2017-12-22T20:26:08.217Z",
+      "pausedDate": "2017-12-27T14:34:52.309Z",
       "paused": true,
       "userId": 4,
       "projectId": 1451,
       "id": 6664
     },
     {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Fri, 22 Dec 2017 21:22:03 GMT",
+      "timeOf": 2814.0000000000005,
+      "startDate": "2017-12-27T14:34:52.309Z",
       "endDate": null,
-      "comment": "komemtarz do projektowania",
+      "comment": "",
       "action": {
         "id": 1053,
         "name": "projektowanie"
       },
       "countMethod": "automatic",
-      "pausedDate": "2017-12-22T21:34:52.309Z",
+      "pausedDate": "2017-12-27T16:00:52.309Z",
       "paused": true,
       "userId": 4,
       "projectId": 1451,
       "id": 6665
     },
     {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Fri, 22 Dec 2017 21:35:27 GMT",
+      "timeOf": 2814.0000000000005,
+      "startDate": "Mon, 25 Dec 2017 08:53:13 GMT",
       "endDate": null,
-      "comment": "komemtarz do projektowania",
+      "comment": "",
       "action": {
         "id": 1053,
         "name": "projektowanie"
       },
       "countMethod": "automatic",
-      "pausedDate": "2017-12-22T21:37:27.307Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6666
-    },
-    {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Fri, 22 Dec 2017 21:37:30 GMT",
-      "endDate": null,
-      "comment": "komemtarz do projektowania",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-23T18:30:06.943Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6667
-    },
-    {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Mon, 25 Dec 2017 16:29:57 GMT",
-      "endDate": null,
-      "comment": "komemtarz do projektowania",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-25T16:33:21.998Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6668
-    },
-    {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Mon, 25 Dec 2017 16:57:42 GMT",
-      "endDate": null,
-      "comment": "komemtarz do projektowania",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-25T16:58:03.445Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6670
-    },
-    {
-      "timeOf": 2036.0000000000002,
-      "startDate": "Mon, 25 Dec 2017 23:53:13 GMT",
-      "endDate": null,
-      "comment": "komemtarz do projektowania",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-26T21:27:53.358Z",
+      "pausedDate": "2017-12-26T12:27:53.358Z",
       "paused": true,
       "userId": 4,
       "projectId": 1451,
       "id": 6672
     },
     {
-      "timeOf": 5400,
-      "startDate": "Tue, 26 Dec 2017 21:27:58 GMT",
-      "endDate": null,
-      "comment": "komentarz do dodo implementacji",
+      "timeOf": 660,
+      "startDate": "Sat, 06 Jan 2018 15:03:41 GMT",
+      "endDate": "2018-01-06T16:35:45.918Z",
+      "comment": "komentarz dotyczacy implementacji powiadomien",
       "action": {
         "id": 1052,
         "name": "implementacja"
@@ -241,8 +97,40 @@
       "userId": 4,
       "projectId": 1452,
       "id": 6673,
-      "lastUpdateDate": "2017-12-28T18:14:13.027Z",
-      "lastUpdateTimeOf": "4"
+      "lastUpdateDate": "2018-01-06T16:34:50.637Z",
+      "lastUpdateTimeOf": "1"
+    },
+    {
+      "timeOf": 2814.0000000000005,
+      "startDate": "Tue, 09 Jan 2018 09:32:33 GMT",
+      "endDate": null,
+      "comment": "",
+      "action": {
+        "id": 1053,
+        "name": "projektowanie"
+      },
+      "countMethod": "automatic",
+      "pausedDate": "2018-01-10T23:36:39.010Z",
+      "paused": true,
+      "userId": 4,
+      "projectId": 1451,
+      "id": 6674
+    },
+    {
+      "timeOf": 2814.0000000000005,
+      "startDate": "Mon, 15 Jan 2018 20:43:14 GMT",
+      "endDate": null,
+      "comment": "",
+      "action": {
+        "id": 1053,
+        "name": "projektowanie"
+      },
+      "countMethod": "automatic",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "projectId": 1451,
+      "id": 6675
     }
   ],
   "projects": [
@@ -476,14 +364,14 @@
     {
       "id": 0,
       "dayOfWeek": 0,
-      "hourFrom": "08:00",
-      "hourTo": "20:00",
-      "workDay": true
+      "hourFrom": "10:00",
+      "hourTo": "15:00",
+      "workDay": false
     },
     {
       "id": 1,
       "dayOfWeek": 1,
-      "hourFrom": "09:00",
+      "hourFrom": "08:00",
       "hourTo": "16:00",
       "workDay": true
     },
@@ -491,28 +379,28 @@
       "id": 2,
       "dayOfWeek": 2,
       "hourFrom": "08:00",
-      "hourTo": "23:00",
+      "hourTo": "16:00",
       "workDay": true
     },
     {
       "id": 3,
       "dayOfWeek": 3,
-      "hourFrom": "13:00",
-      "hourTo": "16:00",
+      "hourFrom": "08:00",
+      "hourTo": "11:00",
       "workDay": true
     },
     {
       "id": 4,
       "dayOfWeek": 4,
       "hourFrom": "08:00",
-      "hourTo": "22:00",
+      "hourTo": "16:00",
       "workDay": true
     },
     {
       "id": 5,
       "dayOfWeek": 5,
       "hourFrom": "08:00",
-      "hourTo": "23:00",
+      "hourTo": "16:00",
       "workDay": true
     },
     {
@@ -520,7 +408,7 @@
       "dayOfWeek": 6,
       "hourFrom": "08:00",
       "hourTo": "16:00",
-      "workDay": true
+      "workDay": false
     }
   ],
   "dayTasks": [
@@ -531,7 +419,7 @@
       "date": "23.12.2017",
       "time": 21,
       "id": 1,
-      "comment": "komentarz do dodo implementacji"
+      "comment": null
     },
     {
       "taskId": 1052,
@@ -540,19 +428,67 @@
       "date": "26.12.2017",
       "time": 13,
       "id": 2,
-      "comment": "komentarz do dodo implementacji"
+      "comment": null
     },
     {
       "taskId": 1052,
       "projectId": 1452,
       "userId": 4,
       "date": "28.12.2017",
-      "comment": "komentarz do dodo implementacji",
+      "comment": null,
       "id": 3,
       "time": 18
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "5.01.2018",
+      "time": "1",
+      "comment": null,
+      "id": 4
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "6.01.2018",
+      "time": "4",
+      "comment": null,
+      "id": 5
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "1/6/2018",
+      "time": 7,
+      "comment": "komentarz dotyczacy implementacji powiadomien",
+      "id": 6
     }
   ],
-  "raportUpdate": [],
+  "raportUpdate": [
+    {
+      "date": "23.12.2017",
+      "taskId": 1052,
+      "userId": 4,
+      "projectId": 1452,
+      "time": "25",
+      "comment": "komentarz do dodo implementacji",
+      "updateDate": "2018-01-05T21:30:20.544Z",
+      "id": 1
+    },
+    {
+      "date": "28.12.2017",
+      "taskId": 1052,
+      "userId": 4,
+      "projectId": 1452,
+      "time": "11",
+      "comment": "komentarz dotyczacy implementacji powiadomien",
+      "updateDate": "2018-01-10T23:33:32.091Z",
+      "id": 2
+    }
+  ],
   "statements": [
     {
       "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
@@ -562,7 +498,7 @@
     },
     {
       "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
-      "id": 13,
+      "id": 133,
       "sendDate": "2017-12-14T13:34:00+01:00",
       "title": "Przerwa techniczna"
     },
@@ -571,6 +507,12 @@
       "id": 12,
       "sendDate": "2017-12-14T15:00:00+01:00",
       "title": "Lista praktykantów"
+    },
+    {
+      "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
+      "id": 144,
+      "sendDate": "2018-01-04T10:45:00+01:00",
+      "title": "Termin drugiej tury stażu"
     }
   ]
 }
