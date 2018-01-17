@@ -49,6 +49,17 @@ export class CalendarPage {
               // });
   }
 
+  minutesToHM(time:number){
+    let Minutes;
+    let hours = Math.floor(time);
+    let minutes = Math.floor(60*(time - Math.floor(time)));
+    if(minutes < 10){
+      Minutes = '0'.concat(minutes.toString());
+      return hours.toString().concat(':'.concat(Minutes.toString()));
+    }
+    else
+    return hours.toString().concat(':'.concat(minutes.toString()));
+  }
 
   getProjects(){
     if(this.globalVars.getSelectedProject() != undefined) this.selectedProject = this.globalVars.getSelectedProject();
@@ -58,21 +69,37 @@ export class CalendarPage {
     this.restapiService.getDayTask().then(data =>{
       this.dayTasks = data;
       for(let day of this.dayTasks){
-        this.dayTasks[this.dayTasks.indexOf(day)] = {'update':null,'task':day}
+        this.dayTasks[this.dayTasks.indexOf(day)] = {
+          'update':null,
+          'task':day,
+          'full_time':null,
+          'full_update_time':null,
+          'difference':null}
       }
     });
     this.restapiService.getRaportUpdate().then(data =>{
-      console.log('pobieramy updaty');
       this.raportUpdates = data;
       for(let day of this.dayTasks){
         for(let update of this.raportUpdates){
           if(update.taskId == day['task'].taskId && update.date == day['task'].date && update.projectId == day['task'].projectId){
             this.dayTasks[this.dayTasks.indexOf(day)]['update'] = update;
+            this.dayTasks[this.dayTasks.indexOf(day)]['full_update_time'] = this.minutesToHM(update.time);
+            if(this.dayTasks[this.dayTasks.indexOf(day)]['task'].time > this.dayTasks[this.dayTasks.indexOf(day)]['update'].time){
+              this.dayTasks[this.dayTasks.indexOf(day)]['difference'] = this.dayTasks[this.dayTasks.indexOf(day)]['task'].time - this.dayTasks[this.dayTasks.indexOf(day)]['update'].time;
+            }
+            else if(this.dayTasks[this.dayTasks.indexOf(day)]['task'].time < this.dayTasks[this.dayTasks.indexOf(day)]['update'].time){
+              this.dayTasks[this.dayTasks.indexOf(day)]['difference'] = this.dayTasks[this.dayTasks.indexOf(day)]['update'].time - this.dayTasks[this.dayTasks.indexOf(day)]['task'].time;
+            }
+            this.dayTasks[this.dayTasks.indexOf(day)]['difference'] = this.minutesToHM(this.dayTasks[this.dayTasks.indexOf(day)]['difference']);
             console.log(this.dayTasks);
             break;
           }
         }
+        day['full_time'] = this.minutesToHM(day['task'].time);
       }
+      // for(let dt of this.dayTasks){
+      //   dt['full_time'] = this.minutesToHM(dt['task'].time);
+      // }
     });
     this.restapiService.getProjects().then(data =>{
       this.userProjects = data;
@@ -98,6 +125,7 @@ export class CalendarPage {
       });
     });
   }
+  
   addDayTaskToUpdate(date:string,task_id:number,user_id:number,project_id:number,time:number){
     this.taskToEdit.date = date;
     this.taskToEdit.task_id = task_id;

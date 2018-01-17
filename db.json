@@ -35,54 +35,6 @@
       "lastUpdateTimeOf": "3"
     },
     {
-      "timeOf": 2806,
-      "startDate": "Fri, 22 Dec 2017 13:16:02 GMT",
-      "endDate": null,
-      "comment": "",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-27T14:34:52.309Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6664
-    },
-    {
-      "timeOf": 2814.0000000000005,
-      "startDate": "2017-12-27T14:34:52.309Z",
-      "endDate": null,
-      "comment": "",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-27T16:00:52.309Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6665
-    },
-    {
-      "timeOf": 2814.0000000000005,
-      "startDate": "Mon, 25 Dec 2017 08:53:13 GMT",
-      "endDate": null,
-      "comment": "",
-      "action": {
-        "id": 1053,
-        "name": "projektowanie"
-      },
-      "countMethod": "automatic",
-      "pausedDate": "2017-12-26T12:27:53.358Z",
-      "paused": true,
-      "userId": 4,
-      "projectId": 1451,
-      "id": 6672
-    },
-    {
       "timeOf": 660,
       "startDate": "Sat, 06 Jan 2018 15:03:41 GMT",
       "endDate": "2018-01-06T16:35:45.918Z",
@@ -101,36 +53,54 @@
       "lastUpdateTimeOf": "1"
     },
     {
-      "timeOf": 2814.0000000000005,
-      "startDate": "Tue, 09 Jan 2018 09:32:33 GMT",
+      "timeOf": 2674,
+      "startDate": "2018-01-03T09:30:31.296Z",
       "endDate": null,
-      "comment": "",
+      "comment": null,
       "action": {
         "id": 1053,
         "name": "projektowanie"
       },
       "countMethod": "automatic",
-      "pausedDate": "2018-01-10T23:36:39.010Z",
+      "pausedDate": "2018-01-03T15:50:04.849Z",
       "paused": true,
       "userId": 4,
       "projectId": 1451,
       "id": 6674
     },
     {
-      "timeOf": 2814.0000000000005,
-      "startDate": "Mon, 15 Jan 2018 20:43:14 GMT",
+      "timeOf": 2674,
+      "startDate": "2018-01-04T08:31:31.296Z",
       "endDate": null,
-      "comment": "",
+      "comment": null,
       "action": {
         "id": 1053,
         "name": "projektowanie"
       },
       "countMethod": "automatic",
-      "pausedDate": null,
-      "paused": false,
+      "pausedDate": "2018-01-10T14:45:04.849Z",
+      "paused": true,
       "userId": 4,
       "projectId": 1451,
       "id": 6675
+    },
+    {
+      "timeOf": 300,
+      "startDate": "2018-01-16T18:08:21.401Z",
+      "endDate": null,
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "action": {
+        "id": 1051,
+        "name": "testowanie"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "projectId": 1452,
+      "id": 6676,
+      "lastUpdateDate": "2018-01-16T18:44:32.833Z",
+      "lastUpdateTimeOf": "2"
     }
   ],
   "projects": [
@@ -465,6 +435,15 @@
       "time": 7,
       "comment": "komentarz dotyczacy implementacji powiadomien",
       "id": 6
+    },
+    {
+      "taskId": 1051,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "16.01.2018",
+      "time": 5,
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "id": 7
     }
   ],
   "raportUpdate": [

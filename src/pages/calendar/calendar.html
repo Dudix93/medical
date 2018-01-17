@@ -31,9 +31,9 @@
               </ion-row>
               <ion-row *ngFor="let dayTask of dayTasks">  
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask">{{dayTask['task'].date}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] == null">{{dayTask['task'].time}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['task'].time}} + {{dayTask['update'].time-dayTask['task'].time}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['task'].time}} - {{dayTask['task'].time - dayTask['update'].time}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] == null">{{dayTask['full_time']}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['full_time']}} + {{dayTask['difference']}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['full_time']}} - {{dayTask['difference']}}</ion-col>
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask"><ion-icon name="ios-create-outline" (click)="addDayTaskToUpdate(dayTask['task'].date,dayTask['task'].taskId,dayTask['task'].userId,dayTask['task'].projectId,dayTask['task'].time)"></ion-icon></ion-col>
               </ion-row>
             </ion-grid>
