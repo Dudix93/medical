@@ -85,9 +85,9 @@
       "id": 6675
     },
     {
-      "timeOf": 300,
+      "timeOf": 660,
       "startDate": "2018-01-16T18:08:21.401Z",
-      "endDate": null,
+      "endDate": "2018-01-17T14:33:58.539Z",
       "comment": "komentarz do testowania bla bla wubaluba bla bla",
       "action": {
         "id": 1051,
@@ -99,8 +99,8 @@
       "userId": 4,
       "projectId": 1452,
       "id": 6676,
-      "lastUpdateDate": "2018-01-16T18:44:32.833Z",
-      "lastUpdateTimeOf": "2"
+      "lastUpdateDate": "2018-01-17T14:33:46.711Z",
+      "lastUpdateTimeOf": "6"
     }
   ],
   "projects": [
@@ -444,28 +444,47 @@
       "time": 5,
       "comment": "komentarz do testowania bla bla wubaluba bla bla",
       "id": 7
+    },
+    {
+      "taskId": 1051,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "17.01.2018",
+      "time": "6",
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "id": 8
     }
   ],
   "raportUpdate": [
     {
       "date": "23.12.2017",
       "taskId": 1052,
-      "userId": 4,
+      "userId": 0,
       "projectId": 1452,
-      "time": "25",
-      "comment": "komentarz do dodo implementacji",
-      "updateDate": "2018-01-05T21:30:20.544Z",
+      "time": "15",
+      "comment": null,
+      "updateDate": "2018-01-19T12:34:15.326Z",
       "id": 1
     },
     {
       "date": "28.12.2017",
       "taskId": 1052,
-      "userId": 4,
+      "userId": 0,
       "projectId": 1452,
-      "time": "11",
-      "comment": "komentarz dotyczacy implementacji powiadomien",
-      "updateDate": "2018-01-10T23:33:32.091Z",
+      "time": "30",
+      "comment": null,
+      "updateDate": "2018-01-19T12:34:36.076Z",
       "id": 2
+    },
+    {
+      "date": "17.01.2018",
+      "taskId": 1051,
+      "userId": 0,
+      "projectId": 1452,
+      "time": "2",
+      "comment": null,
+      "updateDate": "2018-01-19T12:42:26.799Z",
+      "id": 3
     }
   ],
   "statements": [

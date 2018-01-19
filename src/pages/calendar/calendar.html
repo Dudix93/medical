@@ -15,7 +15,7 @@
     
     <ion-item *ngIf="selectedProject != null">
         <ion-label>Czynność</ion-label>
-        <ion-select [(ngModel)]="selectedTask">
+        <ion-select [(ngModel)]="selectedTask" (ngModelChange)="getCurrentComments(selectedProject,selectedTask)">
           <ng-container *ngFor="let task of userTasks">
                 <ion-option *ngIf="task.projectId == selectedProject" value="{{task.taskId}}">{{task.name}}</ion-option>
           </ng-container>
@@ -25,16 +25,54 @@
 
             <ion-grid *ngIf="selectedProject != null && selectedTask != null"> 
               <ion-row>
-                  <ion-col col-4>Data</ion-col>
-                  <ion-col col-4>Czas(H:M)</ion-col>
-                  <ion-col col-4>Edytuj</ion-col>
+                  <ion-col col-4 class="title">Data</ion-col>
+                  <ion-col col-4 class="title">Czas(H:M)</ion-col>
+                  <ion-col col-2 class="title">Edytuj</ion-col>
+                  <ion-col col-2 class="title"></ion-col>
               </ion-row>
-              <ion-row *ngFor="let dayTask of dayTasks">  
+              <ion-row *ngFor="let dayTask of dayTasks"> 
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask">{{dayTask['task'].date}}</ion-col>
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] == null">{{dayTask['full_time']}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['full_time']}} + {{dayTask['difference']}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['full_time']}} - {{dayTask['difference']}}</ion-col>
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask"><ion-icon name="ios-create-outline" (click)="addDayTaskToUpdate(dayTask['task'].date,dayTask['task'].taskId,dayTask['task'].userId,dayTask['task'].projectId,dayTask['task'].time)"></ion-icon></ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['full_time']}} <span class="plus">+ {{dayTask['difference']}}</span></ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['full_time']}} <span class="minus">- {{dayTask['difference']}}</span></ion-col>
+                  <ion-col col-2 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask"><ion-icon name="ios-create-outline" (click)="updateTimePrompt(selectedTask,dayTask['task'])"></ion-icon></ion-col>
+                  <ion-col col-2 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null"><button ion-button class="cancel_button" (click)="cancelUpdate(dayTask['update'].id)">Anuluj</button></ion-col>
               </ion-row>
             </ion-grid>
+
+            <ng-container *ngIf="selectedProject != null && selectedTask != null">
+                <ion-item text-wrap *ngIf="comment != null">
+                  <span class="title">Aktualny komentarz:</span><br>   
+                  {{comment}}
+                </ion-item>
+                <ion-item *ngIf="comment == null">
+                        <span class="info">Brak komentarza dla wybranej czynności.</span>   
+                </ion-item>
+
+                <ion-item text-wrap *ngIf="updatedComment != null && updatedComment != ''">
+                    <span class="title">Zaktualizowany komentarz:</span><br>    
+                    {{updatedComment}}
+                </ion-item> 
+                <ion-item *ngIf="updatedComment == null">
+                        <span class="info">Nie aktualizowano komentarza.</span>   
+                </ion-item>
+                <ion-item *ngIf="updatedComment == ''">
+                        <span class="alert-info">Zarządano wyczyszczenia komentarza.</span>   
+                </ion-item>   
+
+            <form>  
+                <ion-item>
+                    <ion-label floating>Aktualizuj komentarz</ion-label>
+                    <ion-input type="text" [(ngModel)]="updateComment" name="updateComment" clearInput></ion-input>        
+                </ion-item> 
+            </form>
+            <button ion-button (click)="commentUpdate(selectedProject,selectedTask,false)" disabled *ngIf="updateComment == null || updateComment == ''">Aktualizuj</button>
+            <button ion-button (click)="commentUpdate(selectedProject,selectedTask,false)" type="submit" *ngIf="updateComment != null && updateComment != ''">Aktualizuj</button>
+
+            <button ion-button *ngIf="updateComment == null" disabled>Anuluj<br>zmiany</button>
+            <button ion-button *ngIf="updateComment != null || updatedComment == ''" (click)="cancelCommentUpdate(selectedProject,selectedTask)">Anuluj<br>zmiany</button>
+            
+            <button ion-button *ngIf="comment != null && updatedComment != ''" (click)="commentUpdate(selectedProject,selectedTask,true)">Wyczyść<br>komentarz</button>
+            <button ion-button *ngIf="comment == null || updatedComment == ''" disabled>Wyczyść<br>komentarz</button>
+          </ng-container>
 </ion-content>

@@ -596,7 +596,7 @@ export class HomePage {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
         {
-          text: 'Czynności skończone',
+          text: 'Zakończone czynności',
           icon:'md-calendar',
           handler: () => {
             this.pushCalendarPage();
