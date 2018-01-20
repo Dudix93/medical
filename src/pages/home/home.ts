@@ -119,6 +119,7 @@ export class HomePage {
               private events: Events,
               public globalVars:GlobalVars,
               public push:Push) { 
+                //this.storage.clear();
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
             this.storage.get('zalogowany').then((val) => {
@@ -191,11 +192,15 @@ export class HomePage {
 
 
     getMessages(){
+      // this.storage.set('deletedMessages',undefined);
+      // this.storage.set('unreadMessages',undefined);
+      // this.storage.set('oldMessages',undefined);
       this.newMsgs = new Array<any>();
       let allMsgs;
       let currentMsg;
       let unreadMsgs;
       let oldMsgs;
+      let deletedMsgs;
       let nju = true;
       this.restapiService.getMessages(null,null).then(data =>{
         allMsgs = data;
@@ -206,71 +211,90 @@ export class HomePage {
         }).then(() =>{
           this.storage.get('oldMessages').then(data => {
             oldMsgs = data;
-            if(unreadMsgs != undefined)this.amountNewMessages = unreadMsgs.length;
-            this.unreadMsgs = unreadMsgs;
-            this.oldMsgs = oldMsgs;
-            if(this.unreadMsgs == undefined || this.unreadMsgs == null)this.storage.set('unreadMessages',new Array<any>());
-            if(this.oldMsgs == undefined || this.oldMsgs == null)this.storage.set('oldMessages',new Array<any>());
-            this.globalVars.cleanMessages();
-            for(let msg of allMsgs){
-              nju = true;
-              this.globalVars.pushMessage(new Message(
-                                            msg.id,
-                                            msg.title,
-                                            msg.content,
-                                            new Date(msg.sendDate).toLocaleDateString(),
-                                            new Date(msg.sendDate).getHours().toString()
-                                            .concat(':'
-                                            .concat(new Date(msg.sendDate).getMinutes()<10?
-                                            '0'.concat(new Date(msg.sendDate).getMinutes().toString())
-                                            :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
-              
-                currentMsg = this.globalVars.getMessages()[(this.globalVars.getMessages().length)-1];
-                
-                for(let n of this.unreadMsgs){
-                  if(n.id == currentMsg.id){
-                    nju = false;
-                    break;
-                  }
+          }).then(()=>{
+            this.storage.get('deletedMessages').then(data => {
+              if(data == undefined || data == null) deletedMsgs = [];
+              else deletedMsgs = data;
+                if(unreadMsgs != undefined && unreadMsgs != null)this.amountNewMessages = unreadMsgs.length;
+                this.unreadMsgs = unreadMsgs;
+                this.oldMsgs = oldMsgs;
+                if(this.unreadMsgs == undefined || this.unreadMsgs == null){
+                  this.storage.set('unreadMessages',new Array<any>());
+                  //this.unreadMsgs = allMsgs;
                 }
-
-                if(nju == true){
-                  for(let o of this.oldMsgs){
-                    if(o.id == currentMsg.id){
-                      nju = false;
-                      break;
+                if(this.oldMsgs == undefined || this.oldMsgs == null){
+                  this.storage.set('oldMessages',new Array<any>());
+                  //this.oldMsgs = [];
+                }
+                this.globalVars.cleanMessages();
+                for(let msg of allMsgs){
+                  nju = true;
+                  this.globalVars.pushMessage(new Message(
+                                                Number(msg.id.toString()+this.globalVars.getUser().id.toString()),
+                                                this.globalVars.getUser().id,
+                                                msg.title,
+                                                msg.content,
+                                                new Date(msg.sendDate).toLocaleDateString(),
+                                                new Date(msg.sendDate).getHours().toString()
+                                                .concat(':'
+                                                .concat(new Date(msg.sendDate).getMinutes()<10?
+                                                '0'.concat(new Date(msg.sendDate).getMinutes().toString())
+                                                :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
+                  
+                    currentMsg = this.globalVars.getMessages()[(this.globalVars.getMessages().length)-1];
+                    
+                    if(this.oldMsgs != null && this.oldMsgs != undefined){
+                      for(let n of this.unreadMsgs){
+                        if(n.id == currentMsg.id){
+                          nju = false;
+                          break;
+                        }
+                      }
+  
+                      if(nju == true){
+                        for(let o of this.oldMsgs){
+                          if(o.id == currentMsg.id){
+                            nju = false;
+                            break;
+                          }
+                        }
+                      }
                     }
+                    else{
+                      this.unreadMsgs = new Array<any>();
+                      this.oldMsgs = new Array<any>();
+                    }
+
+                    if(nju == true && deletedMsgs.indexOf(currentMsg.id) == -1){
+                      this.unreadMsgs.push(currentMsg);
+                      this.newMsgs.push(currentMsg);
+                      console.log("dodane jako nowe: "+currentMsg.id);
+                    }
+                    //console.log("przeczytane: "+this.unreadMsgs);
+                }
+                this.storage.set('unreadMessages',this.unreadMsgs);
+
+                if(this.newMsgs.length != 0){
+                  if(this.newMsgs.length == 1){
+                    cordova.plugins.notification.local.schedule({
+                    id: this.newMsgs[0].id,
+                    title: 'Raportowanie wiadomość',
+                    text: this.newMsgs[0].title,
+                    icon:'ios-chatbubbles-outline'
+                  });
+                  console.log("nowa wiadomosc: "+this.newMsgs[0].title);
                   }
+                  else{
+                    cordova.plugins.notification.local.schedule({
+                      id: this.newMsgs[0].id,
+                      title: 'Raportowanie wiadomość',
+                      text: "Masz nowe wiadomości ("+this.newMsgs.length+")",
+                    }); 
+                    console.log("nowe wiadomosci: "+this.newMsgs.length);
+                  }
+                  this.newMsgs = new Array<any>();
                 }
-
-                if(nju == true){
-                  this.unreadMsgs.push(currentMsg);
-                  this.newMsgs.push(currentMsg);
-                  console.log("dodane jako nowe: "+currentMsg.id);
-                }
-                //console.log("przeczytane: "+this.unreadMsgs);
-            }
-            this.storage.set('unreadMessages',this.unreadMsgs);
-
-            if(this.newMsgs.length != 0){
-              if(this.newMsgs.length == 1){
-                cordova.plugins.notification.local.schedule({
-                id: this.newMsgs[0].id,
-                title: 'Raportowanie wiadomość',
-                text: this.newMsgs[0].title,
-                icon:'ios-chatbubbles-outline'
-              });
-              //console.log("nowa wiadomosc: "+this.newMsgs[0].title);
-              }
-              else{
-                cordova.plugins.notification.local.schedule({
-                  id: this.newMsgs[0].id,
-                  title: 'Raportowanie wiadomość',
-                  text: "Masz nowe wiadomości ("+this.newMsgs.length+")",
-                }); 
-              }
-              this.newMsgs = new Array<any>();
-            }
+            });
           });
         });
       });
