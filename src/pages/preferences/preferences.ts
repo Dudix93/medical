@@ -81,21 +81,30 @@ export class PreferencesPage {
 
   saveUserPreferences() {
 
-    this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,1,this.settings.ponOd,this.settings.ponDo,this.settings.pon));
+    if(this.settings.pon == true && this.settings.ponOd > this.settings.ponDo) this.showalert('Popraw godziny w poniedziałku.');
+    else if(this.settings.wt == true && this.settings.wtOd > this.settings.wtDo) this.showalert('Popraw godziny w wtorku.');
+    else if(this.settings.sr == true && this.settings.srOd > this.settings.srDo) this.showalert('Popraw godziny w środzie.');
+    else if(this.settings.czw == true && this.settings.czwOd > this.settings.czwDo) this.showalert('Popraw godziny w czwartku.');
+    else if(this.settings.pt == true && this.settings.ptOd > this.settings.ptDo) this.showalert('Popraw godziny w piątku.');
+    else if(this.settings.sob == true && this.settings.sobOd > this.settings.sobDo) this.showalert('Popraw godziny w sobocie.');
+    else if(this.settings.nd == true && this.settings.ndOd > this.settings.ndDo) this.showalert('Popraw godziny w niedzieli.');
+    else{
+      this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,1,this.settings.ponOd,this.settings.ponDo,this.settings.pon));
 
-    this.restapiService.updateUserPreferences(this.settings.wtId,new SingleDay(this.settings.wtId,2,this.settings.wtOd,this.settings.wtDo,this.settings.wt));
-
-    this.restapiService.updateUserPreferences(this.settings.srId,new SingleDay(this.settings.ptId,3,this.settings.srOd,this.settings.srDo,this.settings.sr));
-
-    this.restapiService.updateUserPreferences(this.settings.czwId,new SingleDay(this.settings.ptId,4,this.settings.czwOd,this.settings.czwDo,this.settings.czw));
-
-    this.restapiService.updateUserPreferences(this.settings.ptId,new SingleDay(this.settings.czwId,5,this.settings.ptOd,this.settings.ptDo,this.settings.pt));
-
-    this.restapiService.updateUserPreferences(this.settings.sobId,new SingleDay(this.settings.sobId,6,this.settings.sobOd,this.settings.sobDo,this.settings.sob));
-
-    this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,0,this.settings.ndOd,this.settings.ndDo,this.settings.nd));
-
-    this.showalert('Zaktualizowano<br>preferencje.');
+      this.restapiService.updateUserPreferences(this.settings.wtId,new SingleDay(this.settings.wtId,2,this.settings.wtOd,this.settings.wtDo,this.settings.wt));
+  
+      this.restapiService.updateUserPreferences(this.settings.srId,new SingleDay(this.settings.ptId,3,this.settings.srOd,this.settings.srDo,this.settings.sr));
+  
+      this.restapiService.updateUserPreferences(this.settings.czwId,new SingleDay(this.settings.ptId,4,this.settings.czwOd,this.settings.czwDo,this.settings.czw));
+  
+      this.restapiService.updateUserPreferences(this.settings.ptId,new SingleDay(this.settings.czwId,5,this.settings.ptOd,this.settings.ptDo,this.settings.pt));
+  
+      this.restapiService.updateUserPreferences(this.settings.sobId,new SingleDay(this.settings.sobId,6,this.settings.sobOd,this.settings.sobDo,this.settings.sob));
+  
+      this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,0,this.settings.ndOd,this.settings.ndDo,this.settings.nd));
+  
+      this.showalert('Zaktualizowano<br>preferencje.');
+    }
   }
 
   showalert(info:string) {

@@ -875,22 +875,25 @@ export class HomePage {
                   }//pierwszy dzień, liczymy od startTask do endDay
   
                   else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
-                    if(endDate == new Date()){//spełnione gdy nie jest spauzowane
+                    if(endDate.toLocaleDateString() == new Date().toLocaleDateString()){//spełnione gdy nie jest spauzowane
                       if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
                         dayTime = this.timeBetween(nowHour,reportStartHour);
                         time += this.timeBetween(nowHour,reportStartHour);
                         this.podgląd(d,reportStartHour,nowHour);
+                        console.log('przed koncem zmiany');
                       }
                       else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
                         dayTime = this.timeBetween(workEndHour,reportStartHour);
                         time += this.timeBetween(workEndHour,reportStartHour);
                         this.podgląd(d,reportStartHour,workEndHour);
+                        console.log('po zmianie');
                       } 
                     }
                     else{
                       dayTime = this.timeBetween(reportEndHour,reportStartHour);
                       time += this.timeBetween(reportEndHour,reportStartHour);
                       this.podgląd(d,reportStartHour,reportEndHour);
+                      console.log('else?');
                     }
                   }//pierwszy i ostatni dzień
   
@@ -900,11 +903,13 @@ export class HomePage {
                         dayTime = this.timeBetween(nowHour,workStartHour);
                         time += this.timeBetween(nowHour,workStartHour);
                         this.podgląd(d,workStartHour,nowHour);
+                        console.log('przed koncem zmiany');
                       }
                       else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
                         dayTime = this.timeBetween(workEndHour,workStartHour);
                         time += this.timeBetween(workEndHour,workStartHour);
                         this.podgląd(d,workStartHour,workEndHour);
+                        console.log('po zmianie');
                       } 
                     }
                     else{
