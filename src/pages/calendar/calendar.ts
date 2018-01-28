@@ -180,7 +180,7 @@ export class CalendarPage {
           console.log('zapisano');
           this.restapiService.saveRaportUpdate(this.taskToEdit);
         }
-        this.showToast('Zaktualizowano czynność.');
+        this.showToast('Zaktualizowano czas.');
         this.globalVars.setSelectedProject(this.taskToEdit.projectId);
         this.globalVars.setSelectedTask(this.taskToEdit.taskId);
       }).then(()=>{
@@ -248,6 +248,7 @@ export class CalendarPage {
     this.globalVars.setSelectedProject(this.taskToEdit.projectId);
     this.globalVars.setSelectedTask(this.taskToEdit.taskId);
     this.updateComment = this.updatedComment = null;
+    this.showToast('Anulowano zmianę komentarza.');
     });
   }
 
@@ -255,6 +256,7 @@ export class CalendarPage {
     console.log('anulujemy: '+id);
     this.restapiService.deleteRaportUpdate(Number(id));
     this.getProjects();
+    this.showToast('Anulowano zmianę czasu.');
   }
 
    commentUpdate(project_id:number,task_id:number,clear:boolean){
@@ -286,6 +288,8 @@ export class CalendarPage {
      this.updatedComment = this.updateComment;
      this.globalVars.setSelectedProject(this.taskToEdit.projectId);
      this.globalVars.setSelectedTask(this.taskToEdit.taskId);
+     if(clear == true) this.showToast('Wyczyszczono komentarz.');
+     else this.showToast('Zaktualizowano komentarz.');
   }
 
   updateTimePrompt(task_title:string,dayTask:any) {

@@ -140,7 +140,7 @@ export class HomePage {
                       console.log('czas++');
                     }
                   }
-                }, 1000);
+                }, 60000);
 
             // this.platform.ready().then((readySource) => {`
             //   this.localNotifications.on('click', (notification, state) => {
