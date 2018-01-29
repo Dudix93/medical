@@ -1,6 +1,6 @@
 export class UserProject {
     constructor(
-        public id:number,
-        public title:string,
+        public project:any,
+        public spent:string,
         public tasks:any){}
   }

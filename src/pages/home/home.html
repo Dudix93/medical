@@ -24,7 +24,7 @@
   <h2 *ngIf="projects == null">Nie jesteś zapisany do żadnego projektu.</h2>
   <ng-container *ngIf="projects != null">
       <ion-grid *ngFor="let project of userProjects,let i = index">
-          <h2>{{project.title}}</h2>
+          <h2>{{project.project.name}} (przeznaczono {{project.spent}} z {{project.project.numberOfHours}} godzin)</h2>
           <h2 *ngIf="project.tasks.length == 0">Brak rozpoczętych czynności.</h2>
           <ng-container *ngIf="project.tasks.length != 0">
           <!-- <ion-row>
@@ -60,7 +60,7 @@
         </ng-container>
         <ion-row>
           <ion-col col-6>
-              <button ion-button (click)="selectTaskToStart(project.title,project.id)" icon-end>
+              <button ion-button (click)="selectTaskToStart(project.project.name,project.project.id)" icon-end>
                   Rozpocznij czynność 
               </button>
           </ion-col>

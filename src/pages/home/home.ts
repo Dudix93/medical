@@ -537,12 +537,22 @@ export class HomePage {
                   console.log('');
                   this.saveDayTask = false;
                 }
-                this.userProjects.push(new UserProject(project.id,project.name,this.userProjectTasks));
+                this.userProjects.push(new UserProject(project,this.sumUpTasksTime(this.userProjectTasks),this.userProjectTasks));
               });
               });
           }
       });
     });
+    }
+
+    sumUpTasksTime(userProjectTasks:Array<any>){
+      let totalMinutes = 0;
+      let totalHours = 0;
+      for(let task of userProjectTasks){
+        totalHours += Number(task[1].split(':')[0]);
+        totalMinutes += Number(task[1].split(':')[1]);
+      }
+      return this.minutesToHM((totalMinutes+(totalHours*60))/60);
     }
   //-----------------------------------------------------------------------------------------------------------------------  
 
@@ -665,12 +675,10 @@ export class HomePage {
       this.projectTasks = pt;
       console.log("--------------------------------");
       for(let task of this.projectTasks.tasks){
-        console.log("taski: "+task.id+" "+task.name);
         for(let project of this.userProjects){
-          if(project.id == project_id && project.tasks.length != 0){
+          if(project.project.id == project_id && project.tasks.length != 0){
             for(let task of project.tasks)startedTasks.push(task[0].action.id);
               if(startedTasks.indexOf(task.id) == -1){
-     
                 if(this.radioButtons.length == 0){
                   this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
                 }
@@ -679,7 +687,7 @@ export class HomePage {
                 }
               }
           }
-          else if(project.id == project_id && project.tasks.length == 0){
+          else if(project.project.id == project_id && project.tasks.length == 0){
 
             if(this.radioButtons.length == 0){
               this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
@@ -691,6 +699,7 @@ export class HomePage {
         }
       }
       this.globalVars.setButtons(this.radioButtons);
+      console.log('butony: '+this.radioButtons);
       return this.globalVars.getButtons();
 
   }
