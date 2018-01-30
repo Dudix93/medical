@@ -17,6 +17,7 @@ import { Message } from '../../models/message'
 import { GlobalVars } from '../../app/globalVars'
 import { UserTask } from '../../models/userTask'
 import { Push, PushToken } from '@ionic/cloud-angular';
+import { timestamp } from 'ionic-native/node_modules/rxjs/operator/timestamp';
 //import { finalize} from 'rxjs/operators';
 
 declare let cordova: any;
@@ -102,7 +103,9 @@ export class HomePage {
   radioButtons:RadioButton[]=[];
   task = {title: '', id:''}
   params = {
-    raportId:null
+    raportId:null,
+    timeSpent:null,
+    projectTime:null
   }
   today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
   messages:any;
@@ -140,7 +143,7 @@ export class HomePage {
                       console.log('czas++');
                     }
                   }
-                }, 60000);
+                }, 1000);
 
             // this.platform.ready().then((readySource) => {`
             //   this.localNotifications.on('click', (notification, state) => {
@@ -330,6 +333,8 @@ export class HomePage {
 
     updateCurrentTask(task_id:number){
       let raport;
+      let index = 0;
+      let minutesSpent = 0;
       if(this.globalVars.getCurrentTaskId != null){
         for(let project of this.userProjects){
           for(let task of project.tasks){
@@ -337,11 +342,14 @@ export class HomePage {
               this.restapiService.getRaports(task[0].id).then(rap => {
                 raport = rap;
 
-                // this.userProjects.forEach(up=>{
-                //   if(up.project.id == raport.project.id){
-
-                //   }
-                // })
+                this.userProjects.forEach(up=>{
+                  if(up.project.id == raport.project.id){
+                    minutesSpent = (Number(this.userProjects[index]['spent'].split(':')[0])*60)+(Number(this.userProjects[index]['spent'].split(':')[1]));
+                    minutesSpent++;
+                    this.userProjects[index]['spent'] = this.minutesToHM((minutesSpent+1)/60);
+                  }
+                  index++;
+                })
 
                 raport.timeOf++;
                 this.restapiService.updateRaport(raport.id,raport);
@@ -628,8 +636,11 @@ export class HomePage {
     this.navCtrl.push(MessagesPage);
   }
 
-  editTask(raportId:any){
+  editTask(raportId:any,timeSpent:any,projectTime:any){
+    console.log(timeSpent+' '+projectTime);
         this.params.raportId = raportId;
+        this.params.timeSpent = timeSpent;
+        this.params.projectTime = projectTime;
         this.navCtrl.push(EditTaskPage, this.params);
   }
 

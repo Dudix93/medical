@@ -9,8 +9,9 @@
     Data rozpoczęcia: {{startDate}}
   </ion-item>
   <ion-item *ngIf="countMethod=='manual'"> 
-      Spędzony czas: {{timeOfHours}} godzin {{timeOfMinutes}} minut.
+      Spędzony czas: {{timeOfHours}} godzin {{timeOfMinutes}} minut (Pozostało {{timeLeft}} z {{projectTime}}).
   </ion-item>
+  
   <!-- <ion-item *ngIf="countMethod=='automatic'"> 
       Spędzony czas: {{params.hours}} godzin {{timeOf}} minut.
   </ion-item> -->

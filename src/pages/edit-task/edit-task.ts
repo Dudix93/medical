@@ -26,6 +26,9 @@ export class EditTaskPage {
   lastUpdateTimeOf:any;
   currentComment:any;
   currentTime:any;
+  timeSpent:any;
+  timeLeft:any;
+  projectTime:any;
   taskToEdit = {
     "date":null,
     "taskId":null,
@@ -85,7 +88,23 @@ export class EditTaskPage {
     else return m.toString();
   }
 
+  minutesToHM(time:number){
+    let Minutes;
+    let hours = Math.floor(time);
+    let minutes = Math.floor(60*(time - Math.floor(time)));
+    if(minutes < 10){
+      Minutes = '0'.concat(minutes.toString());
+      return hours.toString().concat(':'.concat(Minutes.toString()));
+    }
+    else
+    return hours.toString().concat(':'.concat(minutes.toString()));
+  }
+
 getRaportData(){
+  this.timeSpent = this.navParams.get('timeSpent');
+  this.projectTime = this.navParams.get('projectTime');
+  this.timeSpent = Number(this.timeSpent.split(':')[0])*60 + Number(this.timeSpent.split(':')[1]);
+  this.timeLeft = this.minutesToHM((this.projectTime*60-this.timeSpent)/60);
   this.raportId = this.navParams.get('raportId');
   this.restapiService.getRaports(null).then(rap => {
     this.raports = rap;
