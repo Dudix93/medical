@@ -105,6 +105,7 @@ getRaportData(){
   this.projectTime = this.navParams.get('projectTime');
   this.timeSpent = Number(this.timeSpent.split(':')[0])*60 + Number(this.timeSpent.split(':')[1]);
   this.timeLeft = this.minutesToHM((this.projectTime*60-this.timeSpent)/60);
+
   this.raportId = this.navParams.get('raportId');
   this.restapiService.getRaports(null).then(rap => {
     this.raports = rap;
@@ -145,8 +146,14 @@ getRaportData(){
       if(isNaN(Number(this.updateTime)) == true && this.updateTime != undefined){
         this.showalert("Wpisz liczbę!");
       }
-      if(this.updateTime != undefined && this.updateTime != parseInt(this.updateTime.toString(), 10)){
+      else if(this.updateTime != undefined && this.updateTime != parseInt(this.updateTime.toString(), 10)){
         this.showalert("Wpisz pełną godzine!");
+      }
+      else if(Number(this.updateTime) < 0){
+        this.showalert("Wpisz dodatnią liczbę!");
+      }
+      else if(Number(this.updateTime)*60 > (this.projectTime*60-this.timeSpent)){
+        this.showalert("Przekroczysz pulę godzin w projekcie!");
       }
       else{
       this.restapiService.getRaports(null).then(rap => {

@@ -5,7 +5,7 @@
       "timeOf": 62,
       "startDate": "2017-12-09T09:31:07+01:00",
       "endDate": "2017-12-19T19:54:37.351Z",
-      "comment": "komentarz dotyczący konsultacji",
+      "comment": "koment do projektowania",
       "action": {
         "id": 1053,
         "name": "Konsultacja z klientem"
@@ -14,7 +14,37 @@
       "pausedDate": null,
       "paused": false,
       "userId": 4,
-      "projectId": 1452
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      }
     },
     {
       "timeOf": 840,
@@ -29,7 +59,37 @@
       "pausedDate": null,
       "paused": false,
       "userId": 4,
-      "projectId": 1451,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
       "id": 6663,
       "lastUpdateDate": "2017-12-22T10:40:32.493Z",
       "lastUpdateTimeOf": "3"
@@ -47,16 +107,46 @@
       "pausedDate": null,
       "paused": false,
       "userId": 4,
-      "projectId": 1452,
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
       "id": 6673,
       "lastUpdateDate": "2018-01-06T16:34:50.637Z",
       "lastUpdateTimeOf": "1"
     },
     {
-      "timeOf": 2674,
+      "timeOf": 3633.0000000000005,
       "startDate": "2018-01-03T09:30:31.296Z",
       "endDate": null,
-      "comment": null,
+      "comment": "koment do projektowania",
       "action": {
         "id": 1053,
         "name": "projektowanie"
@@ -65,14 +155,44 @@
       "pausedDate": "2018-01-03T15:50:04.849Z",
       "paused": true,
       "userId": 4,
-      "projectId": 1451,
-      "id": 6674
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6680
     },
     {
-      "timeOf": 2674,
+      "timeOf": 3633.0000000000005,
       "startDate": "2018-01-04T08:31:31.296Z",
       "endDate": null,
-      "comment": null,
+      "comment": "koment do projektowania",
       "action": {
         "id": 1053,
         "name": "projektowanie"
@@ -81,7 +201,37 @@
       "pausedDate": "2018-01-10T14:45:04.849Z",
       "paused": true,
       "userId": 4,
-      "projectId": 1451,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
       "id": 6675
     },
     {
@@ -97,10 +247,88 @@
       "pausedDate": null,
       "paused": false,
       "userId": 4,
-      "projectId": 1452,
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
       "id": 6676,
       "lastUpdateDate": "2018-01-17T14:33:46.711Z",
       "lastUpdateTimeOf": "6"
+    },
+    {
+      "timeOf": 180,
+      "startDate": "2018-01-29T11:56:31.846Z",
+      "endDate": null,
+      "comment": "koment  o interfejsie",
+      "action": {
+        "id": 1222,
+        "name": "projektowanie interfejsu"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6677,
+      "lastUpdateDate": "2018-01-29T11:58:16.442Z",
+      "lastUpdateTimeOf": "3"
     }
   ],
   "projects": [
@@ -109,7 +337,7 @@
       "name": "MSD",
       "dateFrom": "2017-12-08T09:31:07+01:00",
       "dateTo": "2017-12-08T08:49:00+01:00",
-      "numberOfHours": 74,
+      "numberOfHours": 80,
       "users": [
         {
           "id": 3,
@@ -203,6 +431,12 @@
         {
           "id": 1053,
           "name": "projektowanie",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        },
+        {
+          "id": 1222,
+          "name": "projektowanie interfejsu",
           "dateFrom": "2017-11-08T09:31:07+01:00",
           "dateTo": null
         }
@@ -342,13 +576,13 @@
       "id": 1,
       "dayOfWeek": 1,
       "hourFrom": "08:00",
-      "hourTo": "16:00",
+      "hourTo": "23:59",
       "workDay": true
     },
     {
       "id": 2,
       "dayOfWeek": 2,
-      "hourFrom": "08:00",
+      "hourFrom": "00:00",
       "hourTo": "16:00",
       "workDay": true
     },
@@ -453,6 +687,15 @@
       "time": "6",
       "comment": "komentarz do testowania bla bla wubaluba bla bla",
       "id": 8
+    },
+    {
+      "taskId": 1222,
+      "projectId": 1451,
+      "userId": 4,
+      "date": "29.01.2018",
+      "time": 5,
+      "comment": "koment  o interfejsie",
+      "id": 9
     }
   ],
   "raportUpdate": [

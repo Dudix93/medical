@@ -193,6 +193,17 @@ export class HomePage {
       });
     }
 
+    isNowWorkHour(){
+      let nowTime = new Date().getHours().toString().concat(':'.concat(new Date().getMinutes().toString()));
+      if(new Date("01.01.2000/".concat(this.currentDay.hourFrom)) < new Date("01.01.2000/".concat(nowTime))){
+        if(new Date("01.01.2000/".concat(this.currentDay.hourTo)) > new Date("01.01.2000/".concat(nowTime))){
+          return true;
+        }
+        else return false; 
+      }
+      else return false;  
+    }
+
 
     getMessages(){
       // this.storage.set('deletedMessages',undefined);
@@ -637,11 +648,13 @@ export class HomePage {
   }
 
   editTask(raportId:any,timeSpent:any,projectTime:any){
-    console.log(timeSpent+' '+projectTime);
-        this.params.raportId = raportId;
-        this.params.timeSpent = timeSpent;
-        this.params.projectTime = projectTime;
-        this.navCtrl.push(EditTaskPage, this.params);
+        if(this.isNowWorkHour() == true){
+          this.params.raportId = raportId;
+          this.params.timeSpent = timeSpent;
+          this.params.projectTime = projectTime;
+          this.navCtrl.push(EditTaskPage, this.params);
+        }
+        else this.showalert('Jesteś poza godzinami pracy.');
   }
 
   menu() {
@@ -805,18 +818,21 @@ export class HomePage {
   }
 
   pauseTask(raport_id:number){
-    for(let raport of this.userTasks){
-      if(raport.id == raport_id){
-        raport.pausedDate = new Date().toISOString();
-        raport.paused = true;
-        this.restapiService.updateRaport(raport.id,raport).then(() =>{
-          this.globalVars.setCurrentTaskId(null);
-          this.globalVars.setCurrentTaskName(null);
-          this.globalVars.setCurrentTaskRaportId(null);
-          this.getProjects(null,null);
-          this.showalert("Wstrzymano czynność.");
-        });
-        break;
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    else{
+      for(let raport of this.userTasks){
+        if(raport.id == raport_id){
+          raport.pausedDate = new Date().toISOString();
+          raport.paused = true;
+          this.restapiService.updateRaport(raport.id,raport).then(() =>{
+            this.globalVars.setCurrentTaskId(null);
+            this.globalVars.setCurrentTaskName(null);
+            this.globalVars.setCurrentTaskRaportId(null);
+            this.getProjects(null,null);
+            this.showalert("Wstrzymano czynność.");
+          });
+          break;
+        }
       }
     }
   }
@@ -826,6 +842,7 @@ export class HomePage {
     if(this.globalVars.getCurrentTask().id != null && this.globalVars.getCurrentTask().id != task_id){
       this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
     }
+    else if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
     else{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
@@ -973,64 +990,70 @@ export class HomePage {
 
 
   finishTaskPrompt(task_id:number, project_id:number, project_name:string) {
-    this.restapiService.getUserTask()
-    const alert = this.alertCtrl.create({
-      title: 'Zakończyć '+project_name+'?',
-      buttons: [
-        {
-          text: 'Anuluj',
-          role: 'cancel',
-          handler: () => {
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    else{
+      this.restapiService.getUserTask()
+      const alert = this.alertCtrl.create({
+        title: 'Zakończyć '+project_name+'?',
+        buttons: [
+          {
+            text: 'Anuluj',
+            role: 'cancel',
+            handler: () => {
+            }
+          },
+          {
+            text: 'Zakończ',
+            handler: () => {
+              this.finishTask(task_id,project_id);
+            }
           }
-        },
-        {
-          text: 'Zakończ',
-          handler: () => {
-            this.finishTask(task_id,project_id);
-          }
-        }
-      ]
-    });
-    alert.present();
+        ]
+      });
+      alert.present();
+    }
   }
 
   selectTaskToStart(project:any) {
-    this.restapiService.getRaports(null)
-    .then(userTasks => {
-      let inputs;
-      console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name);
-        if(this.globalVars.getCurrentTask().id != null
-        && this.globalVars.getCurrentTask().id != undefined
-        && this.globalVars.getCurrentTask().name != null
-        && this.globalVars.getCurrentTask().name != undefined){
-          this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
-        }
-        else{
-          this.restapiService.getProjectTasks(project.id).subscribe(ProjectTasks => {
-            inputs = this.prepareTasksRadioButtons(ProjectTasks,project.id);
-            const tasksAlert = this.alertCtrl.create({
-              title: "Czynnosci w "+project.name,
-              inputs: inputs,        
-              buttons: [
-                {
-                  text: 'Anuluj',
-                  role: 'cancel',
-                  handler: () => {
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    else{
+      this.restapiService.getRaports(null)
+      .then(userTasks => {
+        let inputs;
+        console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name);
+          if(this.globalVars.getCurrentTask().id != null
+          && this.globalVars.getCurrentTask().id != undefined
+          && this.globalVars.getCurrentTask().name != null
+          && this.globalVars.getCurrentTask().name != undefined){
+            this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
+          }
+          else{
+            this.restapiService.getProjectTasks(project.id).subscribe(ProjectTasks => {
+              inputs = this.prepareTasksRadioButtons(ProjectTasks,project.id);
+              const tasksAlert = this.alertCtrl.create({
+                title: "Czynnosci w "+project.name,
+                inputs: inputs,        
+                buttons: [
+                  {
+                    text: 'Anuluj',
+                    role: 'cancel',
+                    handler: () => {
+                    }
+                  },
+                  {
+                    text: 'Rozpocznij',
+                    handler: data => {
+                      this.selectCountMethod(project,data);
+                    }
                   }
-                },
-                {
-                  text: 'Rozpocznij',
-                  handler: data => {
-                    this.selectCountMethod(project,data);
-                  }
-                }
-              ]
+                ]
+              });
+              if(inputs != '')tasksAlert.present();
+              else this.showalert('Brak czynności w '+project.name);
             });
-            if(inputs != '')tasksAlert.present();
-            else this.showalert('Brak czynności w '+project.name);
-          });
-        }
-    });
+          }
+      });
+    }
   }
 
   selectStartDate(projectId:any,taskToStart:any, data:any) {
