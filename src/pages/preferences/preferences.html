@@ -6,6 +6,16 @@
 
 
 <ion-content padding>
+        <ion-segment [(ngModel)]="pref">
+                <ion-segment-button value="hours">
+                  Dni/Godziny
+                </ion-segment-button>
+                <ion-segment-button value="notifications">
+                  Powiadomienia
+                </ion-segment-button>
+              </ion-segment>
+
+    <ng-container *ngIf="pref == 'hours'">
         <form (ngSubmit)="saveUserPreferences()">
             <ion-grid>
                 <ion-row>
@@ -68,4 +78,43 @@
             </ion-grid>
             <button ion-button type="submit">Zapisz ustawienia</button>
           </form>
+        </ng-container>
+
+        <ng-container *ngIf="pref == 'notifications'">
+            <br>
+            <ion-item>
+                <ion-label>Nowe wiadomości</ion-label>
+                <ion-toggle [(ngModel)]="notifications.newMsgsNotificacion"></ion-toggle>
+            </ion-item>
+            
+            <ion-item>
+                    <ion-label>Powiadomienie o trwającej czynności</ion-label>
+                    <ion-select [(ngModel)]="notifications.taskInProgressOption">
+                      <ion-option *ngFor="let t of taskInProgressNotification" value="{{t.value}}">{{t.name}}</ion-option>
+                    </ion-select>
+            </ion-item>
+
+            <ion-item>
+                <ion-label>Własne powiadomienie</ion-label>
+                <ion-toggle [(ngModel)]="notifications.ownNotification"></ion-toggle>
+            </ion-item>
+            <ion-item>
+                    <ion-label>Godzina</ion-label>
+                    <ion-datetime *ngIf="notifications.ownNotification == true" [(ngModel)]="notifications.ownNotificationTime" name="ownNotificationTime" displayFormat="HH:mm" pickerFormat="HH mm"></ion-datetime>
+                    <ion-datetime *ngIf="notifications.ownNotification == false" [disabled]="true" [(ngModel)]="notifications.ownNotificationTime" name="ownNotificationTime" displayFormat="HH:mm" pickerFormat="HH mm"></ion-datetime>
+            </ion-item>
+
+            <ion-item>
+                <ion-label>Data</ion-label>
+                <ion-datetime *ngIf="notifications.ownNotification == true" displayFormat="MM/DD/YYYY" [(ngModel)]="notifications.ownNotificationDate"></ion-datetime>
+                <ion-datetime *ngIf="notifications.ownNotification == false" [disabled]="true" displayFormat="MM/DD/YYYY" [(ngModel)]="notifications.ownNotificationDate"></ion-datetime>
+            </ion-item>
+
+            <ion-item>
+                    <ion-label floating>Treść powiadomienia</ion-label>
+                    <ion-input *ngIf="notifications.ownNotification == true" type="text" [(ngModel)]="notifications.ownNotificationMsg" name="ownNotificationTime" clearInput></ion-input>   
+                    <ion-input *ngIf="notifications.ownNotification == false" [disabled]="true" type="text" [(ngModel)]="notifications.ownNotificationMsg" name="ownNotificationTime" clearInput></ion-input>        
+            </ion-item> 
+            <button ion-button (click)="saveUserPreferences()">Zapisz ustawienia</button>
+        </ng-container>
 </ion-content>

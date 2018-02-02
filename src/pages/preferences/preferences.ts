@@ -12,6 +12,23 @@ import { SingleDay } from '../../models/singleDay'
 })
 export class PreferencesPage {
 
+  pref:string = 'hours';
+  notifications = {
+    'newMsgsNotificacion':true,
+    'ownNotificationTime':null,
+    'ownNotificationMsg':null,
+    'ownNotificationDate':null,
+    'ownNotification':true,
+    'taskInProgressOption':0
+  }
+  taskInProgressNotification:Array<any> =[
+    {'id':0, 'value':'0', 'name':'Brak'},
+    {'id':1, 'value':'0.5', 'name':'co 30 min'},
+    {'id':2, 'value':'1.0', 'name':'co 1 godzinę'},
+    {'id':3, 'value':'2.0', 'name':'co 2 godziny'}
+  ]
+
+  //taskInProgressOption:string;
   preferences:any;
   loggedUser = {id:'', login:''}
   settings = {
@@ -30,7 +47,25 @@ export class PreferencesPage {
               public storage:Storage,
               public alertCtrl:AlertController) {
     this.getUserPreferences();
-    //console.log(this.settings);
+    this.storage.get('notifications').then(data=>{
+      if(data.newMsgsNotificacion == undefined) this.storage.set('notifications',this.notifications);
+      else{
+        this.notifications.newMsgsNotificacion = data.newMsgsNotificacion;
+        this.notifications.ownNotification = data.ownNotification;
+        this.notifications.ownNotificationTime = data.ownNotificationTime;
+        this.notifications.ownNotificationDate = data.ownNotificationDate;
+        this.notifications.ownNotificationMsg = data.ownNotificationMsg;
+        console.log('defined');
+      }
+    });
+    this.storage.get('notifications').then(data=>{
+      if(data == undefined){
+        this.storage.set('notifications',this.notifications);
+      }
+      else{
+        this.notifications = data;
+      }
+    });
   }
 
   getUserPreferences() {
@@ -102,8 +137,18 @@ export class PreferencesPage {
       this.restapiService.updateUserPreferences(this.settings.sobId,new SingleDay(this.settings.sobId,6,this.settings.sobOd,this.settings.sobDo,this.settings.sob));
   
       this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,0,this.settings.ndOd,this.settings.ndDo,this.settings.nd));
-  
+
       this.showalert('Zaktualizowano<br>preferencje.');
+
+      this.storage.set('notifications',this.notifications);
+      this.storage.set('taskInProgressMsgInterval',this.taskInProgressOption);
+
+      console.log(this.notifications.newMsgsNotificacion);
+      console.log(this.taskInProgressOption);
+      console.log(this.notifications.ownNotification);
+      console.log(this.notifications.ownNotificationTime);
+      console.log(this.notifications.ownNotificationDate);
+      console.log(this.notifications.ownNotificationMsg);
     }
   }
 

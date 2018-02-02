@@ -313,6 +313,7 @@ export class HomePage {
         });
       });
     
+
     }
 
     powiadomienieCykliczne() {
@@ -818,7 +819,7 @@ export class HomePage {
   }
 
   pauseTask(raport_id:number){
-    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
     else{
       for(let raport of this.userTasks){
         if(raport.id == raport_id){
@@ -842,7 +843,7 @@ export class HomePage {
     if(this.globalVars.getCurrentTask().id != null && this.globalVars.getCurrentTask().id != task_id){
       this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
     }
-    else if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    else if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
     else{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
@@ -990,7 +991,7 @@ export class HomePage {
 
 
   finishTaskPrompt(task_id:number, project_id:number, project_name:string) {
-    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
     else{
       this.restapiService.getUserTask()
       const alert = this.alertCtrl.create({
@@ -1015,7 +1016,7 @@ export class HomePage {
   }
 
   selectTaskToStart(project:any) {
-    if(this.isNowWorkHour() == false) this.showalert('Jesteś pzoa godzinami pracy.');
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
     else{
       this.restapiService.getRaports(null)
       .then(userTasks => {

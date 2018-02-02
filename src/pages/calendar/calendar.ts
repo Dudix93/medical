@@ -124,14 +124,14 @@ export class CalendarPage {
           if(this.currentTask.id == null){
             if(raport.endDate != null){
               this.currentTask.id = raport.action.id;
-              this.currentTask.projectId = raport.projectId;
+              this.currentTask.projectId = raport.project.id;
               this.currentTask.name = raport.action.name;
               this.userTasks.push(new UserTask(this.currentTask.id,this.currentTask.name,this.currentTask.projectId));
             }
           }
-          else if(raport.endDate != null && (raport.projectId != this.currentTask.projectId || raport.action.id != this.currentTask.id)){
+          else if(raport.endDate != null && (raport.project.id != this.currentTask.projectId || raport.action.id != this.currentTask.id)){
             this.currentTask.id = raport.action.id;
-            this.currentTask.projectId = raport.projectId;
+            this.currentTask.projectId = raport.project.id;
             this.currentTask.name = raport.action.name;
             this.userTasks.push(new UserTask(this.currentTask.id,this.currentTask.name,this.currentTask.projectId));
           }
