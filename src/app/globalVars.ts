@@ -52,6 +52,7 @@ export class GlobalVars {
     "id":null,
     "name":null,
     "raport_id":null,
+    "count_method":null
   }
 
   constructor() {
@@ -113,6 +114,9 @@ export class GlobalVars {
     this.currentTask.name = value;
   }
 
+  setCurrentTaskCountMethod(value){
+    this.currentTask.count_method = value;
+  }
   getProjectTasks() {
     return this.projectTasks;
   }

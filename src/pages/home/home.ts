@@ -93,6 +93,7 @@ export class HomePage {
   unreadMsgs:any;
   oldMsgs:any;
   newMsgs:any;
+  autoTaskNotification:any;
   login:string;
   currentDate:string;
   currentTime:string;
@@ -130,9 +131,34 @@ export class HomePage {
                 this.globalVars.setApiUrl(url);
                 //this.getUserData();
                 this.getProjects(null,null);
+                this.storage.get('notifications').then(notifications => {
+                  this.setAutoTaskNotification(notifications.taskInProgressOption);
+                });
+                setInterval(()=>{
+                  let date;
+                  this.setWorkHours();
+                  this.storage.get('notifications').then(notifications => {
+                    if(notifications.ownNotification == true){
+                      date = new Date(new Date(notifications.ownNotificationDate).toLocaleDateString().concat('/'.concat(notifications.ownNotificationTime)));
+                      if(date.toLocaleDateString() == new Date().toLocaleDateString() && date.getHours() == new Date().getHours() && date.getMinutes() == new Date().getMinutes()){
+                        this.phoneNotification(1,'Twoje powiadomienie:',notifications.ownNotificationMsg);
+                        notifications.ownNotification = false;
+                        this.storage.set('notifications',notifications)
+                      }
+                    }
+                  });
+                },1000);
                 this.inProgress = false;
                 this.events.subscribe('updateViewAfterEdit',()=>{
                   this.getProjects(null,null);
+                });
+                this.events.subscribe('changeNotifications',()=>{
+                  this.storage.get('notifications').then(data => {
+                  }).then(()=>{
+                    this.storage.get('notifications').then(notification => {
+                    this.setAutoTaskNotification(notification.taskInProgressOption);
+                    });
+                  });
                 });
                 setInterval(() => {
                   if(this.globalVars.getCurrentTaskId() != null){
@@ -143,7 +169,7 @@ export class HomePage {
                       console.log('czas++');
                     }
                   }
-                }, 1000);
+                }, 5000);
 
             // this.platform.ready().then((readySource) => {`
             //   this.localNotifications.on('click', (notification, state) => {
@@ -195,6 +221,7 @@ export class HomePage {
 
     isNowWorkHour(){
       let nowTime = new Date().getHours().toString().concat(':'.concat(new Date().getMinutes().toString()));
+      console.log(this.currentDay.hourFrom+" "+this.currentDay.hourTo+" "+nowTime);
       if(new Date("01.01.2000/".concat(this.currentDay.hourFrom)) < new Date("01.01.2000/".concat(nowTime))){
         if(new Date("01.01.2000/".concat(this.currentDay.hourTo)) > new Date("01.01.2000/".concat(nowTime))){
           return true;
@@ -204,6 +231,30 @@ export class HomePage {
       else return false;  
     }
 
+    setAutoTaskNotification(interval:number){
+      console.log(interval);
+      if(interval != 0){
+        clearInterval(this.autoTaskNotification);
+        this.autoTaskNotification = setInterval(()=>{
+          if(this.globalVars.getCurrentTask().count_method == 'automatic'){
+            this.phoneNotification(this.globalVars.getCurrentTask().id,'Jesteś w trakcie',this.globalVars.getCurrentTask().name);
+          }
+        },interval);
+      }
+      else{
+        clearInterval(this.autoTaskNotification);
+        console.log('wyczyscilem interval');
+      }
+    }
+
+    doRefresh(refresher) {
+      console.log('Begin async operation', refresher);
+      this.getProjects(null,null);
+      setTimeout(() => {
+        console.log('Async operation has ended');
+        refresher.complete();
+      }, 2000);
+    }
 
     getMessages(){
       // this.storage.set('deletedMessages',undefined);
@@ -288,26 +339,21 @@ export class HomePage {
                 }
                 this.storage.set('unreadMessages',this.unreadMsgs);
 
-                if(this.newMsgs.length != 0){
-                  if(this.newMsgs.length == 1){
-                    cordova.plugins.notification.local.schedule({
-                    id: this.newMsgs[0].id,
-                    title: 'Raportowanie wiadomość',
-                    text: this.newMsgs[0].title,
-                    icon:'ios-chatbubbles-outline'
-                  });
-                  console.log("nowa wiadomosc: "+this.newMsgs[0].title);
+                this.storage.get('notifications').then(notifications=>{
+                  if(notifications.newMsgsNotificacion == true){
+                      if(this.newMsgs.length != 0){
+                      if(this.newMsgs.length == 1){
+                      this.phoneNotification(this.newMsgs[0].id,'Raportowanie wiadomość',this.newMsgs[0].title);
+                      console.log("nowa wiadomosc: "+this.newMsgs[0].title);
+                      }
+                      else{
+                        this.phoneNotification(this.newMsgs[0].id,'Raportowanie wiadomość',"Masz nowe wiadomości ("+this.newMsgs.length+")");
+                        console.log("nowe wiadomosci: "+this.newMsgs.length);
+                      }
+                      this.newMsgs = new Array<any>();
+                    }
                   }
-                  else{
-                    cordova.plugins.notification.local.schedule({
-                      id: this.newMsgs[0].id,
-                      title: 'Raportowanie wiadomość',
-                      text: "Masz nowe wiadomości ("+this.newMsgs.length+")",
-                    }); 
-                    console.log("nowe wiadomosci: "+this.newMsgs.length);
-                  }
-                  this.newMsgs = new Array<any>();
-                }
+                });
             });
           });
         });
@@ -316,20 +362,28 @@ export class HomePage {
 
     }
 
-    powiadomienieCykliczne() {
-      let id = new Date().getUTCDate().toString().
-      concat(new Date().getMonth().toString().
-      concat(new Date().getFullYear().toString().
-      concat(new Date().getHours().toString().
-      concat(new Date().getMinutes().toString()))));
-      console.log("Powiadomienie o nr id: "+id+" otrzymane o godzinie "+this.getHour());
+    phoneNotification(id:number,title:string,text:string){
       cordova.plugins.notification.local.schedule({
-          id: Number(id),
-          title: 'Powiadomienie',
-          text: 'Otrzymano o godzinie: '+this.getHour(),
-          //trigger: { every: 'minute', count: 3 }
-        });
+        id: id,
+        title: title,
+        text: text,
+      }); 
     }
+
+    // powiadomienieCykliczne() {
+    //   let id = new Date().getUTCDate().toString().
+    //   concat(new Date().getMonth().toString().
+    //   concat(new Date().getFullYear().toString().
+    //   concat(new Date().getHours().toString().
+    //   concat(new Date().getMinutes().toString()))));
+    //   console.log("Powiadomienie o nr id: "+id+" otrzymane o godzinie "+this.getHour());
+    //   cordova.plugins.notification.local.schedule({
+    //       id: Number(id),
+    //       title: 'Powiadomienie',
+    //       text: 'Otrzymano o godzinie: '+this.getHour(),
+    //       //trigger: { every: 'minute', count: 3 }
+    //     });
+    // }
 
     minutesToHM(time:number){
       let Minutes;
@@ -474,6 +528,10 @@ export class HomePage {
       let currentAutoTask = null;
       let index;
       let time;
+      this.globalVars.setCurrentTaskId(null);
+      this.globalVars.setCurrentTaskName(null);
+      this.globalVars.setCurrentTaskRaportId(null);
+      this.globalVars.setCurrentTaskCountMethod(null);
       this.userProjects = new Array<any>();
       this.userProjectTasks = new Array<any>();
       this.restapiService.getProjects().then(data => {
@@ -485,86 +543,91 @@ export class HomePage {
               this.projectTasks = data;
               this.restapiService.getUserPreferences().then(data =>{
                 this.userPreferences = data;
-                currentAutoTask = null;
-                this.projectTasks = new Array<any>();
-                autoTasks = new Array<any>(); 
-                autoTasksIds = new Array<any>(); 
-                this.userProjectTasks = new Array<[any,any]>();
-                for(let raport of this.userTasks){
-                  if(project.id == raport.project.id){
-                    this.projectTasks.push(raport);
-                  }
-                }
-                for(let task of this.projectTasks){
-                  if(task.countMethod == 'manual'){
-                    if(task.endDate == null){
-                      this.globalVars.setCurrentTaskId(task.action.id);
-                      this.globalVars.setCurrentTaskName(task.action.name);
-                      this.globalVars.setCurrentTaskRaportId(task.id);
+                this.storage.get('notifications').then(notifications => {
+                  currentAutoTask = null;
+                  this.projectTasks = new Array<any>();
+                  autoTasks = new Array<any>(); 
+                  autoTasksIds = new Array<any>(); 
+                  this.userProjectTasks = new Array<[any,any]>();
+                  for(let raport of this.userTasks){
+                    if(project.id == raport.project.id){
+                      this.projectTasks.push(raport);
                     }
-                    this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
-                    //console.log('czas: '+task.timeOf);
                   }
-                  else if(task.endDate == null && task.countMethod == 'automatic'){
-                    if(task.pausedDate == null){
-                      this.globalVars.setCurrentTaskId(task.action.id);
-                      this.globalVars.setCurrentTaskName(task.action.name);
-                      this.globalVars.setCurrentTaskRaportId(task.id);
+                  for(let task of this.projectTasks){
+                    if(task.countMethod == 'manual'){
+                      if(task.endDate == null){
+                        this.globalVars.setCurrentTaskId(task.action.id);
+                        this.globalVars.setCurrentTaskName(task.action.name);
+                        this.globalVars.setCurrentTaskRaportId(task.id);
+                        this.globalVars.setCurrentTaskCountMethod('manual');
+                      }
+                      this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
+                      //console.log('czas: '+task.timeOf);
                     }
-                    autoTasks.push(task);
+                    else if(task.endDate == null && task.countMethod == 'automatic'){
+                      if(task.pausedDate == null){
+                        this.globalVars.setCurrentTaskId(task.action.id);
+                        this.globalVars.setCurrentTaskName(task.action.name);
+                        this.globalVars.setCurrentTaskRaportId(task.id);
+                        this.globalVars.setCurrentTaskCountMethod('automatic');
+                        this.setAutoTaskNotification(notifications.taskInProgressOption);
+                      }
+                      autoTasks.push(task);
+                    }
+                    else if(task.endDate != null && task.countMethod == 'automatic' && autoTasksIds.indexOf(task.action.id) == (-1)){
+                      this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
+                      autoTasksIds.push(task.action.id);
+                    }
                   }
-                  else if(task.endDate != null && task.countMethod == 'automatic' && autoTasksIds.indexOf(task.action.id) == (-1)){
-                    this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
-                    autoTasksIds.push(task.action.id);
-                  }
-                }
 
-                index = 1;
-                time = 0;
-                for(let task of autoTasks){
-                  if(currentAutoTask == null){
-                    currentAutoTask = task;
-                    if(project_id == task.project.id && task_id == task.action.id){
-                      this.saveDayTask = true;
-                      console.log('savedaytask true');
+                  index = 1;
+                  time = 0;
+                  for(let task of autoTasks){
+                    if(currentAutoTask == null){
+                      currentAutoTask = task;
+                      if(project_id == task.project.id && task_id == task.action.id){
+                        this.saveDayTask = true;
+                        console.log('savedaytask true');
+                      }
                     }
-                  }
-                  if(currentAutoTask.action.id != task.action.id){
-                    console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                    if(currentAutoTask.action.id != task.action.id){
+                      console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                      console.log('');
+                      this.userProjectTasks.push([currentAutoTask,this.minutesToHM(time)]);
+                      this.updateRaportsTime(currentAutoTask.action.id,currentAutoTask.project.id,time*60);
+                      currentAutoTask = task;
+                      time = 0;
+                    }
+                    if(index == autoTasks.length){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      if(task.pausedDate != null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                      else if(task.pausedDate == null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
+                      let hours = Math.floor(time);
+                      let minutes = Math.floor(60*(time - Math.floor(time)));
+                      console.log('');
+                      console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                      this.userProjectTasks.push([task,this.minutesToHM(time)]);
+                      this.updateRaportsTime(task.action.id,task.project.id,time*60);
+                      if(project_id != null) this.mergeDayTasks();
+                      continue;
+                    }
+                    if(task.pausedDate != null){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                      currentAutoTask = task;
+                    }
+                    else if(task.pausedDate == null){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
+                      currentAutoTask = task;
+                    }
+                    index++;
                     console.log('');
-                    this.userProjectTasks.push([currentAutoTask,this.minutesToHM(time)]);
-                    this.updateRaportsTime(currentAutoTask.action.id,currentAutoTask.project.id,time*60);
-                    currentAutoTask = task;
-                    time = 0;
+                    this.saveDayTask = false;
                   }
-                  if(index == autoTasks.length){
-                    if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
-                    if(task.pausedDate != null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
-                    else if(task.pausedDate == null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
-                    let hours = Math.floor(time);
-                    let minutes = Math.floor(60*(time - Math.floor(time)));
-                    console.log('');
-                    console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
-                    this.userProjectTasks.push([task,this.minutesToHM(time)]);
-                    this.updateRaportsTime(task.action.id,task.project.id,time*60);
-                    if(project_id != null) this.mergeDayTasks();
-                    continue;
-                  }
-                  if(task.pausedDate != null){
-                    if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
-                    time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
-                    currentAutoTask = task;
-                  }
-                  else if(task.pausedDate == null){
-                    if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
-                    time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
-                    currentAutoTask = task;
-                  }
-                  index++;
-                  console.log('');
-                  this.saveDayTask = false;
-                }
-                this.userProjects.push(new UserProject(project,this.sumUpTasksTime(this.userProjectTasks),this.userProjectTasks));
+                  this.userProjects.push(new UserProject(project,this.sumUpTasksTime(this.userProjectTasks),this.userProjectTasks));
+                });
               });
               });
           }
@@ -779,17 +842,23 @@ export class HomePage {
 
     this.globalVars.setCurrentTaskId(task.id);
     this.globalVars.setCurrentTaskName(task.title);
+    this.globalVars.setCurrentTaskCountMethod(countMethod);
     this.restapiService.saveRaport(this.raport).then(() =>{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
-        for(let raport of raports){
-          if(raport.action.id == task.id && raport.endDate == null && raport.project.id == project.id){
-            this.globalVars.setCurrentTaskRaportId(raport.id);
-            console.log(this.globalVars.getCurrentTask());
-            this.getProjects(null,null);
-            break;
+        this.storage.get('notifications').then(notifications => {
+          for(let raport of raports){
+            if(raport.action.id == task.id && raport.endDate == null && raport.project.id == project.id){
+              this.globalVars.setCurrentTaskRaportId(raport.id);
+              console.log(this.globalVars.getCurrentTask());
+              this.getProjects(null,null);
+              break;
+            }
           }
-        }
+          if(countMethod == 'automatic'){
+            this.setAutoTaskNotification(notifications.taskInProgressOption);
+          }
+        });
       });
     });
   }
@@ -809,6 +878,7 @@ export class HomePage {
       this.globalVars.setCurrentTaskId(null);
       this.globalVars.setCurrentTaskName(null);
       this.globalVars.setCurrentTaskRaportId(null);
+      this.globalVars.setCurrentTaskCountMethod(null);
       if(automatic == true){
         this.dayTasks = new Array<any>();
         this.getProjects(project_id,task_id);
@@ -829,6 +899,7 @@ export class HomePage {
             this.globalVars.setCurrentTaskId(null);
             this.globalVars.setCurrentTaskName(null);
             this.globalVars.setCurrentTaskRaportId(null);
+            this.globalVars.setCurrentTaskCountMethod('paused');
             this.getProjects(null,null);
             this.showalert("Wstrzymano czynność.");
           });
@@ -847,34 +918,38 @@ export class HomePage {
     else{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
-        for(let raport of raports){
-          if(raport.id == raport_id){
-            console.log(raport);
-            this.raport.timeOf = raport.timeOf;
-            this.raport.startDate = new Date().toISOString();
-            this.raport.comment = raport.comment;
-            this.raport.action.id = raport.action.id;
-            this.raport.action.name = raport.action.name;
-            this.raport.countMethod = raport.countMethod;
-            this.raport.userId = raport.userId;
-            this.raport.project = raport.project;
-            console.log(this.raport);
-  
-            this.globalVars.setCurrentTaskId(this.raport.action.id);
-            this.globalVars.setCurrentTaskName(this.raport.action.name);
-            this.restapiService.saveRaport(this.raport).then(() =>{this.getProjects(null,null);});
-            break;
-            }
-          }
-  
-            for(let raport of raports){
-              if(raport.action.id == this.raport.action.id && raport.endDate == null && raport.project.id == this.raport.project.id){
-                this.globalVars.setCurrentTaskRaportId(raport.id);
-                console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name+" "+this.globalVars.getCurrentTask().raport_id);
-                this.showalert("Wznowiono czynność.");
-                break;
+        this.storage.get('notifications').then(notifications => {
+          for(let raport of raports){
+            if(raport.id == raport_id){
+              console.log(raport);
+              this.raport.timeOf = raport.timeOf;
+              this.raport.startDate = new Date().toISOString();
+              this.raport.comment = raport.comment;
+              this.raport.action.id = raport.action.id;
+              this.raport.action.name = raport.action.name;
+              this.raport.countMethod = raport.countMethod;
+              this.raport.userId = raport.userId;
+              this.raport.project = raport.project;
+              console.log(this.raport);
+    
+              this.globalVars.setCurrentTaskId(this.raport.action.id);
+              this.globalVars.setCurrentTaskName(this.raport.action.name);
+              this.globalVars.setCurrentTaskCountMethod(this.raport.countMethod);
+              this.setAutoTaskNotification(notifications.taskInProgressOption);
+              this.restapiService.saveRaport(this.raport).then(() =>{this.getProjects(null,null);});
+              break;
               }
             }
+    
+              for(let raport of raports){
+                if(raport.action.id == this.raport.action.id && raport.endDate == null && raport.project.id == this.raport.project.id){
+                  this.globalVars.setCurrentTaskRaportId(raport.id);
+                  console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name+" "+this.globalVars.getCurrentTask().raport_id);
+                  this.showalert("Wznowiono czynność.");
+                  break;
+                }
+              }
+          });
     });
     }
   }

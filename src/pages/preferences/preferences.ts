@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { CommonModule } from '@angular/common';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { SingleDay } from '../../models/singleDay'
 
@@ -23,8 +23,8 @@ export class PreferencesPage {
   }
   taskInProgressNotification:Array<any> =[
     {'id':0, 'value':'0', 'name':'Brak'},
-    {'id':1, 'value':'0.5', 'name':'co 30 min'},
-    {'id':2, 'value':'1.0', 'name':'co 1 godzinę'},
+    {'id':1, 'value':'5000', 'name':'co 30 min'},
+    {'id':2, 'value':'10000', 'name':'co 1 godzinę'},
     {'id':3, 'value':'2.0', 'name':'co 2 godziny'}
   ]
 
@@ -45,7 +45,8 @@ export class PreferencesPage {
               public restapiService: RestapiServiceProvider, 
               public navParams: NavParams, 
               public storage:Storage,
-              public alertCtrl:AlertController) {
+              public alertCtrl:AlertController,
+              public events:Events) {
     this.getUserPreferences();
     this.storage.get('notifications').then(data=>{
       if(data.newMsgsNotificacion == undefined) this.storage.set('notifications',this.notifications);
@@ -123,6 +124,7 @@ export class PreferencesPage {
     else if(this.settings.pt == true && this.settings.ptOd > this.settings.ptDo) this.showalert('Popraw godziny w piątku.');
     else if(this.settings.sob == true && this.settings.sobOd > this.settings.sobDo) this.showalert('Popraw godziny w sobocie.');
     else if(this.settings.nd == true && this.settings.ndOd > this.settings.ndDo) this.showalert('Popraw godziny w niedzieli.');
+    else if(this.notifications.ownNotification == true && (this.notifications.ownNotificationMsg == null || this.notifications.ownNotificationMsg == undefined || this.notifications.ownNotificationMsg == '')) this.showalert('Wpisz wiadomość.');
     else{
       this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,1,this.settings.ponOd,this.settings.ponDo,this.settings.pon));
 
@@ -141,14 +143,8 @@ export class PreferencesPage {
       this.showalert('Zaktualizowano<br>preferencje.');
 
       this.storage.set('notifications',this.notifications);
-      this.storage.set('taskInProgressMsgInterval',this.taskInProgressOption);
-
-      console.log(this.notifications.newMsgsNotificacion);
-      console.log(this.taskInProgressOption);
-      console.log(this.notifications.ownNotification);
-      console.log(this.notifications.ownNotificationTime);
-      console.log(this.notifications.ownNotificationDate);
-      console.log(this.notifications.ownNotificationMsg);
+      this.storage.set('taskInProgressMsgInterval',this.notifications.taskInProgressOption);
+      this.events.publish('changeNotifications');
     }
   }
 
