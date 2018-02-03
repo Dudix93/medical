@@ -29,7 +29,8 @@ export class GlobalVars {
     "lastModifiedDate": "",
     "lastName": "",
     "login": "",
-    "password": ""
+    "password": "",
+    "resetDate":""
   }
 
   raport = {

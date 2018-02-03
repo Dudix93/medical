@@ -95,7 +95,7 @@ export class RestapiServiceProvider {
 
   login(data) {
       let value = this.globalVar.getApiUrl();
-        return this.http.post(value+'/api/authenticate', data)
+        return this.http.post(value+'/authenticate', data)
         .map((response:Response) => {
           console.log("token: "+response.json().id_token);
           this.globalVar.setToken(response.json().id_token);
@@ -125,7 +125,7 @@ export class RestapiServiceProvider {
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
-        this.http.get(value+'/api/users/me/',this.headers())
+        this.http.get(value+'/users/me/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
@@ -293,7 +293,7 @@ export class RestapiServiceProvider {
     console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/api/users', data)
+        this.http.post(value+'/users', data)
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -543,6 +543,7 @@ export class RestapiServiceProvider {
   }
 
   updateUserPreferences(id,data) {
+    console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
         this.http.put(value+'/preferences/'+id, data, this.headers())

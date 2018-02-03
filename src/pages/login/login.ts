@@ -104,8 +104,7 @@ export class LoginPage {
     
     this.restapiService.login(this.loginData).subscribe((data) => {
       this.storage.set('isLoggedIn',true);
-      this.storage.set('zalogowany', this.loginData.username);
-      this.storage.set('haslo', this.loginData.password);
+      this.storage.set('zalogowany', {'username':this.loginData.username,'password':this.loginData.password,'rememberMe':true});
       this.navCtrl.push(HomePage);
     });
   }

@@ -126,10 +126,11 @@ export class HomePage {
                 //this.storage.clear();
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
-            this.storage.get('zalogowany').then((val) => {
+            this.storage.get('zalogowany').then((zalogowny) => {
+              this.restapiService.login(zalogowny);
               this.storage.get('apiUrl').then(url =>{
                 this.globalVars.setApiUrl(url);
-                //this.getUserData();
+                this.getUserData();
                 this.getProjects(null,null);
                 this.storage.get('notifications').then(notifications => {
                   this.setAutoTaskNotification(notifications.taskInProgressOption);

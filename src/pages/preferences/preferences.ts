@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { SingleDay } from '../../models/singleDay'
+import { GlobalVars } from '../../app/globalVars';
 
 @IonicPage()
 @Component({
@@ -41,12 +42,25 @@ export class PreferencesPage {
     ndId:0,nd:true, ndOd: '', ndDo: '', 
     }
 
+    user = {
+      "activated": this.globalVars.getUser().activated,
+      "email": this.globalVars.getUser().email,
+      "firstName": this.globalVars.getUser().firstName,
+      "id": this.globalVars.getUser().id,
+      "imageUrl": this.globalVars.getUser().imageUrl,
+      "langKey": this.globalVars.getUser().langKey,
+      "lastName": this.globalVars.getUser().lastName,
+      "login": this.globalVars.getUser().login,
+      "resetDate": "2018-02-03T12:36:31.013Z"
+    } 
+
   constructor(public navCtrl: NavController, 
               public restapiService: RestapiServiceProvider, 
               public navParams: NavParams, 
               public storage:Storage,
               public alertCtrl:AlertController,
-              public events:Events) {
+              public events:Events,
+              public globalVars:GlobalVars) {
     this.getUserPreferences();
     this.storage.get('notifications').then(data=>{
       if(data.newMsgsNotificacion == undefined) this.storage.set('notifications',this.notifications);
@@ -73,6 +87,9 @@ export class PreferencesPage {
     this.restapiService.getUserPreferences()
     .then(data => {
       this.preferences = data;
+      this.preferences.forEach(element => {
+        console.log(element);
+      });
       for (let entry of this.preferences) {
 
 
@@ -126,19 +143,19 @@ export class PreferencesPage {
     else if(this.settings.nd == true && this.settings.ndOd > this.settings.ndDo) this.showalert('Popraw godziny w niedzieli.');
     else if(this.notifications.ownNotification == true && (this.notifications.ownNotificationMsg == null || this.notifications.ownNotificationMsg == undefined || this.notifications.ownNotificationMsg == '')) this.showalert('Wpisz wiadomość.');
     else{
-      this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,1,this.settings.ponOd,this.settings.ponDo,this.settings.pon));
+      this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,this.user,'1',this.settings.ponOd,this.settings.ponDo,this.settings.pon));
 
-      this.restapiService.updateUserPreferences(this.settings.wtId,new SingleDay(this.settings.wtId,2,this.settings.wtOd,this.settings.wtDo,this.settings.wt));
+      this.restapiService.updateUserPreferences(this.settings.wtId,new SingleDay(this.settings.wtId,this.user,'2',this.settings.wtOd,this.settings.wtDo,this.settings.wt));
   
-      this.restapiService.updateUserPreferences(this.settings.srId,new SingleDay(this.settings.ptId,3,this.settings.srOd,this.settings.srDo,this.settings.sr));
+      this.restapiService.updateUserPreferences(this.settings.srId,new SingleDay(this.settings.srId,this.user,'3',this.settings.srOd,this.settings.srDo,this.settings.sr));
   
-      this.restapiService.updateUserPreferences(this.settings.czwId,new SingleDay(this.settings.ptId,4,this.settings.czwOd,this.settings.czwDo,this.settings.czw));
+      this.restapiService.updateUserPreferences(this.settings.czwId,new SingleDay(this.settings.ptId,this.user,'4',this.settings.czwOd,this.settings.czwDo,this.settings.czw));
   
-      this.restapiService.updateUserPreferences(this.settings.ptId,new SingleDay(this.settings.czwId,5,this.settings.ptOd,this.settings.ptDo,this.settings.pt));
+      this.restapiService.updateUserPreferences(this.settings.ptId,new SingleDay(this.settings.czwId,this.user,'5',this.settings.ptOd,this.settings.ptDo,this.settings.pt));
   
-      this.restapiService.updateUserPreferences(this.settings.sobId,new SingleDay(this.settings.sobId,6,this.settings.sobOd,this.settings.sobDo,this.settings.sob));
+      this.restapiService.updateUserPreferences(this.settings.sobId,new SingleDay(this.settings.sobId,this.user,'6',this.settings.sobOd,this.settings.sobDo,this.settings.sob));
   
-      this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,0,this.settings.ndOd,this.settings.ndDo,this.settings.nd));
+      this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,this.user,'0',this.settings.ndOd,this.settings.ndDo,this.settings.nd));
 
       this.showalert('Zaktualizowano<br>preferencje.');
 
