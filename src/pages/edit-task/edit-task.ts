@@ -162,7 +162,7 @@ getRaportData(){
           if(this.raport.action.id == raport.action.id && this.raport.projectId == raport.projectId && this.raport.id == raport.id){
             raport.lastUpdateDate = new Date();
             if(this.updateTime != '' && this.updateTime != undefined && this.updateTime != null){
-              raport.lastUpdateTimeOf = this.updateTime;
+              raport.lastUpdateTimeOf = Number(this.updateTime);
               raport.timeOf = raport.timeOf + this.updateTime*60;
             }
               this.restapiService.getDayTask().then(data =>{
@@ -189,9 +189,8 @@ getRaportData(){
                   console.log('save: '+JSON.stringify(new DayTask(this.raport.action.id,this.raport.projectId,this.raport.userId,new Date().toLocaleDateString(),this.updateTime,this.comment)));
                 }
               });
-            console.log(raport.comment);
-            console.log(this.comment);
             if(raport.comment != this.comment) raport.comment = this.comment;
+            console.log(raport);
             this.restapiService.updateRaport(raport.id,raport);
           }
         }
@@ -205,8 +204,9 @@ getRaportData(){
       this.restapiService.getRaports(null).then(rap => {
         this.raports = rap;
         for(let raport of this.raports){
-          if(this.raport.action.id == raport.action.id && this.raport.projectId == raport.projectId){
+          if(this.raport.action.id == raport.action.id && this.raport.project.id == raport.project.id){
             if(raport.comment != this.comment) raport.comment = this.comment;
+            console.log(raport);
             this.restapiService.updateRaport(raport.id,raport);
           }
         }

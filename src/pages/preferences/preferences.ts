@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
 import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-service';
 import { SingleDay } from '../../models/singleDay'
+import { NewSingleDay } from '../../models/newSingleDay'
 import { GlobalVars } from '../../app/globalVars';
 
 @IonicPage()
@@ -51,7 +52,7 @@ export class PreferencesPage {
       "langKey": this.globalVars.getUser().langKey,
       "lastName": this.globalVars.getUser().lastName,
       "login": this.globalVars.getUser().login,
-      "resetDate": "2018-02-03T12:36:31.013Z"
+      "resetDate": null
     } 
 
   constructor(public navCtrl: NavController, 
@@ -124,10 +125,25 @@ export class PreferencesPage {
               if(entry.dayOfWeek == 5)this.settings.ptDo = entry.hourTo;
               if(entry.dayOfWeek == 6)this.settings.sobDo = entry.hourTo;
               if(entry.dayOfWeek == 0)this.settings.ndDo = entry.hourTo;
-              // console.log("pon settings: "+if(entry.dayOfWeek == 6)this.settings.sobDo);
-              // console.log("pon entry: "+entry.sobDo);
-              //console.log("Do usunięcia: "+this.deleteID);
+
             }
+          if(this.preferences == ''){
+            this.settings.ponOd = "07:00";
+            this.settings.wtOd = "07:00";
+            this.settings.srOd = "07:00";
+            this.settings.czwOd = "07:00";
+            this.settings.ptOd = "07:00";
+            this.settings.sobOd = "07:00";
+            this.settings.ndOd = "07:00";
+
+            this.settings.ponDo = "15:00";
+            this.settings.wtDo = "15:00";
+            this.settings.srDo = "15:00";
+            this.settings.czwDo = "15:00";
+            this.settings.ptDo = "15:00";
+            this.settings.sobDo = "15:00";
+            this.settings.ndDo = "15:00";
+          }
             
         });
   }
@@ -142,7 +158,7 @@ export class PreferencesPage {
     else if(this.settings.sob == true && this.settings.sobOd > this.settings.sobDo) this.showalert('Popraw godziny w sobocie.');
     else if(this.settings.nd == true && this.settings.ndOd > this.settings.ndDo) this.showalert('Popraw godziny w niedzieli.');
     else if(this.notifications.ownNotification == true && (this.notifications.ownNotificationMsg == null || this.notifications.ownNotificationMsg == undefined || this.notifications.ownNotificationMsg == '')) this.showalert('Wpisz wiadomość.');
-    else{
+    else if(this.preferences != ''){
       this.restapiService.updateUserPreferences(this.settings.ponId,new SingleDay(this.settings.ponId,this.user,'1',this.settings.ponOd,this.settings.ponDo,this.settings.pon));
 
       this.restapiService.updateUserPreferences(this.settings.wtId,new SingleDay(this.settings.wtId,this.user,'2',this.settings.wtOd,this.settings.wtDo,this.settings.wt));
@@ -158,6 +174,27 @@ export class PreferencesPage {
       this.restapiService.updateUserPreferences(this.settings.ndId,new SingleDay(this.settings.ndId,this.user,'0',this.settings.ndOd,this.settings.ndDo,this.settings.nd));
 
       this.showalert('Zaktualizowano<br>preferencje.');
+
+      this.storage.set('notifications',this.notifications);
+      this.storage.set('taskInProgressMsgInterval',this.notifications.taskInProgressOption);
+      this.events.publish('changeNotifications');
+    }
+    else{
+      this.restapiService.saveUserPreferences(this.settings.ponId,new NewSingleDay(this.user,'1',this.settings.ponOd,this.settings.ponDo,this.settings.pon));
+
+      this.restapiService.saveUserPreferences(this.settings.wtId,new NewSingleDay(this.user,'2',this.settings.wtOd,this.settings.wtDo,this.settings.wt));
+  
+      this.restapiService.saveUserPreferences(this.settings.srId,new NewSingleDay(this.user,'3',this.settings.srOd,this.settings.srDo,this.settings.sr));
+  
+      this.restapiService.saveUserPreferences(this.settings.czwId,new NewSingleDay(this.user,'4',this.settings.czwOd,this.settings.czwDo,this.settings.czw));
+  
+      this.restapiService.saveUserPreferences(this.settings.ptId,new NewSingleDay(this.user,'5',this.settings.ptOd,this.settings.ptDo,this.settings.pt));
+  
+      this.restapiService.saveUserPreferences(this.settings.sobId,new NewSingleDay(this.user,'6',this.settings.sobOd,this.settings.sobDo,this.settings.sob));
+  
+      this.restapiService.saveUserPreferences(this.settings.ndId,new NewSingleDay(this.user,'0',this.settings.ndOd,this.settings.ndDo,this.settings.nd));
+
+      this.showalert('Zapisano<br>preferencje.');
 
       this.storage.set('notifications',this.notifications);
       this.storage.set('taskInProgressMsgInterval',this.notifications.taskInProgressOption);

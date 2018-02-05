@@ -29,7 +29,7 @@ declare let cordova: any;
 
 export class HomePage {
  raport = {
-  "timeOf": null,
+  "timeOf": 0,
   "startDate": '',
   "endDate": null,
   "comment": null,
@@ -40,9 +40,23 @@ export class HomePage {
   "countMethod": null,
   "pausedDate": null,
   "paused": false,
-  "userId": null,
-  "project": null
+  "user": null,
+  "project": null,
+  "lastUpdateDate":null,
+  "lastUpdateTimeOf":0
  }
+
+ user = {
+  "activated": this.globalVars.getUser().activated,
+  "email": this.globalVars.getUser().email,
+  "firstName": this.globalVars.getUser().firstName,
+  "id": this.globalVars.getUser().id,
+  "imageUrl": this.globalVars.getUser().imageUrl,
+  "langKey": this.globalVars.getUser().langKey,
+  "lastName": this.globalVars.getUser().lastName,
+  "login": this.globalVars.getUser().login,
+  "resetDate": null
+} 
 
   dayTask = {
       task_id:0,
@@ -86,7 +100,7 @@ export class HomePage {
   userPreferences:any;
   time:number;
   firstDay:boolean;
-  user: Array<any>;
+  //user: Array<any>;
   dayTasks: any;
   projects: any;
   project:any;
@@ -126,8 +140,9 @@ export class HomePage {
                 //this.storage.clear();
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
-            this.storage.get('zalogowany').then((zalogowny) => {
-              this.restapiService.login(zalogowny);
+            this.storage.get('zalogowany').then((zalogowany) => {
+              console.log('zalogowany: '+JSON.stringify(zalogowany));
+              //this.restapiService.login(zalogowany).subscribe(data=>{console.log(data)});
               this.storage.get('apiUrl').then(url =>{
                 this.globalVars.setApiUrl(url);
                 this.getUserData();
@@ -150,9 +165,15 @@ export class HomePage {
                   });
                 },1000);
                 this.inProgress = false;
+                
                 this.events.subscribe('updateViewAfterEdit',()=>{
                   this.getProjects(null,null);
                 });
+
+                this.events.subscribe('updateUserData',()=>{
+                  this.getUserData();
+                });
+
                 this.events.subscribe('changeNotifications',()=>{
                   this.storage.get('notifications').then(data => {
                   }).then(()=>{
@@ -161,6 +182,7 @@ export class HomePage {
                     });
                   });
                 });
+
                 setInterval(() => {
                   if(this.globalVars.getCurrentTaskId() != null){
                     this.setWorkHours();
@@ -217,6 +239,16 @@ export class HomePage {
       this.restapiService.getUser().then(user => {
         this.globalVars.setUser(user);
         this.name = this.globalVars.getUser().firstName;
+
+        this.user.activated= this.globalVars.getUser().activated,
+        this.user.email= this.globalVars.getUser().email,
+        this.user.firstName= this.globalVars.getUser().firstName,
+        this.user.id= this.globalVars.getUser().id,
+        this.user.imageUrl= this.globalVars.getUser().imageUrl,
+        this.user.langKey= this.globalVars.getUser().langKey,
+        this.user.lastName= this.globalVars.getUser().lastName,
+        this.user.login= this.globalVars.getUser().login,
+        this.user.resetDate= null
       });
     }
 
@@ -364,11 +396,11 @@ export class HomePage {
     }
 
     phoneNotification(id:number,title:string,text:string){
-      cordova.plugins.notification.local.schedule({
-        id: id,
-        title: title,
-        text: text,
-      }); 
+      // cordova.plugins.notification.local.schedule({
+      //   id: id,
+      //   title: title,
+      //   text: text,
+      // }); 
     }
 
     // powiadomienieCykliczne() {
@@ -759,18 +791,19 @@ export class HomePage {
   }
 
   prepareTasksRadioButtons(pt:any,project_id:number){
+    console.log(pt);
     let buttons:any;
     let startedTasks:any;
     this.radioButtons = new Array<any>();
     this.globalVars.setButtons([]);
-    this.restapiService.getProjectTasks(project_id).
-    subscribe((data:any) => {
-      console.log(data);
-    });
+    // this.restapiService.getProjectTasks(project_id).
+    // subscribe((data:any) => {
+    //   console.log(data);
+    // });
       startedTasks = new Array<any>();
       this.projectTasks = pt;
       console.log("--------------------------------");
-      for(let task of this.projectTasks.tasks){
+      for(let task of this.projectTasks){
         for(let project of this.userProjects){
           if(project.project.id == project_id && project.tasks.length != 0){
             for(let task of project.tasks)startedTasks.push(task[0].action.id);
@@ -824,7 +857,7 @@ export class HomePage {
         const today = new Date();
         today.setTime(today.getTime() + (1 * 60 * 60 * 1000));
         const todayStr: string = today.toISOString();
-        this.raport.startDate = todayStr.substring(0, 11) + startHour.startHour;
+        this.raport.startDate = todayStr.substring(0, 11) + startHour.startHour+':00.000Z';
       }
       else if(startHour.startHour == ''){
         this.raport.startDate = new Date().toISOString();
@@ -838,12 +871,13 @@ export class HomePage {
     this.raport.action.name = task.title;
     this.raport.countMethod = countMethod;
     //this.raport.userId = this.globalVars.getUser().id;
-    this.raport.userId = 4;
+    this.raport.user = this.user;
     this.raport.project = project;
 
     this.globalVars.setCurrentTaskId(task.id);
     this.globalVars.setCurrentTaskName(task.title);
     this.globalVars.setCurrentTaskCountMethod(countMethod);
+    console.log(JSON.stringify(this.raport));
     this.restapiService.saveRaport(this.raport).then(() =>{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
@@ -929,7 +963,7 @@ export class HomePage {
               this.raport.action.id = raport.action.id;
               this.raport.action.name = raport.action.name;
               this.raport.countMethod = raport.countMethod;
-              this.raport.userId = raport.userId;
+              this.raport.user = raport.user;
               this.raport.project = raport.project;
               console.log(this.raport);
     
@@ -963,6 +997,9 @@ export class HomePage {
   }
 
   countTime(project_id:number,task_id:number,pref:any,startDate:Date,endDate:Date){
+    // console.log(startDate.getMonth()+' '+new Date(endDate).getMonth()+' '+startDate.getUTCDate()+' '+new Date(endDate).getUTCDate());
+    // console.log(startDate+' '+startDate.getUTCDate());
+    // console.log(endDate+' '+endDate.getUTCDate());
     let time = 0;
     let reportStartHour;
     let reportEndHour;
@@ -976,6 +1013,7 @@ export class HomePage {
     this.userPreferences = pref;
     let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
               for(let d = startDate;d.getMonth()<=new Date(endDate).getMonth() && d.getUTCDate()<=new Date(endDate).getUTCDate();d.setDate(d.getDate()+1)){
+                //console.log(d.toLocaleDateString());
                 for(let p of this.userPreferences){
                   if(p.dayOfWeek == d.getDay()){
                     workStartHour = p.hourFrom;

@@ -33,10 +33,8 @@ export class LoginPage {
     });
     this.storage.get('isLoggedIn').then((val) => {
       if(val == true){
-        this.storage.get('zalogowany').then(login => {
-          this.storage.get('haslo').then(password => {
-            this.login2(login,password);
-          });
+        this.storage.get('zalogowany').then(zalogowany => {
+            this.login2(zalogowany);
         });
       }
     });
@@ -88,14 +86,14 @@ export class LoginPage {
     });
   }
 
-  login2(login:string,password:string) {
+  login2(zalogowany:any) {
 
     this.storage.set('apiUrl', this.credentials.apiUrl);
     this.globalVar.setApiUrl(this.credentials.apiUrl);
 
-    if(login != null && password != null){
-      this.loginData.username = login;
-      this.loginData.password = password;
+    if(zalogowany != null){
+      this.loginData.username = zalogowany.username;
+      this.loginData.password = zalogowany.password;
     }
     else{
       this.loginData.username = this.credentials.login;
@@ -105,6 +103,7 @@ export class LoginPage {
     this.restapiService.login(this.loginData).subscribe((data) => {
       this.storage.set('isLoggedIn',true);
       this.storage.set('zalogowany', {'username':this.loginData.username,'password':this.loginData.password,'rememberMe':true});
+      this.globalVar.setUserPassword(this.loginData.password);
       this.navCtrl.push(HomePage);
     });
   }
