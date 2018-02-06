@@ -9,13 +9,17 @@
     Data rozpoczęcia: {{startDate}}
   </ion-item>
   <ion-item *ngIf="countMethod=='manual'"> 
-      Spędzony czas: {{timeOfHours}} godzin {{timeOfMinutes}} minut (Pozostało {{timeLeft}} z {{projectTime}}).
+      Spędzony czas: {{timeOfHours}} godzin (pozostało {{timeLeft}} z {{projectTime}} godzin).
   </ion-item>
+
+  <ion-item *ngIf="countMethod=='manual'"> 
+    Czas do wykorzystania na dzisiaj: {{timeLeftToday.hours}}:{{timeLeftToday.minutes}} 
+</ion-item>
   
   <!-- <ion-item *ngIf="countMethod=='automatic'"> 
       Spędzony czas: {{params.hours}} godzin {{timeOf}} minut.
   </ion-item> -->
-  <ion-item *ngIf="countMethod=='manual'">  
+  <ion-item *ngIf="countMethod=='manual' && lastUpdateTimeOf != 0">  
       Ostatnia aktualizacja:<br> 
       {{updateDate}} o {{lastUpdateTimeOf}} godzin.
   </ion-item>

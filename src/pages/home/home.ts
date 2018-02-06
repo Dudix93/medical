@@ -293,6 +293,7 @@ export class HomePage {
       // this.storage.set('deletedMessages',undefined);
       // this.storage.set('unreadMessages',undefined);
       // this.storage.set('oldMessages',undefined);
+      this.amountNewMessages = 0;
       this.newMsgs = new Array<any>();
       let allMsgs;
       let currentMsg;
@@ -313,7 +314,7 @@ export class HomePage {
             this.storage.get('deletedMessages').then(data => {
               if(data == undefined || data == null) deletedMsgs = [];
               else deletedMsgs = data;
-                if(unreadMsgs != undefined && unreadMsgs != null)this.amountNewMessages = unreadMsgs.length;
+                if(unreadMsgs != undefined && unreadMsgs != null)
                 this.unreadMsgs = unreadMsgs;
                 this.oldMsgs = oldMsgs;
                 if(this.unreadMsgs == undefined || this.unreadMsgs == null){
@@ -372,6 +373,9 @@ export class HomePage {
                 }
                 this.storage.set('unreadMessages',this.unreadMsgs);
 
+                this.unreadMsgs.forEach(msg => {
+                  if(msg.userId == this.globalVars.getUser().id)this.amountNewMessages++;
+                });
                 this.storage.get('notifications').then(notifications=>{
                   if(notifications.newMsgsNotificacion == true){
                       if(this.newMsgs.length != 0){
@@ -396,11 +400,11 @@ export class HomePage {
     }
 
     phoneNotification(id:number,title:string,text:string){
-      // cordova.plugins.notification.local.schedule({
-      //   id: id,
-      //   title: title,
-      //   text: text,
-      // }); 
+        cordova.plugins.notification.local.schedule({
+        id: id,
+        title: title,
+        text: text,
+      }); 
     }
 
     // powiadomienieCykliczne() {
@@ -446,6 +450,10 @@ export class HomePage {
                     minutesSpent = (Number(this.userProjects[index]['spent'].split(':')[0])*60)+(Number(this.userProjects[index]['spent'].split(':')[1]));
                     minutesSpent++;
                     this.userProjects[index]['spent'] = this.minutesToHM((minutesSpent+1)/60);
+                    console.log(Number(this.userProjects[index]['spent'].split(':')[0])+' '+this.userProjects[index].project.numberOfHours);
+                    if(Number(this.userProjects[index]['spent'].split(':')[0]) == this.userProjects[index].project.numberOfHours){
+                      this.finishTask(this.globalVars.getCurrentTask().id,this.userProjects[index].project.id);
+                    }
                   }
                   index++;
                 })
@@ -494,6 +502,9 @@ export class HomePage {
             this.currentDay.workDay = p.workDay;
             this.currentDay.hourFrom = p.hourFrom;
             this.currentDay.hourTo = p.hourTo;
+
+            this.globalVars.setStartWorkHour(p.hourFrom);
+            this.globalVars.setStopWorkHour(p.hourTo);
             break;
           }
         }
@@ -518,8 +529,11 @@ export class HomePage {
           if(currentDayTask.taskId == null){
             currentDayTask.taskId = dt.taskId;
             currentDayTask.projectId = dt.projectId;
-            currentDayTask.date = dt.date;
-            currentDayTask.time = dt.time;
+            currentDayTask.date = new Date(dt.date.concat('/00:00'));
+            
+            if(Math.floor(60*(dt.time/60 - Math.floor(dt.time/60)))>30) currentDayTask.time = Math.floor(dt.time/60)+1;
+            else currentDayTask.time = Math.floor(dt.time/60);
+
             currentDayTask.userId = dt.userId;
             currentDayTask.comment = dt.comment;
           }
@@ -528,8 +542,11 @@ export class HomePage {
             currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
                 currentDayTask.taskId = dt.taskId;
                 currentDayTask.projectId = dt.projectId;
-                currentDayTask.date = dt.date;
-                currentDayTask.time = dt.time;
+                currentDayTask.date = new Date(dt.date.concat('/00:00'));
+                
+                if(Math.floor(60*(dt.time/60 - Math.floor(dt.time/60)))>30) currentDayTask.time = Math.floor(dt.time/60)+1;
+                else currentDayTask.time = Math.floor(dt.time/60);
+
                 currentDayTask.userId = dt.userId;
                 currentDayTask.comment = dt.comment;
                 console.log('nadpisanie: '+currentDayTask.date+" "+currentDayTask.time);
@@ -539,6 +556,7 @@ export class HomePage {
                 }
           }
           else if(currentDayTask.taskId == dt.taskId && currentDayTask.projectId == dt.projectId && currentDayTask.date == dt.date){
+            console.log(Number(currentDayTask.time)+" + "+Number(dt.time))
             currentDayTask.time = Number(currentDayTask.time) + Number(dt.time);
             if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
               currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
@@ -804,25 +822,42 @@ export class HomePage {
       this.projectTasks = pt;
       console.log("--------------------------------");
       for(let task of this.projectTasks){
+        if(task.dateTo == null) task.dateTo = new Date("01/01/2999");
         for(let project of this.userProjects){
           if(project.project.id == project_id && project.tasks.length != 0){
             for(let task of project.tasks)startedTasks.push(task[0].action.id);
               if(startedTasks.indexOf(task.id) == -1){
+                console.log(task);
+                console.log(task.dateTo.valueOf()+' '+new Date().valueOf()+' '+new Date(task.dateFrom).valueOf());
                 if(this.radioButtons.length == 0){
-                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
+                  if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,true));
+                  else
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,true));
                 }
                 else{
-                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
+                  if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,false));
+                  else
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,false));
                 }
               }
           }
           else if(project.project.id == project_id && project.tasks.length == 0){
-
+            console.log(task);
+            console.log(task.dateTo.valueOf()+' '+new Date().valueOf()+' '+task.dateFrom.valueOf());
             if(this.radioButtons.length == 0){
-              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true));
+              
+              if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,true));
+              else
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,true));
             }
             else{
-              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false));
+              if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,false));
+              else
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,false));
             }
           }
         }
@@ -835,8 +870,8 @@ export class HomePage {
 
   prepareCountMethodRadioButtons(){
     this.radioButtons = [];
-    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manual",true));
-    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatic",false));
+    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manual",false,true));
+    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatic",false,false));
     return this.radioButtons;
   }
 
@@ -877,7 +912,7 @@ export class HomePage {
     this.globalVars.setCurrentTaskId(task.id);
     this.globalVars.setCurrentTaskName(task.title);
     this.globalVars.setCurrentTaskCountMethod(countMethod);
-    console.log(JSON.stringify(this.raport));
+    console.log('zapisujemy raport: '+JSON.stringify(this.raport));
     this.restapiService.saveRaport(this.raport).then(() =>{
       this.restapiService.getRaports(null).then(data => {
         raports = data;
@@ -905,8 +940,11 @@ export class HomePage {
       raports = data;
       for(let raport of raports){
         if(raport.action.id == task_id && raport.project.id == project_id){
-          raport.endDate = new Date().toISOString();
-          this.restapiService.updateRaport(raport.id,raport);
+          if(raport.timeOf == 0)this.restapiService.deleteRaport(raport.id);
+          else{
+            raport.endDate = new Date().toISOString();
+            this.restapiService.updateRaport(raport.id,raport);
+          }
           if(raport.countMethod == 'automatic')automatic = true;
         }
       }

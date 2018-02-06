@@ -20,7 +20,7 @@ export class PreferencesPage {
     'ownNotificationTime':null,
     'ownNotificationMsg':null,
     'ownNotificationDate':null,
-    'ownNotification':true,
+    'ownNotification':false,
     'taskInProgressOption':0
   }
   taskInProgressNotification:Array<any> =[

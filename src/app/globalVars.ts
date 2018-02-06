@@ -7,8 +7,8 @@ export class GlobalVars {
   projectTasks:any;
   selectedTask:any;
   selectedProject:any;
-  startWorkHour:any;
-  stopWorkHour:any;
+  startWorkHour:string;
+  stopWorkHour:string;
 
   messages = new Array<any>();
   newMessages = new Array<any>();
@@ -55,6 +55,8 @@ export class GlobalVars {
     "raport_id":null,
     "count_method":null
   }
+
+  
 
   constructor() {
   }

@@ -33,6 +33,7 @@ export class CalendarPage {
     "projectId":null
   }
   taskToEdit = {
+    "id":null,
     "date":null,
     "taskId":null,
     "userId":null,
@@ -85,6 +86,7 @@ export class CalendarPage {
           'task':day,
           'full_time':null,
           'full_update_time':null,
+          'dateString':null,
           'difference':null}
       }
     });
@@ -94,6 +96,7 @@ export class CalendarPage {
       for(let day of this.dayTasks){
         day.comment = this.comment;
         for(let update of this.raportUpdates){
+          this.dayTasks[this.dayTasks.indexOf(day)]['dateString'] = new Date(this.dayTasks[this.dayTasks.indexOf(day)]['task'].date).toLocaleDateString();
           if(update.taskId == day['task'].taskId && update.date == day['task'].date && update.projectId == day['task'].projectId){
             this.updateComment = update.comment;
             this.dayTasks[this.dayTasks.indexOf(day)]['update'] = update;
@@ -142,6 +145,7 @@ export class CalendarPage {
   
   addDayTaskToUpdate(dayTask:any,updateTime:any,oldTime:any){
     let updated = false;
+    this.taskToEdit.id = null
     this.taskToEdit.date = dayTask.date;
     this.taskToEdit.taskId = dayTask.taskId;
     this.taskToEdit.userId = this.globalVars.getUser().id;
@@ -169,11 +173,14 @@ export class CalendarPage {
       this.restapiService.getRaportUpdate().then(data =>{
         this.raports = data;
         for(let update of this.raports){
-          if(this.taskToEdit.projectId == update.projectId && this.taskToEdit.taskId == update.taskId && this.taskToEdit.date == update.date){
-            this.restapiService.updateRaportUpdate(update.id,this.taskToEdit);
-            console.log('zaktualizowano');
-            updated = true;
-            break;
+          if(update.date != null){
+            if(this.taskToEdit.projectId == update.projectId && this.taskToEdit.taskId == update.taskId && new Date(this.taskToEdit.date).toLocaleDateString() == new Date(update.date).toLocaleDateString()){
+              this.taskToEdit.id = update.id;
+              this.restapiService.updateRaportUpdate(update.id,this.taskToEdit);
+              console.log('zaktualizowano');
+              updated = true;
+              break;
+            }
           }
         }
         if(updated == false){
@@ -218,7 +225,8 @@ export class CalendarPage {
     });
     
     this.restapiService.getProjectTasks(this.selectedProject).subscribe(data=>{
-      for(let task of data.tasks){
+      console.log(this.selectedProject+' '+data);
+      for(let task of data){
         if(task.id == this.selectedTask){
           this.selectedTaskName = task.name;
           break;
@@ -266,12 +274,13 @@ export class CalendarPage {
      this.restapiService.getRaportUpdate().then(data => {
       raportUpdates = data;
       for(let update of raportUpdates){
-        console.log(update.projectId+' ? '+project_id+' '+update.taskId+' ? '+task_id);
+        //console.log(update.projectId+' ? '+project_id+' '+update.taskId+' ? '+task_id);
         if(update.projectId == project_id && update.taskId == task_id){
-          console.log('znalazlem '+update.id);
+          //console.log('znalazlem '+update.id);
           found = true;
           update.comment = this.updateComment;
           update.updateDate = new Date().toISOString();
+          console.log(JSON.stringify(update));
           this.restapiService.updateRaportUpdate(update.id,update);
         }
       }
@@ -294,7 +303,7 @@ export class CalendarPage {
 
   updateTimePrompt(task_title:string,dayTask:any) {
     const alert = this.alertCtrl.create({
-      title: 'Edytujesz '+this.selectedTaskName+'<br>'+'z dnia '+dayTask.date,
+      title: 'Edytujesz '+this.selectedTaskName+'<br>'+'z dnia '+new Date(dayTask.date).toLocaleDateString(),
       inputs: [
         {
           name: 'time',

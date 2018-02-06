@@ -5,6 +5,7 @@ import { RestapiServiceProvider } from '../../providers/restapi-service/restapi-
 import { GlobalVars } from '../../app/globalVars';
 import { DayTask } from '../../models/dayTask';
 import { CalendarPage } from '../../pages/calendar/calendar';
+import { ToastController } from 'ionic-angular/components/toast/toast-controller';
 
 @Component({
   selector: 'page-edit-task',
@@ -29,6 +30,12 @@ export class EditTaskPage {
   timeSpent:any;
   timeLeft:any;
   projectTime:any;
+  dayTasks:any;
+  timeLeftToday = {
+    "total":null,
+    "hours":null,
+    "minutes":null
+  }
   taskToEdit = {
     "date":null,
     "taskId":null,
@@ -44,6 +51,7 @@ export class EditTaskPage {
               private restapiService: RestapiServiceProvider, 
               private storage: Storage,
               private alertCtrl: AlertController,
+              private toastCtrl: ToastController,
               private events: Events,
               private globalVars: GlobalVars) 
   {
@@ -109,51 +117,62 @@ getRaportData(){
   this.raportId = this.navParams.get('raportId');
   this.restapiService.getRaports(null).then(rap => {
     this.raports = rap;
-    for(let raport of this.raports){
-      if(this.raportId == raport.id){
-        this.raport = raport;
-        this.countMethod = this.raport.countMethod;
-        this.task_name = this.raport.action.name;
-        this.comment = this.currentComment = this.raport.comment;
-        this.lastUpdateTimeOf = this.raport.lastUpdateTimeOf;
-        if(this.raport.timeOf > 60){
-          this.timeOfHours = (this.raport.timeOf/60).toString().split(".")[0];
-          this.timeOfMinutes = (this.raport.timeOf)-(this.timeOfHours*60);
+    this.restapiService.getRaports(null).then(dt => {
+      this.dayTasks = dt;
+      for(let raport of this.raports){
+        if(this.raportId == raport.id){
+          // for(let dt of this.dayTasks){
+          //   if(dt.taskId == raport.action.id && dt.projectId == raport.project.id && raport.userId == raport.user.id){
+              this.timeLeftToday.total = (new Date("01.01.2000/".concat(this.globalVars.getStopWorkHour())).getTime() - new Date("01.01.2000/".concat(this.globalVars.getStartWorkHour())).getTime());
+              this.timeLeftToday.hours = Math.floor(this.timeLeftToday.total/3600000);
+              this.timeLeftToday.minutes = Math.floor(60*(this.timeLeftToday.total/3600000 - Math.floor(this.timeLeftToday.total/3600000)));
+          //   }
+          // }
+          this.raport = raport;
+          this.countMethod = this.raport.countMethod;
+          this.task_name = this.raport.action.name;
+          this.comment = this.currentComment = this.raport.comment;
+          this.lastUpdateTimeOf = this.raport.lastUpdateTimeOf;
+          if(this.raport.timeOf > 60){
+            this.timeOfHours = (this.raport.timeOf/60).toString().split(".")[0];
+            this.timeOfMinutes = (this.raport.timeOf)-(this.timeOfHours*60);
+          }
+          else{
+            this.timeOfHours = 0;
+            this.timeOfMinutes = this.raport.timeOf;
+          }
+          this.updateDate = new Date(this.raport.lastUpdateDate).toLocaleDateString().concat(" ".
+                            concat(new Date(this.raport.lastUpdateDate).getHours().toString().concat(":".
+                            concat(this.fullMinutes(new Date(this.raport.lastUpdateDate).getMinutes())))));
+          this.startDate = new Date(this.raport.startDate).toLocaleDateString().concat(" ".
+                            concat(new Date(this.raport.startDate).getHours().toString().concat(":".
+                            concat(this.fullMinutes(new Date(this.raport.startDate).getMinutes())))));   
+                break;
         }
-        else{
-          this.timeOfHours = 0;
-          this.timeOfMinutes = this.raport.timeOf;
-        }
-        this.updateDate = new Date(this.raport.lastUpdateDate).toLocaleDateString().concat(" ".
-                          concat(new Date(this.raport.lastUpdateDate).getHours().toString().concat(":".
-                          concat(this.fullMinutes(new Date(this.raport.lastUpdateDate).getMinutes())))));
-        this.startDate = new Date(this.raport.startDate).toLocaleDateString().concat(" ".
-                          concat(new Date(this.raport.startDate).getHours().toString().concat(":".
-                          concat(this.fullMinutes(new Date(this.raport.startDate).getMinutes())))));   
-              break;
       }
-    }
-    console.log(this.lastUpdateTimeOf);
-    console.log(this.updateDate);
-    console.log(this.timeOfHours+":"+this.timeOfMinutes);
+      console.log(this.lastUpdateTimeOf);
+      console.log(this.updateDate);
+      console.log(this.timeOfHours+":"+this.timeOfMinutes);
+    }); 
   }); 
 }
 
   updateTask(){
+    let error = false;
     let dayTasks;
     let updated = false;
     if(this.raport.countMethod == 'manual'){
       if(isNaN(Number(this.updateTime)) == true && this.updateTime != undefined){
-        this.showalert("Wpisz liczbę!");
+        this.showToast("Wpisz liczbę!");
       }
       else if(this.updateTime != undefined && this.updateTime != parseInt(this.updateTime.toString(), 10)){
-        this.showalert("Wpisz pełną godzine!");
+        this.showToast("Wpisz pełną godzine!");
       }
       else if(Number(this.updateTime) < 0){
-        this.showalert("Wpisz dodatnią liczbę!");
+        this.showToast("Wpisz dodatnią liczbę!");
       }
       else if(Number(this.updateTime)*60 > (this.projectTime*60-this.timeSpent)){
-        this.showalert("Przekroczysz pulę godzin w projekcie!");
+        this.showToast("Przekroczysz pulę godzin w projekcie!");
       }
       else{
       this.restapiService.getRaports(null).then(rap => {
@@ -162,17 +181,18 @@ getRaportData(){
           if(this.raport.action.id == raport.action.id && this.raport.projectId == raport.projectId && this.raport.id == raport.id){
             raport.lastUpdateDate = new Date();
             if(this.updateTime != '' && this.updateTime != undefined && this.updateTime != null){
-              raport.lastUpdateTimeOf = Number(this.updateTime);
+              raport.lastUpdateTimeOf = Number(this.updateTime)*60;
               raport.timeOf = raport.timeOf + this.updateTime*60;
             }
               this.restapiService.getDayTask().then(data =>{
                 dayTasks = data;
                 for(let dayTask of dayTasks){
-                  if(dayTask.date && raport.action.id == dayTask.taskId && raport.action.id == dayTask.taskId){
+                  //console.log(JSON.stringify(dayTask));
+                  if(dayTask.date && raport.action.id == dayTask.taskId){
                     dayTask.comment = this.comment;
                     this.restapiService.updateDayTask(dayTask.id,dayTask);
                   }
-                  if(new Date().toLocaleDateString() == dayTask.date && raport.action.id == dayTask.taskId && raport.action.id == dayTask.taskId){
+                  if(new Date().toLocaleDateString() == new Date(dayTask.date).toLocaleDateString() && raport.action.id == dayTask.taskId && raport.action.id == dayTask.taskId){
                     if(this.updateTime != '' && this.updateTime != undefined && this.updateTime != null){
                       if(dayTask.time != undefined) dayTask.time = Number(dayTask.time) + Number(this.updateTime);
                       else dayTask.time = Number(this.updateTime);
@@ -185,17 +205,21 @@ getRaportData(){
                   }
                 }
                 if(updated == false){
-                  this.restapiService.saveDayTask(new DayTask(this.raport.action.id,this.raport.projectId,this.raport.userId,new Date().toLocaleDateString(),this.updateTime,this.comment));
-                  console.log('save: '+JSON.stringify(new DayTask(this.raport.action.id,this.raport.projectId,this.raport.userId,new Date().toLocaleDateString(),this.updateTime,this.comment)));
+                  this.restapiService.saveDayTask(new DayTask(this.raport.action.id,this.raport.project.id,this.raport.user.id,new Date(),this.updateTime,this.comment));
+                  //console.log('save: '+JSON.stringify(new DayTask(this.raport.action.id,this.raport.projectId,this.raport.userId,new Date().toLocaleDateString(),this.updateTime,this.comment)));
                 }
               });
             if(raport.comment != this.comment) raport.comment = this.comment;
-            console.log(raport);
-            this.restapiService.updateRaport(raport.id,raport);
+            //console.log(JSON.stringify(raport));
+            raport.startDate = new Date(raport.startDate);
+            this.restapiService.updateRaport(raport.id,raport).catch(error=>{
+              if(error.status == 500)this.showalert("Wystąpił problem z serwerem.");
+              error = true;
+            });
           }
         }
         this.events.publish('updateViewAfterEdit');
-        this.showalert('Zaktualizowano czynność.');
+        if(error == false)this.showalert('Zaktualizowano czynność.');
         this.navCtrl.pop();
       });
     }
@@ -207,11 +231,14 @@ getRaportData(){
           if(this.raport.action.id == raport.action.id && this.raport.project.id == raport.project.id){
             if(raport.comment != this.comment) raport.comment = this.comment;
             console.log(raport);
-            this.restapiService.updateRaport(raport.id,raport);
+            this.restapiService.updateRaport(raport.id,raport).catch(error=>{
+              if(error.status == 500)this.showalert("Wystąpił problem z serwerem.");
+              error = true;
+            });;
           }
         }
         this.events.publish('updateViewAfterEdit');
-        this.showalert('Zaktualizowano czynność.');
+        if(error == false) this.showalert('Zaktualizowano czynność.');
         this.navCtrl.pop();
       });
     }
@@ -261,6 +288,15 @@ showalert(info:string) {
     ]
   });
   alert.present();
+}
+
+showToast(message:any) {
+  let toast = this.toastCtrl.create({
+    message: message,
+    duration: 3000,
+    position: 'bottom'
+  });
+  toast.present();
 }
 
 }

@@ -87,7 +87,7 @@ export class LoginPage {
   }
 
   login2(zalogowany:any) {
-
+    let response;
     this.storage.set('apiUrl', this.credentials.apiUrl);
     this.globalVar.setApiUrl(this.credentials.apiUrl);
 
@@ -100,17 +100,30 @@ export class LoginPage {
       this.loginData.password = this.credentials.password;
     }
     
-    this.restapiService.login(this.loginData).subscribe((data) => {
-      this.storage.set('isLoggedIn',true);
-      this.storage.set('zalogowany', {'username':this.loginData.username,'password':this.loginData.password,'rememberMe':true});
-      this.globalVar.setUserPassword(this.loginData.password);
-      this.navCtrl.push(HomePage);
-    });
+    this.restapiService.login(this.loginData).then(data => {
+
+        this.storage.set('isLoggedIn',true);
+        this.storage.set('zalogowany', {'username':this.loginData.username,'password':this.loginData.password,'rememberMe':true});
+        this.globalVar.setUserPassword(this.loginData.password);
+        this.navCtrl.push(HomePage);
+      
+    }).catch(err => {
+      console.log('error: '+err.status);
+      if(err.status == 0 || err.status == 403){
+        this.showToast("Błąd połączenia z serwerem.");
+      }
+      else if(err.status == 401 || err.status == 400){
+        this.showToast("Podałeś zły login lub hasło.");
+      }
+  });
   }
 
   register(){
     this.correct=true;
-    this.navCtrl.push(RegisterPage);
+    this.restapiService.register(this.credentials.apiUrl,null).catch(err=>{
+      if(err.status == 400)this.navCtrl.push(RegisterPage,{'apiUrl':this.credentials.apiUrl});
+      else this.showToast("Błąd połączenia z serwerem.");
+    });
   }
 
   showToast(message:any) {

@@ -31,7 +31,7 @@
                   <ion-col col-2 class="title"></ion-col>
               </ion-row>
               <ion-row *ngFor="let dayTask of dayTasks"> 
-                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask">{{dayTask['task'].date}}</ion-col>
+                  <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask">{{dayTask['dateString']}}</ion-col>
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] == null">{{dayTask['full_time']}}</ion-col>
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time < dayTask['update'].time">{{dayTask['full_time']}} <span class="plus">+ {{dayTask['difference']}}</span></ion-col>
                   <ion-col col-4 *ngIf="dayTask['task'].projectId == selectedProject && dayTask['task'].taskId == selectedTask && dayTask['update'] != null && dayTask['task'].time > dayTask['update'].time">{{dayTask['full_time']}} <span class="minus">- {{dayTask['difference']}}</span></ion-col>
