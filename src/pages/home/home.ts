@@ -441,7 +441,7 @@ export class HomePage {
       if(this.globalVars.getCurrentTaskId != null){
         for(let project of this.userProjects){
           for(let task of project.tasks){
-            if(task[0].endDate == null && task[0].action.id == task_id && task[0].countMethod == 'automatic'){
+            if(task[0].endDate == null && task[0].pausedDate == null && task[0].action.id == task_id && task[0].countMethod == 'automatic'){
               this.restapiService.getRaports(task[0].id).then(rap => {
                 raport = rap;
 
@@ -1238,6 +1238,7 @@ export class HomePage {
               {
                 text: 'OK',
                 handler: data => {
+                  console.log('selectcount: '+data);
                   if(data == 'manual') this.startTask(project,taskToStart, data, null);
                   else this.selectStartDate(project,taskToStart, data);
                 }
