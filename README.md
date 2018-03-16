@@ -9,17 +9,17 @@ Aplikacja powstała jako praca dyplomowa - inżynierska, w ramach stażu odbyteg
 
 ### Użyte technologie:
 
--  \[Ionic \](https://ionicframework.com/)
+-  [Ionic](https://ionicframework.com/)
 
--  \[Angular\](https://angular.io/)
+-  [Angular](https://angular.io/)
 
--  \[Cordova\](https://cordova.apache.org/)
+-  [Cordova](https://cordova.apache.org/)
 
--  \[NodeJS\](https://nodejs.org/)
+-  [NodeJS](https://nodejs.org/)
 
--  \[TypeScript\](https://www.typescriptlang.org/)
+-  [TypeScript](https://www.typescriptlang.org/)
 
-\### Prezentacja aplikacji:
+### Prezentacja aplikacji:
 
 | ![enter image description here](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/err_logn.png) |![enter image description here](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/err_conn.png) |
 |--|--|
