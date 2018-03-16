@@ -1,26 +1,48 @@
-This is a starter template for [Ionic](http://ionicframework.com/docs/) projects.
 
-## How to use this template
+## Aplikacja mobilna do raportowania czasu przeznaczonego na projekty
 
-*This template does not work on its own*. The shared files for each starter are found in the [ionic2-app-base repo](https://github.com/ionic-team/ionic2-app-base).
+Aplikacja powstała jako praca dyplomowa - inżynierska, w ramach stażu odbytego w firmie programistycznej "Transition Technologies". Pozwala ona na zarządzanie i raportowanie czasu spędzonego nad projektami w firmie, z podziałem na poszczególne czynności (np. programowanie, testowanie itp.). Aplikacja funkcjonuje w oparciu o połączenie z REST API, z którym następuje wymiana danych.
 
-To use this template, either create a new ionic project using the ionic node.js utility, or copy the files from this repository into the [Starter App Base](https://github.com/ionic-team/ionic2-app-base).
+### Użyte technologie:
+- [Ionic ](https://ionicframework.com/) 
+- [Angular](https://angular.io/) 
+- [Cordova](https://cordova.apache.org/) 
+- [NodeJS](https://nodejs.org/) 
+ - [TypeScript](https://www.typescriptlang.org/) 
+ 
+ 
+### Prezentacja aplikacji:
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/err_logn.png) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/err_conn.png) 
+|
+|--|--|
 
-### With the Ionic CLI:
+>Ekran logowania i walidacja
 
-Take the name after `ionic2-starter-`, and that is the name of the template to be used when using the `ionic start` command below:
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/zliczanie_manualne.png) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/aktywne_zliczanie.png) 
+|
+|--|--|
+>Ekran główny
 
-```bash
-$ sudo npm install -g ionic cordova
-$ ionic start myBlank blank
-```
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/czynnosci.png) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/metoda_zliczania.png) 
+|
+|--|--|
+>Rozpoczynanie czynnosci
 
-Then, to run it, cd into `myBlank` and run:
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/edit_manual.jpg) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/edit_autotask.jpg) 
+|
+|--|--|
+>Edycja czynnosci
 
-```bash
-$ ionic cordova platform add ios
-$ ionic cordova run ios
-```
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/dni.png) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/opcje_powiadomienia.png) 
+|
+|--|--|
+>Ustawienia
 
-Substitute ios for android if not on a Mac.
+| ![error logowanie](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/wiadomosci.jpg) |![error serwer](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/wiadomosc.jpg) 
+|
+|--|--|
+>Wiadomości
+
+![enter image description here](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/zakonczone_czynnosci.png)
+>Zakończone czynności
 
