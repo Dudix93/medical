@@ -7,7 +7,7 @@
 Aplikacja powstała jako praca dyplomowa - inżynierska, w ramach stażu odbytego w firmie programistycznej "Transition Technologies". Pozwala ona na zarządzanie i raportowanie czasu spędzonego nad projektami w firmie, z podziałem na poszczególne czynności (np. programowanie, testowanie itp.). Aplikacja funkcjonuje w oparciu o połączenie z REST API, z którym następuje wymiana danych.
 
  ## [EN]
-The following app has been developed as a part of engineering thesis, during an internship in an software programming company called "Transition Technologies". It allows to count and report time spent on the projects in the company, divided into single tasts (for instance programming, testing ect.). The app works in connection with external a REST API server which is used to exchange data. 
+The following app has been developed as a part of engineering thesis, during an internship in an software development company called "Transition Technologies". It allows to count and report time spent on the projects in the company, divided into single tasts (for instance programming, testing ect.). The app works in connection with external a REST API server which is used to exchange data. 
 
 ### Użyte technologie/Powered by:
 
