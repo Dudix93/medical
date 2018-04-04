@@ -62,6 +62,7 @@ The following app has been developed as a part of engineering thesis, during an 
 
 ### [EN]
 >Depending on active counting method, it's possible to edit time and comment for current task (manual counting method) or comment only (automatic counting method).
+
 | ![enter image description here](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/dni.png) |![enter image description here](https://github.com/Dudix93/raportowanie/blob/api2/screenshots/opcje_powiadomienia.png) |
 |--|--|
 
