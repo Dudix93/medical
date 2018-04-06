@@ -33,10 +33,8 @@ export class LoginPage {
     });
     this.storage.get('isLoggedIn').then((val) => {
       if(val == true){
-        this.storage.get('zalogowany').then(login => {
-          this.storage.get('haslo').then(password => {
-            this.login2(login,password);
-          });
+        this.storage.get('zalogowany').then(zalogowany => {
+            this.login2(zalogowany);
         });
       }
     });
@@ -53,7 +51,6 @@ export class LoginPage {
   }
 
   login() {
-    console.log("credentials.apiUrl "+this.credentials.apiUrl);
     this.storage.set('apiUrl', this.credentials.apiUrl);
     this.globalVar.setApiUrl(this.credentials.apiUrl);
     this.storage.get('apiUrl').then((value) => {
@@ -62,9 +59,8 @@ export class LoginPage {
     this.restapiService.getUsers()
     .then(data => {
       this.correct=false;
+      console.log(data);
       this.users = data;
-      console.log("dejta: "+data);
-      console.log(this.users);
       for (var user of this.users) {
         if(user.login == this.credentials.login){
           if(user.password == this.credentials.password && user.active == true){
@@ -72,15 +68,17 @@ export class LoginPage {
             this.storage.set('isLoggedIn',true);
             this.storage.set('zalogowany', user.login);
             this.storage.set('haslo', user.password);
-            this.storage.set('zalogowany_id', user.id);
+            this.storage.set('apiUrl',this.credentials.apiUrl);
             break;
           }
         }
       }
       if(this.correct == true){
-        console.log('odpalam');
         this.storage.set('isLoggedIn',true);
         this.navCtrl.push(HomePage);
+      }
+      else if(this.users.status == 0){
+        this.showToast("Nie można się połączyć z serwerem.");
       }
       else{
         this.showToast("Podałeś zły login lub hasło.");
@@ -88,34 +86,44 @@ export class LoginPage {
     });
   }
 
-  login2(login:string,password:string) {
-
+  login2(zalogowany:any) {
+    let response;
     this.storage.set('apiUrl', this.credentials.apiUrl);
     this.globalVar.setApiUrl(this.credentials.apiUrl);
 
-    if(login != null && password != null){
-      this.loginData.username = login;
-      this.loginData.password = password;
+    if(zalogowany != null){
+      this.loginData.username = zalogowany.username;
+      this.loginData.password = zalogowany.password;
     }
     else{
       this.loginData.username = this.credentials.login;
       this.loginData.password = this.credentials.password;
     }
-
-    console.log(this.restapiService.login(this.loginData));
     
-    this.restapiService.login(this.loginData).subscribe((data) => {
-      console.log(data);
-      this.storage.set('isLoggedIn',true);
-      this.storage.set('zalogowany', this.loginData.username);
-      this.storage.set('haslo', this.loginData.password);
-      this.navCtrl.push(HomePage);
-    });
+    this.restapiService.login(this.loginData).then(data => {
+
+        this.storage.set('isLoggedIn',true);
+        this.storage.set('zalogowany', {'username':this.loginData.username,'password':this.loginData.password,'rememberMe':true});
+        this.globalVar.setUserPassword(this.loginData.password);
+        this.navCtrl.push(HomePage);
+      
+    }).catch(err => {
+      console.log('error: '+err.status);
+      if(err.status == 0 || err.status == 403){
+        this.showToast("Błąd połączenia z serwerem.");
+      }
+      else if(err.status == 401 || err.status == 400){
+        this.showToast("Podałeś zły login lub hasło.");
+      }
+  });
   }
 
   register(){
     this.correct=true;
-    this.navCtrl.push(RegisterPage);
+    this.restapiService.register(this.credentials.apiUrl,null).catch(err=>{
+      if(err.status == 400)this.navCtrl.push(RegisterPage,{'apiUrl':this.credentials.apiUrl});
+      else this.showToast("Błąd połączenia z serwerem.");
+    });
   }
 
   showToast(message:any) {

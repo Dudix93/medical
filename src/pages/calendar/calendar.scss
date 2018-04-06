@@ -1,3 +1,36 @@
 page-calendar {
+    .icon {
+        font-size: 25px;
+     }
 
+     .col {
+        font-size: 17px;
+     }
+
+     .cancel_button{
+         height:17px;
+         font-size:12px;
+         background-color: chocolate;
+     }
+
+     .title{
+         font-weight: bold;
+     }
+     
+     .info{
+        font-style: italic;
+    }
+
+    .alert-info{
+        font-style: italic;
+        color:rgb(201, 41, 13);
+    }
+
+     .plus{
+         color:rgb(22, 155, 28);
+     }
+
+     .minus{
+        color:rgb(201, 41, 13);
+    }
 }

@@ -15,6 +15,10 @@ import { DayTask } from '../../models/dayTask';
 import { LocalNotifications} from '@ionic-native/local-notifications'
 import { Message } from '../../models/message'
 import { GlobalVars } from '../../app/globalVars'
+import { UserTask } from '../../models/userTask'
+import { Push, PushToken } from '@ionic/cloud-angular';
+import { timestamp } from 'ionic-native/node_modules/rxjs/operator/timestamp';
+//import { finalize} from 'rxjs/operators';
 
 declare let cordova: any;
 
@@ -24,42 +28,35 @@ declare let cordova: any;
 })
 
 export class HomePage {
-  userTask = {
-    id:0,
-    user_id: '', 
-    task_id: '',
-    task_title:'', 
-    update_date:'', 
-    update_hour:'', 
-    update_time:0, 
-    time_spent:0, 
-    start_date:'', 
-    start_hour:'',
-    description:'',
-    latest_dayTask:0,
-    latest_pausedTask:0,
-    count_method:'',
-    paused:false,  
-    finish_date:'',
-    finish_hour:''}
+ raport = {
+  "timeOf": 0,
+  "startDate": '',
+  "endDate": null,
+  "comment": null,
+  "action": {
+    "id": null,
+    "name": null
+  },
+  "countMethod": null,
+  "pausedDate": null,
+  "paused": false,
+  "user": null,
+  "project": null,
+  "lastUpdateDate":null,
+  "lastUpdateTimeOf":0
+ }
 
-    newUserTask = {
-      user_id:null, 
-      task_id:null,
-      task_title:null, 
-      update_date:null, 
-      update_hour:null, 
-      update_time:null, 
-      time_spent:null, 
-      start_date:null, 
-      start_hour:null,
-      description:null,
-      latest_dayTask:null,
-      latest_pausedTask:null,
-      count_method:null,
-      paused:false, 
-      finish_date:null,
-      finish_hour:null}
+ user = {
+  "activated": this.globalVars.getUser().activated,
+  "email": this.globalVars.getUser().email,
+  "firstName": this.globalVars.getUser().firstName,
+  "id": this.globalVars.getUser().id,
+  "imageUrl": this.globalVars.getUser().imageUrl,
+  "langKey": this.globalVars.getUser().langKey,
+  "lastName": this.globalVars.getUser().lastName,
+  "login": this.globalVars.getUser().login,
+  "resetDate": null
+} 
 
   dayTask = {
       task_id:0,
@@ -77,6 +74,12 @@ export class HomePage {
     restart_date:null,
     restart_hour:null,
   }    
+
+  currentDay = {
+    workDay:null,
+    hourFrom:null,
+    hourTo:null,
+  }   
   
   newPausedTask = {
     id:0,
@@ -89,6 +92,7 @@ export class HomePage {
   } 
   pushPage = EditTaskPage;
   inProgress:boolean;
+  saveDayTask = false;
   dayTasksObjects:any;
   pausedTaskObjects:any;
   userTasks: any;
@@ -96,40 +100,33 @@ export class HomePage {
   userPreferences:any;
   time:number;
   firstDay:boolean;
-  user: Array<any>;
-  dayTasks: Array<number>;
+  //user: Array<any>;
+  dayTasks: any;
   projects: any;
   project:any;
   unreadMsgs:any;
   oldMsgs:any;
   newMsgs:any;
+  autoTaskNotification:any;
   login:string;
   currentDate:string;
   currentTime:string;
-  name:string;
   autoTasks:Array<any>;
   userProjectTasks:Array<any>;
   userProjects:Array<any>;
-  userProject:UserProject[]=[];
+  projectTasks:any;
   radioButtons:RadioButton[]=[];
   task = {title: '', id:''}
   params = {
-    task_title: '', 
-    task_id:0,
-    hours:0,
-    minutes:0 
+    raportId:null,
+    timeSpent:null,
+    projectTime:null
   }
   today = (new Date().getMonth()+1).toString().concat(".".concat((new Date().getUTCDate().toString().concat(".".concat((new Date().getFullYear().toString()))))));
   messages:any;
-  message = {
-    "message":'',
-    "sent":true,
-    "date":'',
-    "time":'',
-    "read":'',
-  }
   amountNewMessages:number = 0;
-
+  user_id:any;
+  name:string;
   constructor(public navCtrl: NavController, 
               private restapiService: RestapiServiceProvider, 
               private storage:Storage,
@@ -138,260 +135,608 @@ export class HomePage {
               private localNotifications: LocalNotifications,
               private platform: Platform,
               private events: Events,
-              public globalVars:GlobalVars) { 
+              public globalVars:GlobalVars,
+              public push:Push) { 
+                //this.storage.clear();
         this.storage.get('isLoggedIn').then(value =>{
           if(value == true){
-            this.storage.get('zalogowany').then((val) => {
-              this.login = val;
-            this.getUserProjectsAndTasks();
-            //this.getProjects();
-            this.inProgress = false;
-            this.events.subscribe('updateViewAfterEdit',()=>{
-              this.getUserProjectsAndTasks();
-            });
-            this.platform.ready().then((readySource) => {
-              this.localNotifications.on('click', (notification, state) => {
-                let json = JSON.parse(notification.data);
-           
-                let alert = alertCtrl.create({
-                  title: notification.title,
-                  subTitle: json.mydata
+            this.storage.get('zalogowany').then((zalogowany) => {
+              console.log('zalogowany: '+JSON.stringify(zalogowany));
+              //this.restapiService.login(zalogowany).subscribe(data=>{console.log(data)});
+              this.storage.get('apiUrl').then(url =>{
+                this.globalVars.setApiUrl(url);
+                this.getUserData();
+                this.getProjects(null,null);
+                this.storage.get('notifications').then(notifications => {
+                  this.setAutoTaskNotification(notifications.taskInProgressOption);
                 });
-                alert.present();
-              })
-            });
-            this.getMessages();
-            if(this.platform.is('cordova')){
-              //this.scheduleNotification();
+                setInterval(()=>{
+                  let date;
+                  this.setWorkHours();
+                  this.storage.get('notifications').then(notifications => {
+                    if(notifications.ownNotification == true){
+                      date = new Date(new Date(notifications.ownNotificationDate).toLocaleDateString().concat('/'.concat(notifications.ownNotificationTime)));
+                      if(date.toLocaleDateString() == new Date().toLocaleDateString() && date.getHours() == new Date().getHours() && date.getMinutes() == new Date().getMinutes()){
+                        this.phoneNotification(1,'Twoje powiadomienie:',notifications.ownNotificationMsg);
+                        notifications.ownNotification = false;
+                        this.storage.set('notifications',notifications)
+                      }
+                    }
+                  });
+                },1000);
+                this.inProgress = false;
+                
+                this.events.subscribe('updateViewAfterEdit',()=>{
+                  this.getProjects(null,null);
+                });
+
+                this.events.subscribe('updateUserData',()=>{
+                  this.getUserData();
+                });
+
+                this.events.subscribe('changeNotifications',()=>{
+                  this.storage.get('notifications').then(data => {
+                  }).then(()=>{
+                    this.storage.get('notifications').then(notification => {
+                    this.setAutoTaskNotification(notification.taskInProgressOption);
+                    });
+                  });
+                });
+
+                setInterval(() => {
+                  if(this.globalVars.getCurrentTaskId() != null){
+                    this.setWorkHours();
+                    //console.log(JSON.stringify(this.currentDay));
+                    if(this.currentDay.workDay == true && new Date() > new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourFrom))) && new Date() < new Date(new Date().toDateString().concat("/".concat(this.currentDay.hourTo)))){
+                      this.updateCurrentTask(this.globalVars.getCurrentTaskId());
+                      console.log('czas++');
+                    }
+                  }
+                }, 5000);
+
+            // this.platform.ready().then((readySource) => {`
+            //   this.localNotifications.on('click', (notification, state) => {
+            //     let json = JSON.parse(notification.data);
+           
+            //     let alert = alertCtrl.create({
+            //       title: notification.title,
+            //       subTitle: json.mydata
+            //     });
+            //     alert.present();
+            //   })
+            // });
+
+            // if (platform.is('cordova')){
+            //   this.push.register().then((t: PushToken) => {
+            //     return this.push.saveToken(t);
+            //   }).then((t: PushToken) => {
+            //     console.log('Token saved:', t.token);
+            //   });
+          
+            //   this.push.rx.notification();
+            // }
+    
+            // if(this.platform.is('cordova')){
+              // setInterval(() => {
+              //   this.powiadomienieCykliczne();
+              // }, 120000);
+              
+              this.getMessages();
               setInterval(() => {
                 this.getMessages();
-              }, 5000);
-            }
+              }, 10000);
+            // }
+          });
             });
+          }
+          else{
+            this.navCtrl.push(LoginPage);
           }
         });
     }
 
+    getUserData(){
+      this.restapiService.getUser().then(user => {
+        this.globalVars.setUser(user);
+        this.name = this.globalVars.getUser().firstName;
+
+        this.user.activated= this.globalVars.getUser().activated,
+        this.user.email= this.globalVars.getUser().email,
+        this.user.firstName= this.globalVars.getUser().firstName,
+        this.user.id= this.globalVars.getUser().id,
+        this.user.imageUrl= this.globalVars.getUser().imageUrl,
+        this.user.langKey= this.globalVars.getUser().langKey,
+        this.user.lastName= this.globalVars.getUser().lastName,
+        this.user.login= this.globalVars.getUser().login,
+        this.user.resetDate= null
+      });
+    }
+
+    isNowWorkHour(){
+      let nowTime = new Date().getHours().toString().concat(':'.concat(new Date().getMinutes().toString()));
+      console.log(this.currentDay.hourFrom+" "+this.currentDay.hourTo+" "+nowTime);
+      if(new Date("01.01.2000/".concat(this.currentDay.hourFrom)) < new Date("01.01.2000/".concat(nowTime))){
+        if(new Date("01.01.2000/".concat(this.currentDay.hourTo)) > new Date("01.01.2000/".concat(nowTime))){
+          return true;
+        }
+        else return false; 
+      }
+      else return false;  
+    }
+
+    setAutoTaskNotification(interval:number){
+      console.log(interval);
+      if(interval != 0){
+        clearInterval(this.autoTaskNotification);
+        this.autoTaskNotification = setInterval(()=>{
+          if(this.globalVars.getCurrentTask().count_method == 'automatic'){
+            this.phoneNotification(this.globalVars.getCurrentTask().id,'Jesteś w trakcie',this.globalVars.getCurrentTask().name);
+          }
+        },interval);
+      }
+      else{
+        clearInterval(this.autoTaskNotification);
+        console.log('wyczyscilem interval');
+      }
+    }
+
+    doRefresh(refresher) {
+      console.log('Begin async operation', refresher);
+      this.getProjects(null,null);
+      setTimeout(() => {
+        console.log('Async operation has ended');
+        refresher.complete();
+      }, 2000);
+    }
+
     getMessages(){
+      // this.storage.set('deletedMessages',undefined);
+      // this.storage.set('unreadMessages',undefined);
+      // this.storage.set('oldMessages',undefined);
+      this.amountNewMessages = 0;
       this.newMsgs = new Array<any>();
       let allMsgs;
       let currentMsg;
+      let unreadMsgs;
+      let oldMsgs;
+      let deletedMsgs;
       let nju = true;
       this.restapiService.getMessages(null,null).then(data =>{
         allMsgs = data;
-        this.storage.get('unreadMessages').then(unreadMsgs =>{
-          this.storage.get('oldMessages').then(oldMsgs => {
-            this.amountNewMessages = unreadMsgs.length;
-            this.unreadMsgs = unreadMsgs;
-            this.oldMsgs = oldMsgs;
-            if(this.unreadMsgs == undefined || this.unreadMsgs == null)this.storage.set('unreadMessages',new Array<any>());
-            if(this.oldMsgs == undefined || this.oldMsgs == null)this.storage.set('oldMessages',new Array<any>());
-            this.globalVars.cleanMessages();
-            for(let msg of allMsgs){
-              nju = true;
-              this.globalVars.pushMessage(new Message(
-                                            msg.id,
-                                            msg.title,
-                                            msg.content,
-                                            new Date(msg.sendDate).toLocaleDateString(),
-                                            new Date(msg.sendDate).getHours().toString()
-                                            .concat(':'
-                                            .concat(new Date(msg.sendDate).getMinutes()<10?
-                                            '0'.concat(new Date(msg.sendDate).getMinutes().toString())
-                                            :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
-              
-                currentMsg = this.globalVars.getMessages()[(this.globalVars.getMessages().length)-1];
-                console.log(this.unreadMsgs);
-                
-                for(let n of this.unreadMsgs){
-                  if(n.id == currentMsg.id){
-                    nju = false;
-                    break;
-                  }
+        //console.log(data);
+      }).then(() =>{
+        this.storage.get('unreadMessages').then(data =>{
+          unreadMsgs = data;
+        }).then(() =>{
+          this.storage.get('oldMessages').then(data => {
+            oldMsgs = data;
+          }).then(()=>{
+            this.storage.get('deletedMessages').then(data => {
+              if(data == undefined || data == null) deletedMsgs = [];
+              else deletedMsgs = data;
+                if(unreadMsgs != undefined && unreadMsgs != null)
+                this.unreadMsgs = unreadMsgs;
+                this.oldMsgs = oldMsgs;
+                if(this.unreadMsgs == undefined || this.unreadMsgs == null){
+                  this.storage.set('unreadMessages',new Array<any>());
+                  //this.unreadMsgs = allMsgs;
                 }
+                if(this.oldMsgs == undefined || this.oldMsgs == null){
+                  this.storage.set('oldMessages',new Array<any>());
+                  //this.oldMsgs = [];
+                }
+                this.globalVars.cleanMessages();
+                for(let msg of allMsgs){
+                  nju = true;
+                  this.globalVars.pushMessage(new Message(
+                                                Number(msg.id.toString()+this.globalVars.getUser().id.toString()),
+                                                this.globalVars.getUser().id,
+                                                msg.title,
+                                                msg.content,
+                                                new Date(msg.sendDate).toLocaleDateString(),
+                                                new Date(msg.sendDate).getHours().toString()
+                                                .concat(':'
+                                                .concat(new Date(msg.sendDate).getMinutes()<10?
+                                                '0'.concat(new Date(msg.sendDate).getMinutes().toString())
+                                                :''.concat(new Date(msg.sendDate).getMinutes().toString())))));
+                  
+                    currentMsg = this.globalVars.getMessages()[(this.globalVars.getMessages().length)-1];
+                    
+                    if(this.oldMsgs != null && this.oldMsgs != undefined){
+                      for(let n of this.unreadMsgs){
+                        if(n.id == currentMsg.id){
+                          nju = false;
+                          break;
+                        }
+                      }
+  
+                      if(nju == true){
+                        for(let o of this.oldMsgs){
+                          if(o.id == currentMsg.id){
+                            nju = false;
+                            break;
+                          }
+                        }
+                      }
+                    }
+                    else{
+                      this.unreadMsgs = new Array<any>();
+                      this.oldMsgs = new Array<any>();
+                    }
 
-                if(nju == true){
-                  for(let o of this.oldMsgs){
-                    if(o.id == currentMsg.id){
-                      nju = false;
-                      break;
+                    if(nju == true && deletedMsgs.indexOf(currentMsg.id) == -1){
+                      this.unreadMsgs.push(currentMsg);
+                      this.newMsgs.push(currentMsg);
+                      console.log("dodane jako nowe: "+currentMsg.id);
+                    }
+                    //console.log("przeczytane: "+this.unreadMsgs);
+                }
+                this.storage.set('unreadMessages',this.unreadMsgs);
+
+                this.unreadMsgs.forEach(msg => {
+                  if(msg.userId == this.globalVars.getUser().id)this.amountNewMessages++;
+                });
+                this.storage.get('notifications').then(notifications=>{
+                  if(notifications.newMsgsNotificacion == true){
+                      if(this.newMsgs.length != 0){
+                      if(this.newMsgs.length == 1){
+                      this.phoneNotification(this.newMsgs[0].id,'Raportowanie wiadomość',this.newMsgs[0].title);
+                      console.log("nowa wiadomosc: "+this.newMsgs[0].title);
+                      }
+                      else{
+                        this.phoneNotification(this.newMsgs[0].id,'Raportowanie wiadomość',"Masz nowe wiadomości ("+this.newMsgs.length+")");
+                        console.log("nowe wiadomosci: "+this.newMsgs.length);
+                      }
+                      this.newMsgs = new Array<any>();
                     }
                   }
-                }
-
-                if(nju == true){
-                  this.unreadMsgs.push(currentMsg);
-                  this.newMsgs.push(currentMsg);
-                  console.log("dodane jako nowe: "+currentMsg.id);
-                }
-                //console.log("przeczytane: "+this.unreadMsgs);
-            }
-            this.storage.set('unreadMessages',this.unreadMsgs);
-
-            if(this.newMsgs.length != 0){
-              if(this.newMsgs.length == 1){
-              //   cordova.plugins.notification.local.schedule({
-              //   id: this.newMsgs[0].id,
-              //   title: 'Raportowanie',
-              //   text: this.newMsgs[0].title,
-              //   icon:'ios-chatbubbles-outline'
-              // });
-              console.log("nowa wiadomosc: "+this.newMsgs[0].title);
-              }
-              else{
-                // cordova.plugins.notification.local.schedule({
-                //   id: this.newMsgs[0].id,
-                //   title: 'Raportowanie',
-                //   text: "Masz "+this.newMsgs.length+" nowych wiadomości.",
-                //   icon:'ios-chatbubbles-outline'
-                // }); 
-                console.log("Masz "+this.newMsgs.length+" nowych wiadomości.");   
-              }
-              this.newMsgs = new Array<any>();
-            }
+                });
+            });
           });
         });
       });
     
+
     }
 
-    // scheduleNotification() {
-    //   this.storage.get('not_id').then((ajdi) => {
-    //     cordova.plugins.notification.local.schedule({
-    //       id: 1,
+    phoneNotification(id:number,title:string,text:string){
+        cordova.plugins.notification.local.schedule({
+        id: id,
+        title: title,
+        text: text,
+      }); 
+    }
+
+    // powiadomienieCykliczne() {
+    //   let id = new Date().getUTCDate().toString().
+    //   concat(new Date().getMonth().toString().
+    //   concat(new Date().getFullYear().toString().
+    //   concat(new Date().getHours().toString().
+    //   concat(new Date().getMinutes().toString()))));
+    //   console.log("Powiadomienie o nr id: "+id+" otrzymane o godzinie "+this.getHour());
+    //   cordova.plugins.notification.local.schedule({
+    //       id: Number(id),
     //       title: 'Powiadomienie',
-    //       text: 'Treść powiadomienia',
-    //       //data: { mydata: 'My hidden message' },
-    //       trigger: { every: 'minute', count: 2 },
-    //       icon:'alert'
+    //       text: 'Otrzymano o godzinie: '+this.getHour(),
+    //       //trigger: { every: 'minute', count: 3 }
     //     });
-    //   });
     // }
 
-    getProjects(){
-      console.log('API URL: '+this.globalVars.getApiUrl());
-      let userIdFound = false;
-      this.restapiService.getProjects().then(data => {
-        this.projects = data;
-        for(let project of this.projects){
-          for(let user of project.users){
-            if(userIdFound == false){
-              this.storage.get('zalogowany').then(stored_login => {
-                if(user.login == stored_login){
-                  let user_id = user.id;
-                  this.storage.set('zalogowany_id',user_id);
-                  this.name = user.firstName;
-                  console.log('ajdi: '+user.id);
-                  userIdFound = true;
-                }
-              });
-            }
-            else break;
-          }
-        }
-        this.storage.get('zalogowany_id').then(value => {console.log("zalogowany id "+value)});
-        this.storage.get('zalogowany').then(value => {console.log("zalogowany "+value)});
-        console.log(this.projects);
-      })
+    minutesToHM(time:number){
+      let Minutes;
+      let hours = Math.floor(time);
+      let minutes = Math.floor(60*(time - Math.floor(time)));
+      if(minutes < 10){
+        Minutes = '0'.concat(minutes.toString());
+        return hours.toString().concat(':'.concat(Minutes.toString()));
+      }
+      else
+      return hours.toString().concat(':'.concat(minutes.toString()));
     }
-  //-----------------------------------------------------------------------------------------------------------------------  
-  getUserProjectsAndTasks() {
-    this.autoTasks = new Array<any>();
-    this.storage.get('zalogowany_id').then((val) => {
-      console.log("login id "+val);
-      this.restapiService.getUser(val)
-      .then(data => {
-        this.user = new Array<any>();
-        this.user.push(data);
-          this.restapiService.getProjects()
-          .then(data => {
-            this.projects = data;
-            this.restapiService.getTasks()
-            .then(data => {
-              this.tasks = data;
-              this.restapiService.getUserTask()
-              .then(data => {
-                this.userTasks = data;
-                this.userProjects = new Array<any>();
-                if(this.user[0].projects != null){
-                  for(let userProject of this.user[0].projects){
-                    this.userProjectTasks = new Array<any>();
-                    for(let project of this.projects){
-                      if(project.id == userProject){
-                        //console.log(project);
-                        this.project = project;
 
-                          for(let userTask of this.userTasks){
-                            for(let projectTasks of project.tasks){
-                              if(userTask.finish_date == null){
-                                this.storage.set('current_task_id', userTask.task_id);
-                                this.storage.set('current_task_title', userTask.task_title);
-                              }
-                              if(userTask.task_id == projectTasks){
-                                    this.userProjectTasks.push(userTask);
-                                    if(userTask.count_method == 'automatic' && userTask.finish_date == null){
-                                      //console.log(new Date(userTask.start_date.concat("/".concat(userTask.start_hour))));
-                                      this.countTime(userTask.task_id,userTask.start_date,new Date(userTask.start_date.concat("/".concat(userTask.start_hour))));
-                                    }
-                                    continue;
-                              }
-                            }
-                        }
-                      
-                      this.userProjects.push(new UserProject(project.id,project.title,this.userProjectTasks));
-                      console.log(this.userProjectTasks);
+    updateCurrentTask(task_id:number){
+      let raport;
+      let index = 0;
+      let minutesSpent = 0;
+      if(this.globalVars.getCurrentTaskId != null){
+        for(let project of this.userProjects){
+          for(let task of project.tasks){
+            if(task[0].endDate == null && task[0].pausedDate == null && task[0].action.id == task_id && task[0].countMethod == 'automatic'){
+              this.restapiService.getRaports(task[0].id).then(rap => {
+                raport = rap;
+
+                this.userProjects.forEach(up=>{
+                  if(up.project.id == raport.project.id){
+                    minutesSpent = (Number(this.userProjects[index]['spent'].split(':')[0])*60)+(Number(this.userProjects[index]['spent'].split(':')[1]));
+                    minutesSpent++;
+                    this.userProjects[index]['spent'] = this.minutesToHM((minutesSpent+1)/60);
+                    console.log(Number(this.userProjects[index]['spent'].split(':')[0])+' '+this.userProjects[index].project.numberOfHours);
+                    if(Number(this.userProjects[index]['spent'].split(':')[0]) == this.userProjects[index].project.numberOfHours){
+                      this.finishTask(this.globalVars.getCurrentTask().id,this.userProjects[index].project.id);
                     }
                   }
-                }
-              }
-              else this.projects = null; 
-            });
-            });
-          });
-      });
-    });
-  }
+                  index++;
+                })
 
-  getTasks() {
-      this.restapiService.getTasks()
-      .then(data => {
-        this.tasks = data;
-      });
-  }
+                raport.timeOf++;
+                this.restapiService.updateRaport(raport.id,raport);
+                this.userProjects[this.userProjects.indexOf(project)].
+                tasks[this.userProjects[this.userProjects.indexOf(project)].tasks.indexOf(task)][0] = raport;
+                this.userProjects[this.userProjects.indexOf(project)].
+                tasks[this.userProjects[this.userProjects.indexOf(project)].tasks.indexOf(task)][1] = this.minutesToHM(raport.timeOf/60); 
+                this.updateRaportsTime(raport.action.id,raport.project.id,raport.timeOf);
+              });
+            }
+          }
+        }
+      }
+    }
 
-  getUserTask(task_id:number) {
-    this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          if(user_id == task.user_id && task_id == task.task_id){
-            this.userTask = task;
-            console.log(this.userTask);
+    updateRaportsTime(task_id:number,project_id:number,time:number){
+      let raports;
+      this.restapiService.getRaports(null).then(data =>{
+        raports = data;
+        for(let raport of raports){
+          if(raport.action.id == task_id && raport.project.id == project_id){
+            raport.timeOf = time;
+            this.restapiService.updateRaport(raport.id,raport);
+          }
+        }
+      });
+    }
+  
+    updateRaportsComment(task_id:number,project_id:number,comment:string){
+      for(let raport of this.userTasks){
+        if(raport.action.id == task_id && raport.project.id == project_id){
+          raport.comment = comment;
+          this.restapiService.updateRaport(raport.id,raport);
+        }
+      }
+    }
+
+    setWorkHours(){
+      this.restapiService.getUserPreferences().then(data =>{
+        this.userPreferences = data;
+        for(let p of this.userPreferences){
+          if(p.dayOfWeek == new Date().getDay()){
+            this.currentDay.workDay = p.workDay;
+            this.currentDay.hourFrom = p.hourFrom;
+            this.currentDay.hourTo = p.hourTo;
+
+            this.globalVars.setStartWorkHour(p.hourFrom);
+            this.globalVars.setStopWorkHour(p.hourTo);
             break;
           }
         }
       });
-    });
-}
+    }
 
-  saveTask() {
-    this.restapiService.saveTask(this.task).then((result) => {
-      console.log(this.task);
-      this.getTasks();
-    }, (err) => {
-      console.log(err);
-    });
-  }
+    mergeDayTasks(){
+      let dayTasks;
+      let time;
+      let currentDayTaskId;
+      let currentDayTask = {
+        "taskId": null,
+        "projectId": null,
+        "date": null,
+        "time":null,
+        "userId":null,
+        "comment":null,
+      };
+      let currentDayTaskObjects = new Array<any>();
+        for(let dt of this.dayTasks){
+          console.log('dt: '+currentDayTask.date+" "+currentDayTask.time);
+          if(currentDayTask.taskId == null){
+            currentDayTask.taskId = dt.taskId;
+            currentDayTask.projectId = dt.projectId;
+            currentDayTask.date = new Date(dt.date.concat('/00:00'));
+            
+            if(Math.floor(60*(dt.time/60 - Math.floor(dt.time/60)))>30) currentDayTask.time = Math.floor(dt.time/60)+1;
+            else currentDayTask.time = Math.floor(dt.time/60);
 
-  deleteTask(id:String) {
-    this.restapiService.deleteTask(id).then((result) => {
-      console.log(result);
-      this.getTasks();
-    }, (err) => {
-      console.log(err);
+            currentDayTask.userId = dt.userId;
+            currentDayTask.comment = dt.comment;
+          }
+          else if(currentDayTask.taskId != dt.taskId || currentDayTask.projectId != dt.projectId || currentDayTask.date != dt.date){
+            console.log('nowy: '+currentDayTask.date+" "+currentDayTask.time);
+            currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+                currentDayTask.taskId = dt.taskId;
+                currentDayTask.projectId = dt.projectId;
+                currentDayTask.date = new Date(dt.date.concat('/00:00'));
+                
+                if(Math.floor(60*(dt.time/60 - Math.floor(dt.time/60)))>30) currentDayTask.time = Math.floor(dt.time/60)+1;
+                else currentDayTask.time = Math.floor(dt.time/60);
+
+                currentDayTask.userId = dt.userId;
+                currentDayTask.comment = dt.comment;
+                console.log('nadpisanie: '+currentDayTask.date+" "+currentDayTask.time);
+                if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
+                  console.log('koniec: '+currentDayTask.date+" "+currentDayTask.time);
+                  currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+                }
+          }
+          else if(currentDayTask.taskId == dt.taskId && currentDayTask.projectId == dt.projectId && currentDayTask.date == dt.date){
+            console.log(Number(currentDayTask.time)+" + "+Number(dt.time))
+            currentDayTask.time = Number(currentDayTask.time) + Number(dt.time);
+            if(this.dayTasks.indexOf(dt) == this.dayTasks.length-1){
+              currentDayTaskObjects.push(new DayTask(currentDayTask.taskId,currentDayTask.projectId,currentDayTask.userId,currentDayTask.date,currentDayTask.time,currentDayTask.comment));
+              console.log('koniec: '+currentDayTask.date+" "+currentDayTask.time);
+            }
+          }
+          console.log('currentTask: '+currentDayTask.date+" "+currentDayTask.time);
+          console.log('');
+        }
+        for(let dt of currentDayTaskObjects){
+          console.log(dt);
+          this.restapiService.saveDayTask(dt);
+        }
+    }
+
+    getProjects(project_id:number,task_id:number){
+      let userIdFound = false;
+      let autoTasks = [];
+      let autoTasksIds = [];
+      let currentAutoTask = null;
+      let index;
+      let time;
+      this.globalVars.setCurrentTaskId(null);
+      this.globalVars.setCurrentTaskName(null);
+      this.globalVars.setCurrentTaskRaportId(null);
+      this.globalVars.setCurrentTaskCountMethod(null);
+      this.userProjects = new Array<any>();
+      this.userProjectTasks = new Array<any>();
+      this.restapiService.getProjects().then(data => {
+        this.projects = data;
+        this.restapiService.getRaports(null).then(data => {
+          this.userTasks = data;
+           for(let project of this.projects){
+            this.restapiService.getProjectTasks(project.id).subscribe(data => {
+              this.projectTasks = data;
+              this.restapiService.getUserPreferences().then(data =>{
+                this.userPreferences = data;
+                this.storage.get('notifications').then(notifications => {
+                  currentAutoTask = null;
+                  this.projectTasks = new Array<any>();
+                  autoTasks = new Array<any>(); 
+                  autoTasksIds = new Array<any>(); 
+                  this.userProjectTasks = new Array<[any,any]>();
+                  for(let raport of this.userTasks){
+                    if(project.id == raport.project.id){
+                      this.projectTasks.push(raport);
+                    }
+                  }
+                  for(let task of this.projectTasks){
+                    if(task.countMethod == 'manual'){
+                      if(task.endDate == null){
+                        this.globalVars.setCurrentTaskId(task.action.id);
+                        this.globalVars.setCurrentTaskName(task.action.name);
+                        this.globalVars.setCurrentTaskRaportId(task.id);
+                        this.globalVars.setCurrentTaskCountMethod('manual');
+                      }
+                      this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
+                      //console.log('czas: '+task.timeOf);
+                    }
+                    else if(task.endDate == null && task.countMethod == 'automatic'){
+                      if(task.pausedDate == null){
+                        this.globalVars.setCurrentTaskId(task.action.id);
+                        this.globalVars.setCurrentTaskName(task.action.name);
+                        this.globalVars.setCurrentTaskRaportId(task.id);
+                        this.globalVars.setCurrentTaskCountMethod('automatic');
+                        this.setAutoTaskNotification(notifications.taskInProgressOption);
+                      }
+                      autoTasks.push(task);
+                    }
+                    else if(task.endDate != null && task.countMethod == 'automatic' && autoTasksIds.indexOf(task.action.id) == (-1)){
+                      this.userProjectTasks.push([task,this.minutesToHM(task.timeOf/60)]);
+                      autoTasksIds.push(task.action.id);
+                    }
+                  }
+
+                  index = 1;
+                  time = 0;
+                  for(let task of autoTasks){
+                    if(currentAutoTask == null){
+                      currentAutoTask = task;
+                      if(project_id == task.project.id && task_id == task.action.id){
+                        this.saveDayTask = true;
+                        console.log('savedaytask true');
+                      }
+                    }
+                    if(currentAutoTask.action.id != task.action.id){
+                      console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                      console.log('');
+                      this.userProjectTasks.push([currentAutoTask,this.minutesToHM(time)]);
+                      this.updateRaportsTime(currentAutoTask.action.id,currentAutoTask.project.id,time*60);
+                      currentAutoTask = task;
+                      time = 0;
+                    }
+                    if(index == autoTasks.length){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      if(task.pausedDate != null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                      else if(task.pausedDate == null)time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
+                      let hours = Math.floor(time);
+                      let minutes = Math.floor(60*(time - Math.floor(time)));
+                      console.log('');
+                      console.log("sumarycznie dla "+currentAutoTask.action.name+": "+this.minutesToHM(time));
+                      this.userProjectTasks.push([task,this.minutesToHM(time)]);
+                      this.updateRaportsTime(task.action.id,task.project.id,time*60);
+                      if(project_id != null) this.mergeDayTasks();
+                      continue;
+                    }
+                    if(task.pausedDate != null){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date(task.pausedDate));
+                      currentAutoTask = task;
+                    }
+                    else if(task.pausedDate == null){
+                      if(project_id == task.project.id && task_id == task.action.id)this.saveDayTask = true;
+                      time+=this.countTime(currentAutoTask.project.id,task.action.id,this.userPreferences,new Date(task.startDate),new Date());
+                      currentAutoTask = task;
+                    }
+                    index++;
+                    console.log('');
+                    this.saveDayTask = false;
+                  }
+                  this.userProjects.push(new UserProject(project,this.sumUpTasksTime(this.userProjectTasks),this.userProjectTasks));
+                });
+              });
+              });
+          }
+      });
     });
-  }
+    }
+
+    sumUpTasksTime(userProjectTasks:Array<any>){
+      let totalMinutes = 0;
+      let totalHours = 0;
+      for(let task of userProjectTasks){
+        totalHours += Number(task[1].split(':')[0]);
+        totalMinutes += Number(task[1].split(':')[1]);
+      }
+      return this.minutesToHM((totalMinutes+(totalHours*60))/60);
+    }
+  //-----------------------------------------------------------------------------------------------------------------------  
+
+//   getTasks() {
+//       this.restapiService.getTasks()
+//       .then(data => {
+//         this.tasks = data;
+//       });
+//   }
+
+//   getUserTask(task_id:number) {
+//     this.restapiService.getUserTask()
+//     .then(data => {
+//       this.userTasks = data;
+//       this.storage.get('zalogowany_id').then((user_id) => {
+//         for(let task of this.userTasks){
+//           if(user_id == task.user_id && task_id == task.task_id){
+//             this.userTask = task;
+//             console.log(this.userTask);
+//             break;
+//           }
+//         }
+//       });
+//     });
+// }
+
+//   saveTask() {
+//     this.restapiService.saveTask(this.task).then((result) => {
+//       console.log(this.task);
+//       this.getTasks();
+//     }, (err) => {
+//       console.log(err);
+//     });
+//   }
+
+//   deleteTask(id:String) {
+//     this.restapiService.deleteTask(id).then((result) => {
+//       console.log(result);
+//       this.getTasks();
+//     }, (err) => {
+//       console.log(err);
+//     });
+//   }
 
   logout(){
     this.storage.set('isLoggedIn',false);
@@ -414,27 +759,24 @@ export class HomePage {
   }
 
   pushMessagesPage(){
-    console.log('messagePage');
     this.navCtrl.push(MessagesPage);
   }
 
-  editTask(task_id:number, task_title:string, hours:number, minutes:number){
-    this.storage.get('current_task_id').then((id) => {
-      this.storage.get('current_task_title').then((title) => {
-        this.params.task_id = id;
-        this.params.task_title = title;
-        this.params.hours = hours;
-        this.params.minutes = minutes;
-        this.navCtrl.push(EditTaskPage, this.params);
-      });
-    });
+  editTask(raportId:any,timeSpent:any,projectTime:any){
+        if(this.isNowWorkHour() == true){
+          this.params.raportId = raportId;
+          this.params.timeSpent = timeSpent;
+          this.params.projectTime = projectTime;
+          this.navCtrl.push(EditTaskPage, this.params);
+        }
+        else this.showalert('Jesteś poza godzinami pracy.');
   }
 
   menu() {
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
         {
-          text: 'Czynności skończone',
+          text: 'Zakończone czynności',
           icon:'md-calendar',
           handler: () => {
             this.pushCalendarPage();
@@ -466,35 +808,70 @@ export class HomePage {
     actionSheet.present();
   }
 
-  prepareTasksRadioButtons(project_id:number){
-    this.radioButtons = [];
-    //console.log(this.userProjectTasks);
-    for(let project of this.userProjects){
-      if(project.id == project_id){
-        for(let task of this.tasks){
-          if(project_id == task.project_id){
-   
-              if(!this.user[0].tasks.includes(task.id)){
+  prepareTasksRadioButtons(pt:any,project_id:number){
+    console.log(pt);
+    let buttons:any;
+    let startedTasks:any;
+    this.radioButtons = new Array<any>();
+    this.globalVars.setButtons([]);
+    // this.restapiService.getProjectTasks(project_id).
+    // subscribe((data:any) => {
+    //   console.log(data);
+    // });
+      startedTasks = new Array<any>();
+      this.projectTasks = pt;
+      console.log("--------------------------------");
+      for(let task of this.projectTasks){
+        if(task.dateTo == null) task.dateTo = new Date("01/01/2999");
+        for(let project of this.userProjects){
+          if(project.project.id == project_id && project.tasks.length != 0){
+            for(let task of project.tasks)startedTasks.push(task[0].action.id);
+              if(startedTasks.indexOf(task.id) == -1){
+                console.log(task);
+                console.log(task.dateTo.valueOf()+' '+new Date().valueOf()+' '+new Date(task.dateFrom).valueOf());
                 if(this.radioButtons.length == 0){
-                  this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},true));
+                  if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,true));
+                  else
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,true));
                 }
                 else{
-                  this.radioButtons.push(new RadioButton("taskToStart",task.title,"radio",{"id":task.id, "title":task.title},false));
+                  if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,false));
+                  else
+                  this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,false));
                 }
-                continue;
               }
-            
+          }
+          else if(project.project.id == project_id && project.tasks.length == 0){
+            console.log(task);
+            console.log(task.dateTo.valueOf()+' '+new Date().valueOf()+' '+task.dateFrom.valueOf());
+            if(this.radioButtons.length == 0){
+              
+              if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,true));
+              else
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,true));
+            }
+            else{
+              if(task.dateTo.valueOf() > new Date().valueOf() && new Date().valueOf() > new Date(task.dateFrom).valueOf())
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},false,false));
+              else
+              this.radioButtons.push(new RadioButton("taskToStart",task.name,"radio",{"id":task.id, "title":task.name},true,false));
+            }
           }
         }
       }
-    }
-    return this.radioButtons;
+      this.globalVars.setButtons(this.radioButtons);
+      console.log('butony: '+this.radioButtons);
+      return this.globalVars.getButtons();
+
   }
 
   prepareCountMethodRadioButtons(){
     this.radioButtons = [];
-    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manual",true));
-    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatic",false));
+    this.radioButtons.push(new RadioButton("countMethod","manualnie","radio","manual",false,true));
+    this.radioButtons.push(new RadioButton("countMethod","automatycznie","radio","automatic",false,false));
     return this.radioButtons;
   }
 
@@ -508,375 +885,331 @@ export class HomePage {
     }
   }
 
-  startTask(task:any, countMethod:any, startHour:any){
-    console.log(task);
-    console.log(countMethod);
-    console.log(startHour);
-    if(task != undefined){
-      this.dayTasks = new Array<any>();
-      this.currentDate = this.today;
-      this.currentTime = this.getHour();
-      this.user[0].tasks.push(task.id);
-      this.dayTask.hour = this.currentTime;
-      this.dayTask.date = this.currentDate;
-      this.dayTask.task_id = task.id;
-      this.dayTask.user_id = this.user[0].id;
-      this.newUserTask.start_date = this.currentDate;
-      if(startHour == null)this.newUserTask.start_hour = this.currentTime;
-      else this.newUserTask.start_hour = startHour.startHour;
-      this.newUserTask.user_id = this.user[0].id;
-      this.newUserTask.task_id = task.id;
-      this.newUserTask.task_title = task.title;
-      this.newUserTask.count_method = countMethod;
-      this.restapiService.saveDayTask(this.dayTask);
-      this.restapiService.getLatestDayTask(task.id).then(data => {
-        this.dayTasks = new Array<number>();
-        this.dayTasksObjects = data;
-        console.log(data);
-        for(let dayTask of this.dayTasksObjects){
-          this.newUserTask.latest_dayTask = dayTask.id;
-          console.log(dayTask.id);
-          break;
-        }
-        this.restapiService.startTask(this.user[0], this.newUserTask);
-        this.storage.set('current_task_id', task.id);
-        this.storage.set('current_task_title', task.title);
-      });
-    }
-    this.getUserProjectsAndTasks();
-  }
-
-  finishTask(hours:any,minutes:any){
-    let k = new Array<any>();
-    this.userTask.finish_date = new Date().toLocaleDateString();
-    this.userTask.finish_hour = this.getHour();
-    if(this.userTask.count_method == 'automatic'){
-      this.storage.forEach((value,key)=>{
-        k = key.split(' ');
-        if(k[0] == this.userTask.task_id && value != '0:0')
-        {
-          console.log(key+" "+value);
-          this.restapiService.saveDayTask(new DayTask(
-            Number(this.userTask.task_id),
-            Number(this.userTask.user_id),
-            k[1].replace(/\//g,'.'),//date
-            value,//time spent
-          ));
-          this.storage.remove(key);
-        }
-      });
-      console.log('------------NAPRAW USUWANIE ZE STORAGE--------------------------');
-      this.storage.forEach((value,key)=>{console.log(key+" "+value)});
-    }
-    if(hours != null && minutes != null){
-      this.userTask.time_spent = hours.toString().concat(":".concat(minutes));
-    }
-    //console.log(this.userTask);
-    this.restapiService.updateUserTask(this.userTask.id, this.userTask);
-    this.storage.set('current_task_id', null);
-    this.storage.set('current_task_title', null);
-    this.getUserProjectsAndTasks();
-  }
-
-  pauseTask(task_id:number){
-    let preferences:any;
-    this.restapiService.getUserPreferences().then((data) =>{
-      preferences = data;
-      for(let day of preferences){
-        console.log("preferences: "+day.day);
+  startTask(project:any, task:any, countMethod:any, startHour:any){
+    let raports;
+    if(countMethod == 'automatic'){
+      if(startHour.startHour != ''){
+        const today = new Date();
+        today.setTime(today.getTime() + (1 * 60 * 60 * 1000));
+        const todayStr: string = today.toISOString();
+        this.raport.startDate = todayStr.substring(0, 11) + startHour.startHour+':00.000Z';
       }
-      this.restapiService.getUserTask()
-      .then(data => {
-        this.userTasks = data;
-        this.storage.get('zalogowany_id').then((user_id) => {
-          for(let task of this.userTasks){
-            this.storage.get("current_task_id").then((id) => {
-              if(id == task.task_id){
-                this.userTask = task;
-                this.userTask.paused = true;
-                this.pausedTask.task_id = id;
-                this.pausedTask.user_id = user_id;
-                this.pausedTask.pause_date = this.today;
-                this.pausedTask.pause_hour = this.getHour();
-                this.restapiService.savePausedTask(this.pausedTask);
-                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-                this.showalert("Wstrzymano czynność.");
-              }
-            });
+      else if(startHour.startHour == ''){
+        this.raport.startDate = new Date().toISOString();
+      }
+    }
+    else if(countMethod == 'manual'){
+      this.raport.startDate = new Date().toISOString();
+    }
+    
+    this.raport.action.id = task.id;
+    this.raport.action.name = task.title;
+    this.raport.countMethod = countMethod;
+    //this.raport.userId = this.globalVars.getUser().id;
+    this.raport.user = this.user;
+    this.raport.project = project;
+
+    this.globalVars.setCurrentTaskId(task.id);
+    this.globalVars.setCurrentTaskName(task.title);
+    this.globalVars.setCurrentTaskCountMethod(countMethod);
+    console.log('zapisujemy raport: '+JSON.stringify(this.raport));
+    this.restapiService.saveRaport(this.raport).then(() =>{
+      this.restapiService.getRaports(null).then(data => {
+        raports = data;
+        this.storage.get('notifications').then(notifications => {
+          for(let raport of raports){
+            if(raport.action.id == task.id && raport.endDate == null && raport.project.id == project.id){
+              this.globalVars.setCurrentTaskRaportId(raport.id);
+              console.log(this.globalVars.getCurrentTask());
+              this.getProjects(null,null);
+              break;
+            }
+          }
+          if(countMethod == 'automatic'){
+            this.setAutoTaskNotification(notifications.taskInProgressOption);
           }
         });
       });
     });
-    this.getUserProjectsAndTasks();
   }
 
-  restartTask(task_id:number){
-    this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          this.storage.get("current_task_id").then((id) => {
-            if(id == task.task_id){
-              this.restapiService.getLatestPausedTask(id,user_id)
-              .then(data => {
-                this.userTask = task;
-                this.userTask.paused = false;
-                this.pausedTaskObjects = new Array<any>();
-                this.pausedTaskObjects = data;
-                this.newPausedTask = this.pausedTaskObjects[0];
-                this.newPausedTask.restart_date = new Date().toLocaleDateString();
-                this.newPausedTask.restart_hour = this.getHour();
-                this.restapiService.updatePausedTask(this.newPausedTask.id,this.newPausedTask);
-                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-                this.restapiService.updateUserTask(this.userTask.id,this.userTask);
-                this.showalert("Wznowiono czynność.");
-              });
-            }
-          });
+  finishTask(task_id:number,project_id:number){
+    let automatic = false;
+    let raports;
+    this.restapiService.getRaports(null).then(data =>{
+      raports = data;
+      for(let raport of raports){
+        if(raport.action.id == task_id && raport.project.id == project_id){
+          if(raport.timeOf == 0)this.restapiService.deleteRaport(raport.id);
+          else{
+            raport.endDate = new Date().toISOString();
+            this.restapiService.updateRaport(raport.id,raport);
+          }
+          if(raport.countMethod == 'automatic')automatic = true;
         }
-      });
+      }
+      this.globalVars.setCurrentTaskId(null);
+      this.globalVars.setCurrentTaskName(null);
+      this.globalVars.setCurrentTaskRaportId(null);
+      this.globalVars.setCurrentTaskCountMethod(null);
+      if(automatic == true){
+        this.dayTasks = new Array<any>();
+        this.getProjects(project_id,task_id);
+      }
+      else this.getProjects(null,null);
+      this.showalert("Zakończono czynność.");
     });
-    this.getUserProjectsAndTasks();
   }
 
-  countTime(task_id:number,start_date:string,date:Date){
-    let time = 0;
-    let DayTime = 0;
-    let pausedTime = 0;
-    let pausedHour = null;
-    let pausedDate = null;
-    let taskStartHour = '';
-    let startHour = date.getHours().toString().concat(":".concat(date.getMinutes().toString()));
-    this.firstDay = true;
-    this.restapiService.getUserPreferences()
-    .then(data =>{
-      this.userPreferences = data;
-      this.storage.get('zalogowany_id').then(user_id =>{
+  pauseTask(raport_id:number){
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
+    else{
+      for(let raport of this.userTasks){
+        if(raport.id == raport_id){
+          raport.pausedDate = new Date().toISOString();
+          raport.paused = true;
+          this.restapiService.updateRaport(raport.id,raport).then(() =>{
+            this.globalVars.setCurrentTaskId(null);
+            this.globalVars.setCurrentTaskName(null);
+            this.globalVars.setCurrentTaskRaportId(null);
+            this.globalVars.setCurrentTaskCountMethod('paused');
+            this.getProjects(null,null);
+            this.showalert("Wstrzymano czynność.");
+          });
+          break;
+        }
+      }
+    }
+  }
 
-
-            this.restapiService.getLatestPausedTask(task_id,user_id)
-            .then(data =>{
-              this.pausedTaskObjects = data;
-              if(this.pausedTaskObjects != ''){
-                if(this.pausedTaskObjects[0].restart_hour == null){
-                  pausedHour = this.pausedTaskObjects[0].pause_hour;
-                  pausedDate = this.pausedTaskObjects[0].pause_date;
+  restartTask(raport_id:number,task_id:number){
+    let raports;
+    if(this.globalVars.getCurrentTask().id != null && this.globalVars.getCurrentTask().id != task_id){
+      this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
+    }
+    else if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
+    else{
+      this.restapiService.getRaports(null).then(data => {
+        raports = data;
+        this.storage.get('notifications').then(notifications => {
+          for(let raport of raports){
+            if(raport.id == raport_id){
+              console.log(raport);
+              this.raport.timeOf = raport.timeOf;
+              this.raport.startDate = new Date().toISOString();
+              this.raport.comment = raport.comment;
+              this.raport.action.id = raport.action.id;
+              this.raport.action.name = raport.action.name;
+              this.raport.countMethod = raport.countMethod;
+              this.raport.user = raport.user;
+              this.raport.project = raport.project;
+              console.log(this.raport);
+    
+              this.globalVars.setCurrentTaskId(this.raport.action.id);
+              this.globalVars.setCurrentTaskName(this.raport.action.name);
+              this.globalVars.setCurrentTaskCountMethod(this.raport.countMethod);
+              this.setAutoTaskNotification(notifications.taskInProgressOption);
+              this.restapiService.saveRaport(this.raport).then(() =>{this.getProjects(null,null);});
+              break;
+              }
+            }
+    
+              for(let raport of raports){
+                if(raport.action.id == this.raport.action.id && raport.endDate == null && raport.project.id == this.raport.project.id){
+                  this.globalVars.setCurrentTaskRaportId(raport.id);
+                  console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name+" "+this.globalVars.getCurrentTask().raport_id);
+                  this.showalert("Wznowiono czynność.");
+                  break;
                 }
               }
-              for(let pause of this.pausedTaskObjects){
-                if(pause.restart_hour != null){
-                  pausedTime += (new Date("01.01.2000/".concat(pause.restart_hour)).getTime()-new Date("01.01.2000/".concat(pause.pause_hour)).getTime());
-                }
-              }
-              console.log("paused hour: "+pausedHour);
-              console.log("paused date: "+pausedDate);
-              console.log(date.getUTCDate()+":"+date.getMonth()+" ? "+new Date().getUTCDate()+":"+new Date().getMonth());
-              for(let d = date;d.getUTCDate()<=new Date().getUTCDate() && d.getMonth()<=new Date().getMonth();d.setDate(d.getDate()+1)){
-                taskStartHour = d.getHours().toString().concat(":".concat(d.getMinutes().toString()));
-                // this.restapiService.getLatestPausedTask(task_id,pref.user_id)
-                // .then(data =>{
-                //   this.pausedTaskObjects = data;
-                //   this.pausedTaskObjects.reverse();
-                //   for(let pause of this.pausedTaskObjects){
-                //     console.log(pause);
-                //   }
-                // });
-                console.log("kolejny dzien: "+new Date(d).getDay());
-                time += this.timeForDay(
-                  this.userPreferences[d.getDay()],
-                  this.firstDay,
-                  d,
-                  taskStartHour,
-                  this.userPreferences[new Date(d).getDay()].start_hour,
-                  this.userPreferences[new Date(d).getDay()].finish_hour,
-                  startHour,
-                  task_id,
-                  pausedHour,
-                  pausedDate);
-                
-                this.firstDay = false;
-                DayTime = time - DayTime;
-                let hours = Math.floor(DayTime);
-                let minutes = Math.floor(60*(DayTime - Math.floor(DayTime)));
-                console.log(d.toLocaleDateString()+" "+hours+"h "+minutes+"m");
-                this.storage.set(task_id.toString().concat(" ".concat(d.toLocaleDateString())),hours.toString().concat(":".concat(minutes.toString())));
-                DayTime = time;
-              }
-              pausedTime = pausedTime/3600000;
-              let hours = Math.floor(time);
-              let minutes = Math.floor(60*(time - Math.floor(time)));
-              let hp = Math.floor(pausedTime);
-              let mp = Math.floor(60*(pausedTime - Math.floor(pausedTime)));
-              console.log(hours+":"+minutes+" - "+hp+":"+mp);
-              time = time - (pausedTime);
-               hours = Math.floor(time);
-               minutes = Math.floor(60*(time - Math.floor(time)));
-               console.log(hours+":"+minutes);
-              this.autoTasks.push(new AutoTaskTime(task_id,start_date,hours,minutes));
-            });
-      });
+          });
     });
+    }
+  }
+
+  podgląd(d:any,start:any,end:any){
+    let tmp = this.timeBetween(end,start);
+    let hours = Math.floor(tmp/3600000);
+    let minutes = Math.floor(60*(tmp/3600000 - Math.floor(tmp/3600000)));
+    console.log(d.toLocaleDateString()+" "+"godz: "+start+"-"+end+" "+hours+"h "+minutes+"m");
+  }
+
+  countTime(project_id:number,task_id:number,pref:any,startDate:Date,endDate:Date){
+    // console.log(startDate.getMonth()+' '+new Date(endDate).getMonth()+' '+startDate.getUTCDate()+' '+new Date(endDate).getUTCDate());
+    // console.log(startDate+' '+startDate.getUTCDate());
+    // console.log(endDate+' '+endDate.getUTCDate());
+    let time = 0;
+    let reportStartHour;
+    let reportEndHour;
+    let workStartHour;
+    let workEndHour;
+    let workDay;
+    let hours;
+    let minutes;
+    let dayTime;
+    this.firstDay = true;
+    this.userPreferences = pref;
+    let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
+              for(let d = startDate;d.getMonth()<=new Date(endDate).getMonth() && d.getUTCDate()<=new Date(endDate).getUTCDate();d.setDate(d.getDate()+1)){
+                //console.log(d.toLocaleDateString());
+                for(let p of this.userPreferences){
+                  if(p.dayOfWeek == d.getDay()){
+                    workStartHour = p.hourFrom;
+                    workEndHour = p.hourTo;
+                    workDay = p.workDay;
+                    break;
+                  }
+                }
+                if(workDay == true){
+                  reportStartHour = startDate.getHours().toString().concat(":".concat(startDate.getMinutes().toString()));
+                  reportEndHour = endDate.getHours().toString().concat(":".concat(endDate.getMinutes().toString()));
+                  let tmp;
+                  
+                  if(this.firstDay == true && startDate.toLocaleDateString() != endDate.toLocaleDateString()){
+                    dayTime = this.timeBetween(workEndHour,reportStartHour);
+                    time += this.timeBetween(workEndHour,reportStartHour);
+                    this.podgląd(d,reportStartHour,workEndHour);
+                  }//pierwszy dzień, liczymy od startTask do endDay
+  
+                  else if(this.firstDay == true && startDate.toLocaleDateString() == endDate.toLocaleDateString()){
+                    if(endDate.toLocaleDateString() == new Date().toLocaleDateString()){//spełnione gdy nie jest spauzowane
+                      if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(nowHour,reportStartHour);
+                        time += this.timeBetween(nowHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,nowHour);
+                        console.log('przed koncem zmiany');
+                      }
+                      else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(workEndHour,reportStartHour);
+                        time += this.timeBetween(workEndHour,reportStartHour);
+                        this.podgląd(d,reportStartHour,workEndHour);
+                        console.log('po zmianie');
+                      } 
+                    }
+                    else{
+                      dayTime = this.timeBetween(reportEndHour,reportStartHour);
+                      time += this.timeBetween(reportEndHour,reportStartHour);
+                      this.podgląd(d,reportStartHour,reportEndHour);
+                      console.log('else?');
+                    }
+                  }//pierwszy i ostatni dzień
+  
+                  else if(this.firstDay == false && d.toLocaleDateString() == endDate.toLocaleDateString()){
+                    if(endDate == new Date()){
+                      if(new Date("01.01.2000/".concat(workEndHour)) > new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(nowHour,workStartHour);
+                        time += this.timeBetween(nowHour,workStartHour);
+                        this.podgląd(d,workStartHour,nowHour);
+                        console.log('przed koncem zmiany');
+                      }
+                      else if(new Date("01.01.2000/".concat(workEndHour)) < new Date("01.01.2000/".concat(nowHour))){
+                        dayTime = this.timeBetween(workEndHour,workStartHour);
+                        time += this.timeBetween(workEndHour,workStartHour);
+                        this.podgląd(d,workStartHour,workEndHour);
+                        console.log('po zmianie');
+                      } 
+                    }
+                    else{
+                      dayTime = 
+                      time += this.timeBetween(reportEndHour,workStartHour);
+                      this.podgląd(d,workStartHour,reportEndHour);
+                    }
+                  }//nie pierwszy ale ostatni, bo dzisiaj
+  
+                  else{
+                    dayTime = 
+                    time += this.timeBetween(workEndHour,workStartHour);
+                    this.podgląd(d,workStartHour,workEndHour);
+                  }//każdy dzień pomiędzy, liczymy od startDay do endDay
+                }
+                this.firstDay = false;
+                
+                hours = Math.floor(dayTime/3600000);
+                minutes = Math.floor(60*(dayTime/3600000 - Math.floor(dayTime/3600000)));
+                if(this.saveDayTask == true){
+                  this.dayTasks.push(new DayTask(task_id,project_id,this.globalVars.getUser().id,d.toLocaleDateString(),((hours*60)+minutes),null));
+                }
+              }
+              time = time/3600000;
+              hours = Math.floor(time);
+              minutes = Math.floor(60*(time - Math.floor(time)));
+              console.log("sumarycznie dla raportu: "+hours+":"+minutes);
+              return time;
   }
 
   timeBetween(from:string,then:string){
     return (new Date("01.01.2000/".concat(from)).getTime()-new Date("01.01.2000/".concat(then)).getTime())
   }
 
-  timeForDay(pref:any,firstDay:any,d:any,taskStartHour:string,dayOd:any,dayDo:any,startHour:any,task_id:any,pausedHour:any,pausedDate:any){
-    let time = 0;
-    let nowHour = new Date().getHours().toString().concat(":".concat(new Date().getMinutes().toString()));
-    this.pausedTaskObjects = new Array<any>();
-    //------------------------------------------------------------------------------------------------------------------------
-      if(firstDay == true){
-        //jesli to nie jest dzisiaj
-        if(d.toLocaleDateString() != new Date().toLocaleDateString()){
-          if((pausedHour == null) || (pausedHour != null && d.toLocaleDateString() != new Date(pausedDate).toLocaleDateString())){
-            time += this.timeBetween(dayDo,taskStartHour);
-          } 
-          else if(pausedHour != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,taskStartHour);
-          } 
-        }
-        //jesli to jest dzisiaj
-        else
-        {
-          //jeśli jest spauzowany
-            if(pausedHour != null && pausedDate != null){
-              if(d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-                //console.log(d.toLocaleDateString()+" "+pausedDate);
-                time += this.timeBetween(pausedHour,startHour);
-              }
+
+  finishTaskPrompt(task_id:number, project_id:number, project_name:string) {
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
+    else{
+      this.restapiService.getUserTask()
+      const alert = this.alertCtrl.create({
+        title: 'Zakończyć '+project_name+'?',
+        buttons: [
+          {
+            text: 'Anuluj',
+            role: 'cancel',
+            handler: () => {
             }
-            else{
-              //jesli rozpocząłem czynność pozniej niz zacząłem pracę
-              if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
-              //jesli już skończyłem dzisiaj pracować
-              if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
-                time += this.timeBetween(dayDo,dayOd);
-              }
-              //jeśli jeszcze jestem w pracy
-              else{
-                time += this.timeBetween(nowHour,dayOd);
-              }
+          },
+          {
+            text: 'Zakończ',
+            handler: () => {
+              this.finishTask(task_id,project_id);
             }
-          
-        }
-        }
-        //------------------------------------------------------------------------------------------------------------------------
-      else if(d.getUTCDate() == new Date().getUTCDate() && d.getMonth() == new Date().getMonth()){
-        if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
-        if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,startHour);
-        }
-        else{
-          //jesli rozpocząłem czynność pozniej niz zacząłem pracę
-          if(new Date("01.01.2000/".concat(dayOd)) < new Date("01.01.2000/".concat(startHour))) dayOd = startHour;
-          //jesli już skończyłem dzisiaj pracować
-          if(new Date("01.01.2000/".concat(nowHour)) > new Date("01.01.2000/".concat(dayDo))){
-            time += this.timeBetween(dayDo,dayOd);
           }
-          //jeśli jeszcze jestem w pracy
+        ]
+      });
+      alert.present();
+    }
+  }
+
+  selectTaskToStart(project:any) {
+    if(this.isNowWorkHour() == false) this.showalert('Jesteś poza godzinami pracy.');
+    else{
+      this.restapiService.getRaports(null)
+      .then(userTasks => {
+        let inputs;
+        console.log('currentTask: '+this.globalVars.getCurrentTask().id+" "+this.globalVars.getCurrentTask().name);
+          if(this.globalVars.getCurrentTask().id != null
+          && this.globalVars.getCurrentTask().id != undefined
+          && this.globalVars.getCurrentTask().name != null
+          && this.globalVars.getCurrentTask().name != undefined){
+            this.showalert('Nie możesz rozpoczać czynności.<br>Jesteś w trakcie '+this.globalVars.getCurrentTask().name);
+          }
           else{
-            time += this.timeBetween(nowHour,dayOd);
-          }
-        }// SPRAWDŹ CZY NOW NIE JEST ZANIM ZACZYNASZ PRACĘ, BO BĘDZIE NA MINUSIE
-      }
-        }
-        //------------------------------------------------------------------------------------------------------------------------
-        //każdy dzień pomiędzy dzisiaj a dniem rozpoczęcia czynności
-      else{
-        if(pausedDate == null || d.toLocaleDateString() <= new Date(pausedDate).toLocaleDateString()){
-        if(pausedHour != null && pausedDate != null && d.toLocaleDateString() == new Date(pausedDate).toLocaleDateString()){
-            time += this.timeBetween(pausedHour,dayOd);
-          }
-        else{
-          time += this.timeBetween(dayDo,dayOd);
-        }
-      }
-      }
-    time = time/3600000;
-    console.log(" ");
-    return time;
-  }
-
-
-  finishTaskPrompt(task_id:number, task_title:string, hours:any, minutes:any) {
-    this.restapiService.getUserTask()
-    .then(data => {
-      this.userTasks = data;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          this.storage.get("current_task_id").then((id) => {
-            if(id == task.task_id){
-              this.userTask = task;
-            }
-          });
-        }
-      });
-    });
-    const alert = this.alertCtrl.create({
-      title: 'Zkończyć '+task_title+'?',
-      buttons: [
-        {
-          text: 'Anuluj',
-          role: 'cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'Zakończ',
-          handler: () => {
-            this.finishTask(hours,minutes);
-          }
-        }
-      ]
-    });
-    alert.present();
-  }
-
-  selectTaskToStart(project:string, project_id:number) {
-    this.restapiService.getUserTask()
-    .then(userTasks => {
-      this.inProgress = false;
-      this.userTasks = userTasks;
-      this.storage.get('zalogowany_id').then((user_id) => {
-        for(let task of this.userTasks){
-          if(user_id == task.user_id && task.finish_date == null){
-            //console.log(task);
-            this.storage.get('current_task_title').then((title) => {
-              this.showalert("Nie możesz zacząć czynności.<br>Jesteś w trakcie: "+title);
+            this.restapiService.getProjectTasks(project.id).subscribe(ProjectTasks => {
+              inputs = this.prepareTasksRadioButtons(ProjectTasks,project.id);
+              const tasksAlert = this.alertCtrl.create({
+                title: "Czynnosci w "+project.name,
+                inputs: inputs,        
+                buttons: [
+                  {
+                    text: 'Anuluj',
+                    role: 'cancel',
+                    handler: () => {
+                    }
+                  },
+                  {
+                    text: 'Rozpocznij',
+                    handler: data => {
+                      this.selectCountMethod(project,data);
+                    }
+                  }
+                ]
+              });
+              if(inputs != '')tasksAlert.present();
+              else this.showalert('Brak czynności w '+project.name);
             });
-            this.inProgress = true;
-            break;
           }
-        }
-        if(this.inProgress == false){
-          const tasksAlert = this.alertCtrl.create({
-            title: "Czynnosci w "+project,
-            inputs: this.prepareTasksRadioButtons(project_id),        
-            buttons: [
-              {
-                text: 'Anuluj',
-                role: 'cancel',
-                handler: () => {
-                }
-              },
-              {
-                text: 'Rozpocznij',
-                handler: data => {
-                  this.selectCountMethod(data);
-                }
-              }
-            ]
-          });
-          tasksAlert.present();
-        }
       });
-    });
+    }
   }
 
-  selectStartDate(taskToStart:any, data:any) {
+  selectStartDate(projectId:any,taskToStart:any, data:any) {
     const tasksAlert = this.alertCtrl.create({
       title: "Godzina rozpoczęcia:",
       inputs: [
@@ -889,7 +1222,7 @@ export class HomePage {
         {
           text: 'OK',
           handler: startHour => {
-            this.startTask(taskToStart, data, startHour);
+            this.startTask(projectId,taskToStart, data, startHour);
           }
         }
       ]
@@ -897,7 +1230,7 @@ export class HomePage {
     tasksAlert.present();
 }
 
-  selectCountMethod(taskToStart:any) {
+  selectCountMethod(project:any,taskToStart:any) {
           const tasksAlert = this.alertCtrl.create({
             title: "Metoda zliczania czasu:",
             inputs: this.prepareCountMethodRadioButtons(),      
@@ -905,9 +1238,9 @@ export class HomePage {
               {
                 text: 'OK',
                 handler: data => {
-                  console.log(data);
-                  if(data == 'manual') this.startTask(taskToStart, data, null);
-                  else this.selectStartDate(taskToStart, data);
+                  console.log('selectcount: '+data);
+                  if(data == 'manual') this.startTask(project,taskToStart, data, null);
+                  else this.selectStartDate(project,taskToStart, data);
                 }
               }
             ]

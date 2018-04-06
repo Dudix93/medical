@@ -1,6 +1,5 @@
-export class SingleDay{
+export class NewSingleDay{
     constructor(
-        public id:any,
         public user:any,
         public dayOfWeek:any,
         public hourFrom:any,

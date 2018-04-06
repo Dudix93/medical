@@ -61,7 +61,8 @@
       "cordova-plugin-whitelist": {},
       "ionic-plugin-keyboard": {},
       "phonegap-plugin-push": {
-        "SENDER_ID": "160370676742"
+        "SENDER_ID": "160370676742",
+        "FCM_VERSION": "11.0.1"
       },
       "de.appplant.cordova.plugin.local-notification": {},
       "cordova-plugin-local-notification": {}

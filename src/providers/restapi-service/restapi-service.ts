@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { Response, Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 import {GlobalVars} from '../../app/globalVars'
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class RestapiServiceProvider {
@@ -16,53 +17,53 @@ export class RestapiServiceProvider {
               public globalVar:GlobalVars){
   }
 
-  get(apiUrl,resource,id,headers):Promise<any>{
-    console.log(apiUrl);
-    if(id == null){
-      console.log("nie ma id");
-      return new Promise(resolve => {
-        this.http.get(apiUrl+'/'+resource)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-    });
-    }
-    else{
-      console.log("jest id");
-      return new Promise(resolve => {
-        this.http.get(apiUrl+'/'+resource+'/'+id)
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-    });
-    }
-  }
+  // get(apiUrl,resource,id,headers):Promise<any>{
+  //   console.log(apiUrl);
+  //   if(id == null){
+  //     console.log("nie ma id");
+  //     return new Promise(resolve => {
+  //       this.http.get(apiUrl+'/'+resource)
+  //       .map(res => res.json())
+  //       .subscribe(data => {
+  //         this.data = data;
+  //         resolve(this.data);
+  //       });
+  //   });
+  //   }
+  //   else{
+  //     console.log("jest id");
+  //     return new Promise(resolve => {
+  //       this.http.get(apiUrl+'/'+resource+'/'+id)
+  //       .map(res => res.json())
+  //       .subscribe(data => {
+  //         this.data = data;
+  //         resolve(this.data);
+  //       });
+  //   });
+  //   }
+  // }
 
-  post(apiUrl,resource,data,headers):Promise<any>{
-    return new Promise((resolve, reject) => {
-        this.http.post(apiUrl+'/'+resource+'/',data,headers)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-    });
-  }
+  // post(apiUrl,resource,data,headers):Promise<any>{
+  //   return new Promise((resolve, reject) => {
+  //       this.http.post(apiUrl+'/'+resource+'/',data,headers)
+  //       .subscribe(res => {
+  //         resolve(res);
+  //       }, (err) => {
+  //         reject(err);
+  //       });
+  //   });
+  // }
 
-  delete(apiUrl,resource,id):Promise<any>{
-    return new Promise((resolve, reject) => {
-        this.http.delete(apiUrl+'/'+resource+'/',id)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-    });
-  }
+  // delete(apiUrl,resource,id):Promise<any>{
+  //   return new Promise((resolve, reject) => {
+  //       this.http.delete(apiUrl+'/'+resource+'/',id)
+  //       .subscribe(res => {
+  //         resolve(res);
+  //       }, (err) => {
+  //         reject(err);
+  //       });
+  //   });
+  // }
 
   headers():RequestOptions{
     let headers = new Headers();
@@ -92,14 +93,29 @@ export class RestapiServiceProvider {
     else return null;
   }
 
-  login(data) {
+  login2(data) {
       let value = this.globalVar.getApiUrl();
-        return this.http.post(value+'/api/authenticate', data)
-        //return this.http.post(value+'/users', data)
+        return this.http.post(value+'/authenticate', data)
         .map((response:Response) => {
           console.log("token: "+response.json().id_token);
           this.globalVar.setToken(response.json().id_token);
         });
+  }
+
+  login(data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        return this.http.post(value+'/authenticate', data)
+        .subscribe(res => {
+          console.log("token: "+res.json().id_token);
+          this.globalVar.setToken(res.json().id_token);
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
   }
 
   getUsers() {
@@ -120,32 +136,18 @@ export class RestapiServiceProvider {
     });
   }
 
-  getUser(id:number) {
+  getUser() {
     //this.get(this.getApiUrl,"users",id,this.headers);
     return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
         //console.log(value);
-        this.http.get(value+'/users/'+id)
+        this.http.get(value+'/users/me/',this.headers())
         .map(res => res.json())
         .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });
       });
-    });
-  }
-
-  getUserPreferences() {
-    return new Promise(resolve => {
-      this.storage.get('apiUrl').then((value) => {
-        //console.log(options);
-        this.http.get(value+'/preferences',this.headers())
-        .map(res => res.json())
-        .subscribe(data => {
-         this.data = data;
-         resolve(this.data);
-        });
-       });
     });
   }
 
@@ -163,105 +165,11 @@ export class RestapiServiceProvider {
     });
   }
 
-  getTasks() {
-     return new Promise(resolve => {
-      this.storage.get('apiUrl').then((value) => {
-      //console.log(options);
-      this.http.get(value+'/tasks',this.headers())
-      .map(res => res.json())
-      .subscribe(data => {
-        this.data = data;
-        resolve(this.data);
-      });
-       });
-    });
-  }
-
-  getMessages(id:number,read:any) {
-    return new Promise(resolve => {
-      let value = this.globalVar.getApiUrl();
-          this.http.get(value+'/api/statements',this.headers())
-          .map(res => res.json())
-          .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-          });
-      });
-  }
-
-  getProjects() {
-    return new Promise(resolve => {
-      // this.storage.get('apiUrl').then((value) => {
-        let value = this.globalVar.getApiUrl();
-        //console.log(this.headers());
-        //this.http.get(value+'/api/projects/user/',this.headers())
-        this.http.get(value+'/projects/',this.headers())
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-      // });
-    });
-  }
-
-  saveTask(data) {
-    console.log(JSON.stringify(data));
+  deleteUserTask(data){
+    //console.log(data);
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/tasks', data)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
-
-  getDayTask() {
-    return new Promise(resolve => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.get(value+'/dayTask',this.headers())
-        .map(res => res.json())
-        .subscribe(data => {
-          this.data = data;
-          resolve(this.data);
-        });
-      });
-    });
-  }
-
-  saveDayTask(data) {
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/dayTask', data,this.headers())
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
-
-  deleteDayTask(id) {
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/dayTask/'+id,this.headers())
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
-
-  updateDayTask(id,data) {
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/dayTask/'+id, data, this.headers())
+        this.http.delete(value+'/userTask/'+data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -275,7 +183,7 @@ export class RestapiServiceProvider {
     //console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/userTask', data)
+        this.http.post(value+'/userTask', data,this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -299,6 +207,302 @@ export class RestapiServiceProvider {
     });
   }
 
+  getRaportUpdate() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        //console.log(options);
+        this.http.get(value+'/raport-updates',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
+    });
+  }
+
+  deleteRaportUpdate(id:number){
+    console.log(id);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/raport-updates/'+id,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+  
+  saveRaportUpdate(data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/raport-updates', data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  updateRaportUpdate(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/raport-updates/', data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  getTasks() {
+     return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+      //console.log(options);
+      this.http.get(value+'/tasks',this.headers())
+      .map(res => res.json())
+      .subscribe(data => {
+        this.data = data;
+        resolve(this.data);
+      });
+       });
+    });
+  }
+
+  getMessages(id:number,read:any) {
+    return new Promise(resolve => {
+      let value = this.globalVar.getApiUrl();
+          this.http.get(value+'/statements/user',this.headers())
+          .map(res => res.json())
+          .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+          });
+      });
+  }
+
+  getProjects() {
+    return new Promise(resolve => {
+      // this.storage.get('apiUrl').then((value) => {
+        let value = this.globalVar.getApiUrl();
+        //console.log(this.headers());
+        //this.http.get(value+'/api/projects/user/',this.headers())
+        this.http.get(value+'/projects/user',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      // });
+    });
+  }
+
+  register(value,data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+
+        this.http.post(value+'/register', data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });  
+
+    });
+  }
+
+  getProjectTasks(id:number): Observable<any> {
+     
+
+        let value = this.globalVar.getApiUrl();
+        //this.http.get(value+'/api/project-actions/project/'+id,this.headers())
+        return this.http.get(value+'/project-actions/project/'+id,this.headers()).map((res: Response) => {
+          const data = res.json();
+          return data;
+        });
+
+
+        }
+
+  getRaports(id:number) {
+    if(id == null){
+      return new Promise(resolve => {
+        let value = this.globalVar.getApiUrl();
+        //this.http.get(value+'/api/raports/user',this.headers())
+        this.http.get(value+'/raports/user?_sort=action.id,startDate&_order=desc',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+          
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
+        });
+    });
+    }
+    else{
+      return new Promise(resolve => {
+        let value = this.globalVar.getApiUrl();
+        //this.http.get(value+'/api/raports/user/'+id,this.headers())
+        this.http.get(value+'/raports/'+id,this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+          
+        }, (err) => {
+          this.err = err;
+          resolve(this.err);
+        });
+    });
+    }
+  }
+  
+  updateRaport(id,data) {
+    //console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        //this.http.put(value+'/api/raports/user/'+id,data,this.headers())
+        this.http.put(value+'/raports/',data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+  
+  deleteRaport(id) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        //this.http.put(value+'/api/raports/user/'+id,data,this.headers())
+        this.http.delete(value+'/raports/'+id,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  saveRaport(data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/raports', data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  saveTask(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/tasks', data)
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  getDayTask() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/day-tasks?_sort=date,taskId&_order=asc',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
+
+  getAutoDayTask() {
+    return new Promise(resolve => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.get(value+'/autoDayTasks?_sort=date,taskId&_order=asc',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+          this.data = data;
+          resolve(this.data);
+        });
+      });
+    });
+  }
+
+  saveAutoDayTask(data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/autoDayTasks', data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  saveDayTask(data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/day-tasks', data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  deleteDayTask(data){
+    //console.log(data);
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.delete(value+'/day-tasks/'+data,this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  updateDayTask(id,data) {
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.put(value+'/day-tasks/', data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+
   deleteTask(data){
     console.log(data);
     return new Promise((resolve, reject) => {
@@ -313,19 +517,6 @@ export class RestapiServiceProvider {
     });
   }
 
-  deleteUserTask(data){
-    //console.log(data);
-    return new Promise((resolve, reject) => {
-      this.storage.get('apiUrl').then((value) => {
-        this.http.delete(value+'/userTask/'+data,this.headers())
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });
-      });
-    });
-  }
 
   saveUser(data) {
     console.log(JSON.stringify(data));
@@ -342,10 +533,24 @@ export class RestapiServiceProvider {
   }
 
   updateUser(id,data) {
-    //console.log(JSON.stringify(data));
+    console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/users/'+id, data, this.headers())
+        this.http.post(value+'/account/', data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  updateUserPassword(data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/account/change-password/', data, this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {
@@ -369,25 +574,38 @@ export class RestapiServiceProvider {
     });
   }
 
-  saveUserPreferences(data) {
-    console.log(JSON.stringify(data));
-    return new Promise((resolve, reject) => {
+  getUserPreferences() {
+    return new Promise(resolve => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.post(value+'/preferences', data)
-        .subscribe(res => {
-          resolve(res);
-        }, (err) => {
-          reject(err);
-        });  
-      });
+        this.http.get(value+'/preferences/user',this.headers())
+        .map(res => res.json())
+        .subscribe(data => {
+         this.data = data;
+         resolve(this.data);
+        });
+       });
     });
   }
 
   updateUserPreferences(id,data) {
-    //console.log(JSON.stringify(data));
+    console.log(JSON.stringify(data));
     return new Promise((resolve, reject) => {
       this.storage.get('apiUrl').then((value) => {
-        this.http.put(value+'/preferences/'+id, data, this.headers())
+        this.http.put(value+'/preferences', data, this.headers())
+        .subscribe(res => {
+          resolve(res);
+        }, (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+
+  saveUserPreferences(id,data) {
+    console.log(JSON.stringify(data));
+    return new Promise((resolve, reject) => {
+      this.storage.get('apiUrl').then((value) => {
+        this.http.post(value+'/preferences', data, this.headers())
         .subscribe(res => {
           resolve(res);
         }, (err) => {

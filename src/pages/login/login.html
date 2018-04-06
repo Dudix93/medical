@@ -12,7 +12,7 @@
   <form>
       <ion-item>
           <ion-label>API</ion-label>
-          <ion-input type="text" [(ngModel)]="credentials.apiUrl" name="apiUrl" value="http://192.168.0.103:3000"></ion-input>        
+          <ion-input type="text" [(ngModel)]="credentials.apiUrl" name="apiUrl"></ion-input>        
       </ion-item>    
     <ion-item>
         <ion-label>Login</ion-label>
@@ -22,8 +22,8 @@
         <ion-label>Hasło</ion-label>
         <ion-input type="password" [(ngModel)]="credentials.password" name="password"></ion-input>    
     </ion-item>
-    <button ion-button (click)="login()">Zaloguj</button>
-    <button ion-button (click)="login2(null,null)">Zaloguj2</button>
+    <button ion-button (click)="login2()">Zaloguj</button>
+    <!-- <button ion-button (click)="login2(null,null)">Zaloguj2</button> -->
     <button ion-button (click)="register()">Zarejestruj</button>
   </form>
 </ion-content>

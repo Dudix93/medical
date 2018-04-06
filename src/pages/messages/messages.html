@@ -1,6 +1,11 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Wiadomości</ion-title>
+    <ion-toolbar>
+        <ion-title>Wiadomości</ion-title>
+         <ion-buttons end>
+           <button ion-button color="danger" (click)="deleteMessagesPrompt()">Usuń wybrane</button>
+         </ion-buttons>
+    </ion-toolbar>
   </ion-navbar>
 </ion-header>
 
@@ -22,70 +27,67 @@
     <h2 *ngIf="allMessages == null">Nie masz żadnych wiadomości.</h2>
 
     <ng-container *ngIf="sort == 'all'">
-      <ng-container *ngFor="let date of allDates,let i = index">
-              <h1>Z dnia: {{date}}</h1>
         <ion-grid>
             <ion-row>
-                <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
+                <ion-col col-1><ion-label></ion-label></ion-col>
+                <ion-col col-4><ion-label>Data/godzina</ion-label></ion-col>
                 <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
+                <!-- <ion-col col-2><ion-label>Czytaj</ion-label></ion-col> -->
             </ion-row>
-            
+      <ng-container *ngFor="let date of allDates,let i = index">
             <ion-row *ngFor="let msg of allMessages,let i = index">
               <ng-container *ngIf="msg.date == date">
-                <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
-                <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
+                <ion-col col-1><ion-label><ion-checkbox [(ngModel)]="msgsIds[allMessages.indexOf(msg)].checked" name="msgsIds[allMessages.indexOf(msg)].id"></ion-checkbox></ion-label></ion-col>
+                <ion-col col-4><ion-label>{{date}}/{{msg.hour}}</ion-label></ion-col>
+                <ion-col col-7><ion-label style='text-align: left' (click)="showMessage(msg.id,msg.title,msg.message)">{{msg.title}}</ion-label></ion-col>
+                <!-- <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col> -->
               </ng-container>
             </ion-row>
-
-        </ion-grid>
       </ng-container>
+        </ion-grid>
     </ng-container>
 
     <ng-container *ngIf="sort == 'new'">
-        <ng-container *ngFor="let date of newDates,let i = index">
-                <h1>Z dnia: {{date}}</h1>
-          <ion-grid>
-              <ion-row>
-                  <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
-                  <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                  <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
-              </ion-row>
-              
-              <ion-row *ngFor="let msg of newMessages,let i = index">
-                <ng-container *ngIf="msg.date == date">
-                  <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                  <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
-                  <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
-                </ng-container>
-              </ion-row>
-  
-          </ion-grid>
-        </ng-container>
+        <ion-grid>
+            <ion-row>
+                <ion-col col-1><ion-label></ion-label></ion-col>
+                <ion-col col-4><ion-label>Data/godzina</ion-label></ion-col>
+                <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
+                <!-- <ion-col col-2><ion-label>Czytaj</ion-label></ion-col> -->
+            </ion-row>
+      <ng-container *ngFor="let date of newDates,let i = index">
+            <ion-row *ngFor="let msg of newMessages,let i = index">
+              <ng-container *ngIf="msg.date == date">
+                <ion-col col-1><ion-label><ion-checkbox [(ngModel)]="msgsIds[allMessages.indexOf(msg)].checked" name="msgsIds[allMessages.indexOf(msg)].id"></ion-checkbox></ion-label></ion-col>
+                <ion-col col-4><ion-label>{{date}}/{{msg.hour}}</ion-label></ion-col>
+                <ion-col col-7><ion-label style='text-align: left' (click)="showMessage(msg.id,msg.title,msg.message)">{{msg.title}}</ion-label></ion-col>
+                <!-- <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col> -->
+              </ng-container>
+            </ion-row>
+      </ng-container>
+        </ion-grid>
       </ng-container>
 
       <ng-container *ngIf="sort == 'old'">
         <ng-container *ngIf="oldMessages != null">
-          <ng-container *ngFor="let date of oldDates,let i = index">
-                  <h1>Z dnia: {{date}}</h1>
             <ion-grid>
                 <ion-row>
-                    <ion-col col-3><ion-label>Godzina</ion-label></ion-col>
+                    <ion-col col-1><ion-label></ion-label></ion-col>
+                    <ion-col col-4><ion-label>Data/godzina</ion-label></ion-col>
                     <ion-col col-7><ion-label>Wiadomość</ion-label></ion-col>
-                    <ion-col col-2><ion-label>Czytaj</ion-label></ion-col>
+                    <!-- <ion-col col-2><ion-label>Czytaj</ion-label></ion-col> -->
                 </ion-row>
-                
+          <ng-container *ngFor="let date of oldDates,let i = index">
                 <ion-row *ngFor="let msg of oldMessages,let i = index">
                   <ng-container *ngIf="msg.date == date">
-                    <ion-col col-3><ion-label>{{msg.hour}}</ion-label></ion-col>
-                    <ion-col col-7><ion-label style='text-align: left'>{{msg.title}}</ion-label></ion-col>
-                    <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col>
+                    <ion-col col-1><ion-label><ion-checkbox [(ngModel)]="msgsIds[allMessages.indexOf(msg)].checked" name="msgsIds[allMessages.indexOf(msg)].id"></ion-checkbox></ion-label></ion-col>
+                    <ion-col col-4><ion-label>{{date}}/{{msg.hour}}</ion-label></ion-col>
+                    <ion-col col-7><ion-label style='text-align: left' (click)="showMessage(msg.id,msg.title,msg.message)">{{msg.title}}</ion-label></ion-col>
+                    <!-- <ion-col col-2><ion-label><ion-icon name="ios-eye" (click)="showMessage(msg.id,msg.title,msg.message)"></ion-icon></ion-label></ion-col> -->
                   </ng-container>
                 </ion-row>
-    
-            </ion-grid>
           </ng-container>
+            </ion-grid>
         </ng-container>
       </ng-container>
 

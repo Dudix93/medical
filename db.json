@@ -1,72 +1,446 @@
 {
-  "tasks": [
+  "raports": [
     {
-      "title": "czynnosc1",
-      "project_id": 1,
-      "id": 1
+      "id": 6253,
+      "timeOf": 62,
+      "startDate": "2017-12-09T09:31:07+01:00",
+      "endDate": "2017-12-19T19:54:37.351Z",
+      "comment": "koment do projektowania",
+      "action": {
+        "id": 1053,
+        "name": "Konsultacja z klientem"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      }
     },
     {
-      "title": "czynnosc2",
-      "project_id": 1,
-      "id": 2
+      "timeOf": 840,
+      "startDate": "Thu, 21 Dec 2017 13:43:37 GMT",
+      "endDate": "2017-12-22T10:40:50.157Z",
+      "comment": "komentarz do testowania",
+      "action": {
+        "id": 1051,
+        "name": "testowanie"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6663,
+      "lastUpdateDate": "2017-12-22T10:40:32.493Z",
+      "lastUpdateTimeOf": "3"
     },
     {
-      "title": "czynnosc3",
-      "project_id": 1,
-      "id": 3
+      "timeOf": 660,
+      "startDate": "Sat, 06 Jan 2018 15:03:41 GMT",
+      "endDate": "2018-01-06T16:35:45.918Z",
+      "comment": "komentarz dotyczacy implementacji powiadomien",
+      "action": {
+        "id": 1052,
+        "name": "implementacja"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6673,
+      "lastUpdateDate": "2018-01-06T16:34:50.637Z",
+      "lastUpdateTimeOf": "1"
     },
     {
-      "title": "czynnosc4",
-      "project_id": 2,
-      "id": 4
+      "timeOf": 3633.0000000000005,
+      "startDate": "2018-01-03T09:30:31.296Z",
+      "endDate": null,
+      "comment": "koment do projektowania",
+      "action": {
+        "id": 1053,
+        "name": "projektowanie"
+      },
+      "countMethod": "automatic",
+      "pausedDate": "2018-01-03T15:50:04.849Z",
+      "paused": true,
+      "userId": 4,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6680
     },
     {
-      "title": "czynnosc5",
-      "project_id": 2,
-      "id": 5
+      "timeOf": 3633.0000000000005,
+      "startDate": "2018-01-04T08:31:31.296Z",
+      "endDate": null,
+      "comment": "koment do projektowania",
+      "action": {
+        "id": 1053,
+        "name": "projektowanie"
+      },
+      "countMethod": "automatic",
+      "pausedDate": "2018-01-10T14:45:04.849Z",
+      "paused": true,
+      "userId": 4,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6675
     },
     {
-      "title": "czynnosc6",
-      "project_id": 2,
-      "id": 6
+      "timeOf": 660,
+      "startDate": "2018-01-16T18:08:21.401Z",
+      "endDate": "2018-01-17T14:33:58.539Z",
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "action": {
+        "id": 1051,
+        "name": "testowanie"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1452,
+        "name": "HILS",
+        "dateFrom": "2017-11-08T09:31:07+01:00",
+        "dateTo": "2017-11-08T08:49:00+01:00",
+        "numberOfHours": 90,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6676,
+      "lastUpdateDate": "2018-01-17T14:33:46.711Z",
+      "lastUpdateTimeOf": "6"
     },
     {
-      "title": "czynnosc7",
-      "project_id": 3,
-      "id": 7
-    },
-    {
-      "title": "czynnosc8",
-      "project_id": 3,
-      "id": 8
+      "timeOf": 180,
+      "startDate": "2018-01-29T11:56:31.846Z",
+      "endDate": null,
+      "comment": "koment  o interfejsie",
+      "action": {
+        "id": 1222,
+        "name": "projektowanie interfejsu"
+      },
+      "countMethod": "manual",
+      "pausedDate": null,
+      "paused": false,
+      "userId": 4,
+      "project": {
+        "id": 1451,
+        "name": "MSD",
+        "dateFrom": "2017-12-08T09:31:07+01:00",
+        "dateTo": "2017-12-08T08:49:00+01:00",
+        "numberOfHours": 80,
+        "users": [
+          {
+            "id": 3,
+            "login": "admin",
+            "firstName": "Administrator",
+            "lastName": "Administrator",
+            "email": "admin@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          },
+          {
+            "id": 4,
+            "login": "user",
+            "firstName": "User",
+            "lastName": "User",
+            "email": "user@localhost",
+            "activated": true,
+            "langKey": "en",
+            "imageUrl": "",
+            "resetDate": null
+          }
+        ]
+      },
+      "id": 6677,
+      "lastUpdateDate": "2018-01-29T11:58:16.442Z",
+      "lastUpdateTimeOf": "3"
     }
   ],
   "projects": [
     {
-      "title": "projekt1",
-      "tasks": [
-        1,
-        2,
-        3
-      ],
-      "id": 1
+      "id": 1451,
+      "name": "MSD",
+      "dateFrom": "2017-12-08T09:31:07+01:00",
+      "dateTo": "2017-12-08T08:49:00+01:00",
+      "numberOfHours": 80,
+      "users": [
+        {
+          "id": 3,
+          "login": "admin",
+          "firstName": "Administrator",
+          "lastName": "Administrator",
+          "email": "admin@localhost",
+          "activated": true,
+          "langKey": "en",
+          "imageUrl": "",
+          "resetDate": null
+        },
+        {
+          "id": 4,
+          "login": "user",
+          "firstName": "User",
+          "lastName": "User",
+          "email": "user@localhost",
+          "activated": true,
+          "langKey": "en",
+          "imageUrl": "",
+          "resetDate": null
+        }
+      ]
     },
     {
-      "title": "projekt2",
+      "id": 1452,
+      "name": "HILS",
+      "dateFrom": "2017-11-08T09:31:07+01:00",
+      "dateTo": "2017-11-08T08:49:00+01:00",
+      "numberOfHours": 90,
+      "users": [
+        {
+          "id": 3,
+          "login": "admin",
+          "firstName": "Administrator",
+          "lastName": "Administrator",
+          "email": "admin@localhost",
+          "activated": true,
+          "langKey": "en",
+          "imageUrl": "",
+          "resetDate": null
+        },
+        {
+          "id": 4,
+          "login": "user",
+          "firstName": "User",
+          "lastName": "User",
+          "email": "user@localhost",
+          "activated": true,
+          "langKey": "en",
+          "imageUrl": "",
+          "resetDate": null
+        }
+      ]
+    }
+  ],
+  "project-actions": [
+    {
+      "id": 1452,
       "tasks": [
-        4,
-        5,
-        6
-      ],
-      "id": 2
+        {
+          "id": 1051,
+          "name": "testowanie",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        },
+        {
+          "id": 1052,
+          "name": "implementacja",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        },
+        {
+          "id": 1053,
+          "name": "projektowanie",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        }
+      ]
     },
     {
-      "title": "projekt3",
+      "id": 1451,
       "tasks": [
-        7,
-        8
-      ],
-      "id": 3
+        {
+          "id": 1051,
+          "name": "testowanie",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        },
+        {
+          "id": 1053,
+          "name": "projektowanie",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        },
+        {
+          "id": 1222,
+          "name": "projektowanie interfejsu",
+          "dateFrom": "2017-11-08T09:31:07+01:00",
+          "dateTo": null
+        }
+      ]
     }
   ],
   "users": [
@@ -81,7 +455,7 @@
     {
       "id": 4,
       "login": "dodo",
-      "name": "Michal",
+      "firstName": "Michal",
       "email": "m.dodo@wp.pl",
       "password": "dodo123",
       "active": true,
@@ -164,60 +538,10 @@
       "latest_dayTask": 8,
       "latest_pausedTask": null,
       "count_method": "automatic",
-      "paused": false,
+      "paused": true,
       "finish_date": null,
       "finish_hour": null,
       "id": 4
-    }
-  ],
-  "dayTask": [
-    {
-      "id": 4,
-      "task_id": 7,
-      "user_id": 4,
-      "date": "2.11.2017",
-      "hour": "10:53",
-      "time_spent": 2
-    },
-    {
-      "id": 5,
-      "task_id": 8,
-      "user_id": 4,
-      "date": "11/8/2017",
-      "hour": "22:50",
-      "time_spent": 9
-    },
-    {
-      "id": 5,
-      "task_id": 8,
-      "user_id": 4,
-      "date": "12/8/2017",
-      "hour": "22:50",
-      "time_spent": 10
-    },
-    {
-      "id": 6,
-      "task_id": 8,
-      "user_id": 4,
-      "date": "18.11.2017",
-      "hour": "16:42",
-      "time_spent": 12
-    },
-    {
-      "task_id": 3,
-      "user_id": 4,
-      "date": "12.5.2017",
-      "hour": "23:12",
-      "time_spent": "",
-      "id": 7
-    },
-    {
-      "task_id": 1,
-      "user_id": 4,
-      "date": "12.6.2017",
-      "hour": "8:37",
-      "time_spent": "",
-      "id": 8
     }
   ],
   "dayTaskUpdate": [
@@ -229,76 +553,207 @@
       "id": 1
     }
   ],
-  "pausedTask": [],
+  "pausedTask": [
+    {
+      "task_id": 1,
+      "user_id": 4,
+      "pause_date": "12.7.2017",
+      "pause_hour": "19:48",
+      "restart_date": null,
+      "restart_hour": null,
+      "id": 1
+    }
+  ],
   "preferences": [
     {
-      "id":0,
-      "day":0,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 0,
+      "dayOfWeek": 0,
+      "hourFrom": "10:00",
+      "hourTo": "15:00",
+      "workDay": false
     },
     {
-      "id":1,
-      "day":1,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 1,
+      "dayOfWeek": 1,
+      "hourFrom": "08:00",
+      "hourTo": "23:59",
+      "workDay": true
     },
     {
-      "id":2,
-      "day":2,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 2,
+      "dayOfWeek": 2,
+      "hourFrom": "00:00",
+      "hourTo": "16:00",
+      "workDay": true
     },
     {
-      "id":3,
-      "day":3,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 3,
+      "dayOfWeek": 3,
+      "hourFrom": "08:00",
+      "hourTo": "11:00",
+      "workDay": true
     },
     {
-      "id":4,
-      "day":4,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 4,
+      "dayOfWeek": 4,
+      "hourFrom": "08:00",
+      "hourTo": "16:00",
+      "workDay": true
     },
     {
-      "id":5,
-      "day":5,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 5,
+      "dayOfWeek": 5,
+      "hourFrom": "08:00",
+      "hourTo": "16:00",
+      "workDay": true
     },
     {
-      "id":6,
-      "day":6,
-      "start_hour":"08:00",
-      "finish_hour":"16:00",
-      "work_day":true
+      "id": 6,
+      "dayOfWeek": 6,
+      "hourFrom": "08:00",
+      "hourTo": "16:00",
+      "workDay": false
+    }
+  ],
+  "dayTasks": [
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "23.12.2017",
+      "time": 21,
+      "id": 1,
+      "comment": null
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "26.12.2017",
+      "time": 13,
+      "id": 2,
+      "comment": null
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "28.12.2017",
+      "comment": null,
+      "id": 3,
+      "time": 18
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "5.01.2018",
+      "time": "1",
+      "comment": null,
+      "id": 4
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "6.01.2018",
+      "time": "4",
+      "comment": null,
+      "id": 5
+    },
+    {
+      "taskId": 1052,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "1/6/2018",
+      "time": 7,
+      "comment": "komentarz dotyczacy implementacji powiadomien",
+      "id": 6
+    },
+    {
+      "taskId": 1051,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "16.01.2018",
+      "time": 5,
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "id": 7
+    },
+    {
+      "taskId": 1051,
+      "projectId": 1452,
+      "userId": 4,
+      "date": "17.01.2018",
+      "time": "6",
+      "comment": "komentarz do testowania bla bla wubaluba bla bla",
+      "id": 8
+    },
+    {
+      "taskId": 1222,
+      "projectId": 1451,
+      "userId": 4,
+      "date": "29.01.2018",
+      "time": 5,
+      "comment": "koment  o interfejsie",
+      "id": 9
+    }
+  ],
+  "raportUpdate": [
+    {
+      "date": "23.12.2017",
+      "taskId": 1052,
+      "userId": 0,
+      "projectId": 1452,
+      "time": "15",
+      "comment": null,
+      "updateDate": "2018-01-19T12:34:15.326Z",
+      "id": 1
+    },
+    {
+      "date": "28.12.2017",
+      "taskId": 1052,
+      "userId": 0,
+      "projectId": 1452,
+      "time": "30",
+      "comment": null,
+      "updateDate": "2018-01-19T12:34:36.076Z",
+      "id": 2
+    },
+    {
+      "date": "17.01.2018",
+      "taskId": 1051,
+      "userId": 0,
+      "projectId": 1452,
+      "time": "2",
+      "comment": null,
+      "updateDate": "2018-01-19T12:42:26.799Z",
+      "id": 3
     }
   ],
   "statements": [
     {
       "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
-      "id": 1343,
-      "sendDate": "2017-12-04T11:59:00+01:00",
+      "id": 14,
+      "sendDate": "2017-12-16T11:59:00+01:00",
+      "title": "Zamykanie TS"
+    },
+    {
+      "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
+      "id": 133,
+      "sendDate": "2017-12-14T13:34:00+01:00",
       "title": "Przerwa techniczna"
     },
     {
       "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
-      "id": 1108,
-      "sendDate": "2017-12-04T13:34:00+01:00",
-      "title": "Info od Bartka"
+      "id": 12,
+      "sendDate": "2017-12-14T15:00:00+01:00",
+      "title": "Lista praktykantów"
     },
     {
-      "content": "Nastapiła awaria serwera, z powodu dużej aktywności użytkowników.",
-      "id": 11345,
-      "sendDate": "2017-12-04T13:34:00+01:00",
-      "title": "Info od Bartka"
+      "content": "Z powodu końca świata, dnia 32.12.2017 wyłączyć serwery aby nie spowodować zwarcia",
+      "id": 144,
+      "sendDate": "2018-01-04T10:45:00+01:00",
+      "title": "Termin drugiej tury stażu"
     }
   ]
 }
